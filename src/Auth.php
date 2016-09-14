@@ -3,13 +3,14 @@
 namespace Rudra;
 
 
-    /**
-     * Date: 14.09.16
-     * Time: 11:16
-     * @author    : Korotkov Danila <dankorot@gmail.com>
-     * @copyright Copyright (c) 2016, Korotkov Danila
-     * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
-     */
+/**
+ * Date: 14.09.16
+ * Time: 11:16
+ * @author    : Korotkov Danila <dankorot@gmail.com>
+ * @copyright Copyright (c) 2016, Korotkov Danila
+ * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
+ */
+use App\Config\Config;
 
 /**
  * Class Auth
@@ -39,6 +40,11 @@ class Auth
     protected $token = false;
 
     /**
+     * @var
+     */
+    protected $role;
+
+    /**
      * Auth constructor.
      * @param iContainer $di
      * @param $data
@@ -48,6 +54,7 @@ class Auth
         $this->di       = $di;
         $this->email    = $data['email'];
         $this->password = $data['password'];
+        $this->role     = $data['role'];
     }
 
     /**
@@ -129,6 +136,7 @@ class Auth
             $this->getDi()->get('redirect')->run('login');
         }
     }
+
     /**
      * @return array
      */
@@ -136,6 +144,7 @@ class Auth
     {
         return [md5($this->getEmail() . $this->getPassword()), null];
     }
+
     /**
      * @return iContainer
      */
@@ -174,5 +183,25 @@ class Auth
     public function setToken($token)
     {
         $this->token = $token;
+    }
+
+    public function getRole()
+    {
+        return Config::ROLE[$this->role];
+    }
+
+    /**
+     * @param $role
+     * @param $redirect
+     * @param $notice
+     */
+    public function role($role, $redirect, $notice = 'Недостаточно прав')
+    {
+        if ($this->getRole() <= Config::ROLE[$role]) {
+            return;
+        } else {
+            $this->getDi()->setSubSession('alert', 'main', $this->getDi()->get('notice')->noticeErrorMessage($notice));
+            $this->getDi()->get('redirect')->run($redirect);
+        }
     }
 }
