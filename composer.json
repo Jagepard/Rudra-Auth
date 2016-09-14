@@ -1,0 +1,34 @@
+{
+    "name"        : "rudra/auth",
+    "description" : "The Rudra framework",
+    "version"     : "1.0.0-dev",
+    "type"        : "library",
+    "keywords"    : [
+        "rudra",
+        "auth"
+    ],
+    "license"     : "MIT",
+    "authors"     : [
+        {
+            "name"    : "Danila Korotkov (Jagepard)",
+            "email"   : "jagepard@yandex.ru",
+            "homepage": "https://jagepard.ru",
+            "role"    : "Developer"
+        }
+    ],
+    "support"     : {
+        "email": "jagepard@yandex.ru",
+        "skype": "jagepard.ru"
+    },
+    "require"     : {
+        "php": ">=7.0"
+    },
+    "require-dev" : {
+        "codeception/codeception": "*"
+    },
+    "autoload"    : {
+        "psr-4": {
+            "Rudra\\": "src/"
+        }
+    }
+}
