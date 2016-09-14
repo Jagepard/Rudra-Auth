@@ -17,5 +17,162 @@ namespace Rudra;
  */
 class Auth
 {
+    /**
+     * @var iContainer
+     */
+    protected $di;
 
+    /**
+     * @var
+     */
+    protected $email;
+
+    /**
+     * @var
+     */
+    protected $password;
+
+    /**
+     * @var bool
+     * Параметр необходимый для авторизации
+     */
+    protected $token = false;
+
+    /**
+     * Auth constructor.
+     * @param iContainer $di
+     * @param $data
+     */
+    public function __construct(iContainer $di, $data)
+    {
+        $this->di       = $di;
+        $this->email    = $data['email'];
+        $this->password = $data['password'];
+    }
+
+    /**
+     * @param null $userToken
+     * @param bool $false
+     * @param array $redirect
+     * @return bool
+     *
+     * Проверяет авторизован ли пользователь
+     * Если да, то пропускаем выполнение скрипта дальше,
+     * Если нет, то редиректим на страницу регистрации
+     */
+    public function auth($userToken = null, $false = false, $redirect = ['', 'login'])
+    {
+        if (!isset($userToken)) {
+            if ($this->isToken() === $this->getDi()->getSession('token')) {
+                return true;
+            } else {
+                (!$false) ? $this->getDi()->get('redirect')->run($redirect[0], 'https') : false;
+            }
+        } else {
+            if ($userToken === $this->isToken()) {
+                return true;
+            } else {
+                (!$false) ? $this->getDi()->get('redirect')->run($redirect[1], 'https') : false;
+            }
+        }
+    }
+
+    public function check()
+    {
+        if ($this->getDi()->hasSession('auth', true)) {
+            $this->setToken($this->getDi()->getSession('token'));
+        } else {
+            $this->setToken(false);
+            $this->getDi()->setSession('token', 'undefined');
+        }
+    }
+
+    public function logout()
+    {
+        $this->getDi()->unsetSession('auth');
+        $this->getDi()->unsetSession('token');
+        $this->getDi()->get('redirect')->run('');
+    }
+
+    /**
+     * @param $data
+     * @param $notice
+     */
+    public function login($data, $notice)
+    {
+        /**
+         * Если данные введенные в форму авторизации совпадают
+         * с данными в БД, то устанавливаем следующие параметры
+         * $_SESSION['auth']                                              boolean
+         *      - параметр подтверждающий авторизацию
+         */
+        if ($this->getEmail() == $data['name'] and $this->getPassword() == $data['pass']) {
+
+            $this->getDi()->setSession('auth', true);
+            $this->getDi()->setSession('token', $this->getUserToken()[0]);
+
+            $this->getDi()->get('redirect')->run('admin');
+            /**
+             * Если при авторизации пользователь поставил галочку "Запомнить меня",
+             * то записываем его данные в cookie
+             *
+             * $_COOKIE['HELPIO_WELCOME'] string
+             *      хеш склейки ip пользователя и заголовка User-Agent:
+             *      md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])
+             */
+            if (isset($_POST['remember_me'])) {
+                setcookie("HELPIO_WELCOME", md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']), time() + 3600 * 24 * 7);
+            }
+
+        } else {
+            $this->getDi()->setSubSession('alert', 'main', $notice);
+            $this->getDi()->get('redirect')->run('login');
+        }
+    }
+    /**
+     * @return array
+     */
+    public function getUserToken()
+    {
+        return [md5($this->getEmail() . $this->getPassword()), null];
+    }
+    /**
+     * @return iContainer
+     */
+    public function getDi(): iContainer
+    {
+        return $this->di;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * @param boolean $token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+    }
 }
