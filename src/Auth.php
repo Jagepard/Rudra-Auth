@@ -64,7 +64,6 @@ class Auth
      * @param bool $false
      * @param array $redirect
      * @return bool
-     *
      * Проверяет авторизован ли пользователь
      * Если да, то пропускаем выполнение скрипта дальше,
      * Если нет, то редиректим на страницу регистрации
@@ -72,17 +71,40 @@ class Auth
     public function auth($userToken = null, $false = false, $redirect = ['', 'login'])
     {
         if (!isset($userToken)) {
-            if ($this->isToken() === $this->getDi()->getSession('token')) {
-                return true;
-            } else {
-                (!$false) ? $this->getDi()->get('redirect')->run($redirect[0], 'https') : false;
-            }
+            $this->regularAccess($false, $redirect);
         } else {
-            if ($userToken === $this->isToken()) {
-                return true;
-            } else {
-                (!$false) ? $this->getDi()->get('redirect')->run($redirect[1], 'https') : false;
-            }
+            $this->userAcces($userToken, $false, $redirect);
+        }
+    }
+
+    /**
+     * @param $false
+     * @param $redirect
+     * @return boolean
+     * Доступ для всех авторизованных
+     */
+    public function regularAccess($false, $redirect)
+    {
+        if ($this->isToken() === $this->getDi()->getSession('token')) {
+            return true;
+        } else {
+            (!$false) ? $this->getDi()->get('redirect')->run($redirect[0], 'https') : false;
+        }
+    }
+
+    /**
+     * @param $userToken
+     * @param $false
+     * @param $redirect
+     * @return boolean
+     * Для предоставления доступа определенному пользователю
+     */
+    public function userAcces($userToken, $false, $redirect)
+    {
+        if ($userToken === $this->isToken()) {
+            return true;
+        } else {
+            (!$false) ? $this->getDi()->get('redirect')->run($redirect[1], 'https') : false;
         }
     }
 
@@ -126,7 +148,7 @@ class Auth
             $this->getDi()->setSession('auth', true);
             $this->getDi()->setSession('token', $this->getUserToken()[0]);
             $this->getDi()->get('redirect')->run('admin');
-            
+
             /**
              * Если при авторизации пользователь поставил галочку "Запомнить меня",
              * то записываем его данные в cookie
@@ -138,7 +160,6 @@ class Auth
             if ($this->getDi()->getPost('remember_me') !== null) {
                 setcookie("WELCOME", md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);
             }
-            
         } else {
             $this->getDi()->setSubSession('alert', 'main', $notice);
             $this->getDi()->get('redirect')->run('login');
