@@ -21,7 +21,7 @@ class Auth
 {
 
     /**
-     * @var iContainer
+     * @var IContainer
      */
     protected $di;
 
@@ -48,10 +48,10 @@ class Auth
 
     /**
      * Auth constructor.
-     * @param iContainer $di
+     * @param IContainer $di
      * @param $data
      */
-    public function __construct(iContainer $di, $data)
+    public function __construct(IContainer $di, $data)
     {
         $this->di       = $di;
         $this->email    = $data['email'];
@@ -147,9 +147,9 @@ class Auth
     }
 
     /**
-     * @return iContainer
+     * @return IContainer
      */
-    public function getDi(): iContainer
+    public function getDi(): IContainer
     {
         return $this->di;
     }
