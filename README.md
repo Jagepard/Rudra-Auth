@@ -22,3 +22,10 @@
             $this->getDi()->get('redirect')->run('login');
         }
     }
+
+Проверкау авторизации удобно производить в методе before, текущего или родительского класса
+
+    public function before()
+    {
+        $this->getDi()->get('auth')->check();
+    }
