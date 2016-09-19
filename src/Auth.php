@@ -86,6 +86,9 @@ class Auth
         }
     }
 
+    /**
+     * Проверка авторизации
+     */
     public function check()
     {
         if ($this->getDi()->hasSession('auth', true)) {
@@ -96,6 +99,9 @@ class Auth
         }
     }
 
+    /**
+     * Завершить сессию
+     */
     public function logout()
     {
         $this->getDi()->unsetSession('auth');
@@ -112,15 +118,15 @@ class Auth
         /**
          * Если данные введенные в форму авторизации совпадают
          * с данными в БД, то устанавливаем следующие параметры
-         * $_SESSION['auth']                                              boolean
-         *      - параметр подтверждающий авторизацию
+         * $_SESSION['auth']                                              
+         * boolean - параметр подтверждающий авторизацию
          */
         if ($this->getEmail() == $data['name'] and $this->getPassword() == $data['pass']) {
 
             $this->getDi()->setSession('auth', true);
             $this->getDi()->setSession('token', $this->getUserToken()[0]);
-
             $this->getDi()->get('redirect')->run('admin');
+            
             /**
              * Если при авторизации пользователь поставил галочку "Запомнить меня",
              * то записываем его данные в cookie
@@ -132,6 +138,7 @@ class Auth
             if ($this->getDi()->getPost('remember_me') !== null) {
                 setcookie("WELCOME", md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);
             }
+            
         } else {
             $this->getDi()->setSubSession('alert', 'main', $notice);
             $this->getDi()->get('redirect')->run('login');
@@ -140,6 +147,7 @@ class Auth
 
     /**
      * @return array
+     * Возвращает токен пользователя
      */
     public function getUserToken()
     {
@@ -195,6 +203,7 @@ class Auth
      * @param $role
      * @param $redirect
      * @param $notice
+     * Проверка на соответсвие прав доступа
      */
     public function role($role, $redirect, $notice = 'Недостаточно прав')
     {
