@@ -129,7 +129,7 @@ class Auth
              *      хеш склейки ip пользователя и заголовка User-Agent:
              *      md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])
              */
-            if (isset($this->getDi()->getPost('remember_me'))) {
+            if ($this->getDi()->getPost('remember_me') !== null) {
                 setcookie("WELCOME", md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);
             }
         } else {
