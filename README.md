@@ -1,4 +1,11 @@
 # Rudra-Auth
 Авторизация
 
-        $this->getDi()->get('auth')->login($data), $this->getDi()->get('notice')->noticeErrorMessage('Указаны неверные данные'));
+Для авторизации вызываем метод login, в который передаем 2 параметра
+1. Массив, в котором должны быть обязательно ключи:
+        ['name' => 'Имя пользователя']
+        ['pass' => 'Хеш пароля']
+2. Сообщение об ошибке, в данном случае это noticeErrorMessage('Указаны неверные данные')
+
+
+        $this->getDi()->get('auth')->login($v->get($result, ['csrf']), $this->getDi()->get('notice')->noticeErrorMessage('Указаны неверные данные'));
