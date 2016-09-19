@@ -1,15 +1,16 @@
 <?php
 
-namespace Rudra;
-
-
 /**
  * Date: 14.09.16
  * Time: 11:16
+ * 
  * @author    : Korotkov Danila <dankorot@gmail.com>
  * @copyright Copyright (c) 2016, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
+
+namespace Rudra;
+
 use App\Config\Config;
 
 /**
@@ -18,6 +19,7 @@ use App\Config\Config;
  */
 class Auth
 {
+
     /**
      * @var iContainer
      */
@@ -127,10 +129,9 @@ class Auth
              *      хеш склейки ip пользователя и заголовка User-Agent:
              *      md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])
              */
-            if (isset($_POST['remember_me'])) {
-                setcookie("HELPIO_WELCOME", md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']), time() + 3600 * 24 * 7);
+            if (isset($this->getDi()->getPost('remember_me'))) {
+                setcookie("WELCOME", md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);
             }
-
         } else {
             $this->getDi()->setSubSession('alert', 'main', $notice);
             $this->getDi()->get('redirect')->run('login');
@@ -204,4 +205,5 @@ class Auth
             $this->getDi()->get('redirect')->run($redirect);
         }
     }
+
 }
