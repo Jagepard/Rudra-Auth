@@ -3,7 +3,7 @@
 /**
  * Date: 14.09.16
  * Time: 11:16
- * 
+ *
  * @author    : Korotkov Danila <dankorot@gmail.com>
  * @copyright Copyright (c) 2016, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
@@ -15,6 +15,7 @@ use App\Config\Config;
 
 /**
  * Class Auth
+ *
  * @package Rudra
  */
 class Auth
@@ -28,12 +29,7 @@ class Auth
     /**
      * @var
      */
-    protected $email;
-
-    /**
-     * @var
-     */
-    protected $password;
+    protected $userToken;
 
     /**
      * @var bool
@@ -48,21 +44,19 @@ class Auth
 
     /**
      * Auth constructor.
+     *
      * @param IContainer $di
-     * @param $data
      */
-    public function __construct(IContainer $di, $data)
+    public function __construct(IContainer $di)
     {
-        $this->di       = $di;
-        $this->email    = $data['email'];
-        $this->password = $data['password'];
-        $this->role     = $data['role'];
+        $this->di = $di;
     }
 
     /**
-     * @param null $userToken
-     * @param bool $false
+     * @param null  $userToken
+     * @param bool  $false
      * @param array $redirect
+     *
      * @return bool
      * Проверяет авторизован ли пользователь
      * Если да, то пропускаем выполнение скрипта дальше,
@@ -80,10 +74,11 @@ class Auth
     /**
      * @param $false
      * @param $redirect
+     *
      * @return boolean
      * Доступ для всех авторизованных
      */
-    public function regularAccess($false, $redirect)
+    public function regularAccess($false = true, $redirect = ['', 'login'])
     {
         if ($this->isToken() === $this->getDi()->getSession('token')) {
             return true;
@@ -96,6 +91,7 @@ class Auth
      * @param $userToken
      * @param $false
      * @param $redirect
+     *
      * @return boolean
      * Для предоставления доступа определенному пользователю
      */
@@ -113,12 +109,31 @@ class Auth
      */
     public function check()
     {
-        if ($this->getDi()->hasSession('auth', true)) {
-            $this->setToken($this->getDi()->getSession('token'));
+        if ($this->getDi()->hasCoockie('RUDRA')) {
+
+            if (md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')) == $this->getDi()->getCoockie('RUDRA')) {
+
+                $this->getDi()->setSession('token', $this->getDi()->getCoockie('RUDRA_INVOICE'));
+                $this->getDi()->setSession('auth', true);
+                $this->setToken($this->getDi()->getCoockie('RUDRA_INVOICE'));
+
+            } else {
+                $this->getDi()->unsetCoockie('RUDRA');
+                $this->getDi()->unsetCoockie('RUDRA_INVOICE');
+
+                $this->di->get('redirect')->run('login');
+            }
+
         } else {
-            $this->setToken(false);
-            $this->getDi()->setSession('token', 'undefined');
+
+            if ($this->getDi()->hasSession('auth')) {
+                $this->setToken($this->getDi()->getSession('token'));
+            } else {
+                $this->setToken(false);
+                $this->getDi()->setSession('token', 'undefined');
+            }
         }
+
     }
 
     /**
@@ -128,51 +143,66 @@ class Auth
     {
         $this->getDi()->unsetSession('auth');
         $this->getDi()->unsetSession('token');
+
+        /**
+         * Если установлены cookie, то удаляем их
+         */
+        if ($this->getDi()->hasCoockie('RUDRA')) {
+            $this->getDi()->unsetCoockie('RUDRA');
+            $this->getDi()->unsetCoockie('RUDRA_INVOICE');
+        }
+
         $this->getDi()->get('redirect')->run('');
     }
 
     /**
-     * @param $data
+     * @param $user
+     * @param $res
      * @param $notice
      */
-    public function login($data, $notice)
+    public function login($user, array $res, string $notice)
     {
-        /**
-         * Если данные введенные в форму авторизации совпадают
-         * с данными в БД, то устанавливаем следующие параметры
-         * $_SESSION['auth']                                              
-         * boolean - параметр подтверждающий авторизацию
-         */
-        if ($this->getEmail() == $data['name'] and $this->getPassword() == $data['pass']) {
+        if (count($user) > 0) {
+            foreach ($user as $value) {
+                if ($value['pass'] == $res['pass']) {
 
-            $this->getDi()->setSession('auth', true);
-            $this->getDi()->setSession('token', $this->getUserToken()[0]);
-            $this->getDi()->get('redirect')->run('admin');
+                    $this->getDi()->setSession('auth', true);
+                    $this->getDi()->setSession('token', $this->getUserToken($value['name'], $value['pass']));
 
-            /**
-             * Если при авторизации пользователь поставил галочку "Запомнить меня",
-             * то записываем его данные в cookie
-             *
-             * $_COOKIE['HELPIO_WELCOME'] string
-             *      хеш склейки ip пользователя и заголовка User-Agent:
-             *      md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])
-             */
-            if ($this->getDi()->getPost('remember_me') !== null) {
-                setcookie("WELCOME", md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);
+                    if ($this->getDi()->hasPost('remember_me')) {
+                        setcookie("RUDRA",
+                            md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')),
+                            time() + 3600 * 24 * 7);
+                        setcookie("RUDRA_INVOICE", $this->getUserToken($value['name'], $value['pass']), time() + 3600 * 24 * 7);
+                    }
+
+                    $this->getDi()->get('redirect')->run('admin');
+
+                } else {
+                    $this->loginRedirect($notice);
+                }
             }
         } else {
-            $this->getDi()->setSubSession('alert', 'main', $notice);
-            $this->getDi()->get('redirect')->run('login');
+            $this->loginRedirect($notice);
         }
+
+    }
+
+    protected function loginRedirect($notice)
+    {
+        $this->getDi()->setSubSession('alert', 'main', $notice);
+        $this->getDi()->get('redirect')->run('login');
     }
 
     /**
-     * @return array
-     * Возвращает токен пользователя
+     * @param $name
+     * @param $pass
+     *
+     * @return string Возвращает токен пользователя
      */
-    public function getUserToken()
+    public function getUserToken($name, $pass)
     {
-        return [md5($this->getEmail() . $this->getPassword()), null];
+        return md5($name . $pass);
     }
 
     /**
@@ -181,22 +211,6 @@ class Auth
     public function getDi(): IContainer
     {
         return $this->di;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPassword()
-    {
-        return $this->password;
     }
 
     /**
