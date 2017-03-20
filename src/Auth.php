@@ -11,7 +11,7 @@
 
 namespace Rudra;
 
-use App\Config\Config;
+use App\Config;
 
 /**
  * Class Auth
@@ -48,6 +48,11 @@ class Auth
      * @param IContainer $di
      */
     public function __construct(IContainer $di)
+    {
+        $this->init($di);
+    }
+
+    public function init(IContainer $di)
     {
         $this->di = $di;
     }
@@ -109,17 +114,17 @@ class Auth
      */
     public function check()
     {
-        if ($this->getDi()->hasCoockie('RUDRA')) {
+        if ($this->getDi()->hasCookie('RUDRA')) {
 
-            if (md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')) == $this->getDi()->getCoockie('RUDRA')) {
+            if (md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')) == $this->getDi()->getCookie('RUDRA')) {
 
-                $this->getDi()->setSession('token', $this->getDi()->getCoockie('RUDRA_INVOICE'));
+                $this->getDi()->setSession('token', $this->getDi()->hasCookie('RUDRA_INVOICE'));
                 $this->getDi()->setSession('auth', true);
-                $this->setToken($this->getDi()->getCoockie('RUDRA_INVOICE'));
+                $this->setToken($this->getDi()->getCookie('RUDRA_INVOICE'));
 
             } else {
-                $this->getDi()->unsetCoockie('RUDRA');
-                $this->getDi()->unsetCoockie('RUDRA_INVOICE');
+                $this->getDi()->unsetCookie('RUDRA');
+                $this->getDi()->unsetCookie('RUDRA_INVOICE');
 
                 $this->di->get('redirect')->run('login');
             }
@@ -147,9 +152,9 @@ class Auth
         /**
          * Если установлены cookie, то удаляем их
          */
-        if ($this->getDi()->hasCoockie('RUDRA')) {
-            $this->getDi()->unsetCoockie('RUDRA');
-            $this->getDi()->unsetCoockie('RUDRA_INVOICE');
+        if ($this->getDi()->hasCookie('RUDRA')) {
+            $this->getDi()->unsetCookie('RUDRA');
+            $this->getDi()->unsetCookie('RUDRA_INVOICE');
         }
 
         $this->getDi()->get('redirect')->run('');
@@ -190,7 +195,7 @@ class Auth
 
     protected function loginRedirect($notice)
     {
-        $this->getDi()->setSubSession('alert', 'main', $notice);
+        $this->getDi()->setSession('alert', 'main', $notice);
         $this->getDi()->get('redirect')->run('login');
     }
 
@@ -245,7 +250,7 @@ class Auth
         if ($this->getRole() <= Config::ROLE[$role]) {
             return;
         } else {
-            $this->getDi()->setSubSession('alert', 'main', $this->getDi()->get('notice')->noticeErrorMessage($notice));
+            $this->getDi()->setSession('alert', 'main', $this->getDi()->get('notice')->noticeErrorMessage($notice));
             $this->getDi()->get('redirect')->run($redirect);
         }
     }
