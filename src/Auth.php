@@ -24,7 +24,7 @@ class Auth
     /**
      * @var IContainer
      */
-    protected $di;
+    protected $container;
 
     /**
      * @var
@@ -45,16 +45,11 @@ class Auth
     /**
      * Auth constructor.
      *
-     * @param IContainer $di
+     * @param IContainer $container
      */
-    public function __construct(IContainer $di)
+    public function __construct(IContainer $container)
     {
-        $this->init($di);
-    }
-
-    public function init(IContainer $di)
-    {
-        $this->di = $di;
+        $this->container = $container;
     }
 
     /**
@@ -85,10 +80,10 @@ class Auth
      */
     public function regularAccess($false = true, $redirect = ['', 'login'])
     {
-        if ($this->isToken() === $this->getDi()->getSession('token')) {
+        if ($this->isToken() === $this->container()->getSession('token')) {
             return true;
         } else {
-            (!$false) ? $this->getDi()->get('redirect')->run($redirect[0], 'https') : false;
+            (!$false) ? $this->container()->get('redirect')->run($redirect[0], 'https') : false;
         }
     }
 
@@ -105,7 +100,7 @@ class Auth
         if ($userToken === $this->isToken()) {
             return true;
         } else {
-            (!$false) ? $this->getDi()->get('redirect')->run($redirect[1], 'https') : false;
+            (!$false) ? $this->container()->get('redirect')->run($redirect[1], 'https') : false;
         }
     }
 
@@ -114,28 +109,28 @@ class Auth
      */
     public function check()
     {
-        if ($this->getDi()->hasCookie('RUDRA')) {
+        if ($this->container()->hasCookie('RUDRA')) {
 
-            if (md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')) == $this->getDi()->getCookie('RUDRA')) {
-
-                $this->getDi()->setSession('token', $this->getDi()->hasCookie('RUDRA_INVOICE'));
-                $this->getDi()->setSession('auth', true);
-                $this->setToken($this->getDi()->getCookie('RUDRA_INVOICE'));
+            if (md5($this->container()->getServer('REMOTE_ADDR') . $this->container()->getServer('HTTP_USER_AGENT'))
+                == $this->container()->getCookie('RUDRA')
+            ) {
+                $this->container()->setSession('token', $this->container()->hasCookie('RUDRA_INVOICE'));
+                $this->container()->setSession('auth', true);
+                $this->setToken($this->container()->getCookie('RUDRA_INVOICE'));
 
             } else {
-                $this->getDi()->unsetCookie('RUDRA');
-                $this->getDi()->unsetCookie('RUDRA_INVOICE');
-
-                $this->di->get('redirect')->run('login');
+                $this->container()->unsetCookie('RUDRA');
+                $this->container()->unsetCookie('RUDRA_INVOICE');
+                $this->container()->get('redirect')->run('stargate');
             }
 
         } else {
 
-            if ($this->getDi()->hasSession('auth')) {
-                $this->setToken($this->getDi()->getSession('token'));
+            if ($this->container()->hasSession('auth')) {
+                $this->setToken($this->container()->getSession('token'));
             } else {
                 $this->setToken(false);
-                $this->getDi()->setSession('token', 'undefined');
+                $this->container()->setSession('token', 'undefined');
             }
         }
 
@@ -146,18 +141,18 @@ class Auth
      */
     public function logout()
     {
-        $this->getDi()->unsetSession('auth');
-        $this->getDi()->unsetSession('token');
+        $this->container()->unsetSession('auth');
+        $this->container()->unsetSession('token');
 
         /**
          * Если установлены cookie, то удаляем их
          */
-        if ($this->getDi()->hasCookie('RUDRA')) {
-            $this->getDi()->unsetCookie('RUDRA');
-            $this->getDi()->unsetCookie('RUDRA_INVOICE');
+        if ($this->container()->hasCookie('RUDRA')) {
+            $this->container()->unsetCookie('RUDRA');
+            $this->container()->unsetCookie('RUDRA_INVOICE');
         }
 
-        $this->getDi()->get('redirect')->run('');
+        $this->container()->get('redirect')->run('');
     }
 
     /**
@@ -171,17 +166,15 @@ class Auth
             foreach ($user as $value) {
                 if ($value['pass'] == $res['pass']) {
 
-                    $this->getDi()->setSession('auth', true);
-                    $this->getDi()->setSession('token', $this->getUserToken($value['name'], $value['pass']));
+                    $this->container()->setSession('auth', true);
+                    $this->container()->setSession('token', $this->getUserToken($value['name'], $value['pass']));
 
-                    if ($this->getDi()->hasPost('remember_me')) {
-                        setcookie("RUDRA",
-                            md5($this->getDi()->getServer('REMOTE_ADDR') . $this->getDi()->getServer('HTTP_USER_AGENT')),
-                            time() + 3600 * 24 * 7);
+                    if ($this->container()->hasPost('remember_me')) {
+                        setcookie("RUDRA", md5($this->container()->getServer('REMOTE_ADDR') . $this->container()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);
                         setcookie("RUDRA_INVOICE", $this->getUserToken($value['name'], $value['pass']), time() + 3600 * 24 * 7);
                     }
 
-                    $this->getDi()->get('redirect')->run('admin');
+                    $this->container()->get('redirect')->run('admin');
 
                 } else {
                     $this->loginRedirect($notice);
@@ -195,8 +188,8 @@ class Auth
 
     protected function loginRedirect($notice)
     {
-        $this->getDi()->setSession('alert', 'main', $notice);
-        $this->getDi()->get('redirect')->run('login');
+        $this->container()->setSession('alert', 'main', $notice);
+        $this->container()->get('redirect')->run('stargate');
     }
 
     /**
@@ -213,9 +206,9 @@ class Auth
     /**
      * @return IContainer
      */
-    public function getDi(): IContainer
+    public function container(): IContainer
     {
-        return $this->di;
+        return $this->container;
     }
 
     /**
@@ -250,9 +243,10 @@ class Auth
         if ($this->getRole() <= Config::ROLE[$role]) {
             return;
         } else {
-            $this->getDi()->setSession('alert', 'main', $this->getDi()->get('notice')->noticeErrorMessage($notice));
-            $this->getDi()->get('redirect')->run($redirect);
+            $this->container()->setSession(
+                'alert', 'main', $this->container()->get('notice')->noticeErrorMessage($notice)
+            );
+            $this->container()->get('redirect')->run($redirect);
         }
     }
-
 }
