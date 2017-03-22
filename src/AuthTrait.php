@@ -1,0 +1,43 @@
+<?php
+/**
+ * Date: 22.03.17
+ * Time: 13:03
+ *
+ * @author    : Korotkov Danila <dankorot@gmail.com>
+ * @copyright Copyright (c) 2016, Korotkov Danila
+ * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
+ */
+
+namespace Rudra;
+
+
+trait AuthTrait
+{
+
+    /**
+     * @param        $user
+     * @param        $res
+     * @param string $message
+     *
+     * @return mixed
+     */
+    public function login($user, $res, $message = 'Укажите верные данные')
+    {
+        $this->container()->get('auth')->login($user, $res, $message);
+    }
+
+    public function logout()
+    {
+        $this->container()->get('auth')->logout();
+    }
+
+    public function check()
+    {
+        $this->container()->get('auth')->check();
+    }
+
+    public function auth()
+    {
+        $this->container()->get('auth')->auth();
+    }
+}
