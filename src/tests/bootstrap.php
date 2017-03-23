@@ -9,6 +9,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
 
-require_once 'stub/Redirect.php';
+
 require_once dirname(__DIR__) . '/Auth.php';
+require_once dirname(__DIR__) . '/AuthTrait.php';
 require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
+require_once 'stub/StubClass.php';
