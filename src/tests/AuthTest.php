@@ -2,7 +2,6 @@
 
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 use Rudra\Container;
-use stub\Redirect;
 
 /**
  * Date: 17.02.17
@@ -17,92 +16,79 @@ use stub\Redirect;
 class AuthTest extends PHPUnit_Framework_TestCase
 {
 
-    protected $auth;
-    protected $container;
+    protected $stubClass;
 
     protected function setUp()
     {
-        $this->container = Container::app();
-        $this->auth      = new \Rudra\Auth($this->container);
-
-        $this->auth->setToken(true);
-        $this->container->set('redirect', new Redirect(), 'raw');
+        $this->stubClass = new StubClass(Container::app());
     }
 
     public function testRegularAccess()
     {
-        $this->container()->setSession('token', true);
-        $this->auth()->setToken(true);
-        $this->assertTrue($this->auth()->auth());
+        $this->stubClass()->container()->setSession('token', true);
+        $this->stubClass()->container()->get('auth')->setToken(true);
+        $this->assertTrue($this->stubClass()->auth());
 
-        $this->container()->setSession('token', 'undefined');
-        $this->auth()->setToken(false);
-        $this->assertFalse($this->auth()->auth(true));
-        $this->assertNull($this->auth()->auth());
+        $this->stubClass()->container()->setSession('token', 'undefined');
+        $this->stubClass()->container()->get('auth')->setToken(false);
+        $this->assertFalse($this->stubClass()->auth(true));
+        $this->assertNull($this->stubClass()->auth());
     }
 
     public function testUserAccess()
     {
-        $this->container()->setSession('token', 'userIdToken');
-        $this->auth()->setToken('userIdToken');
-        $this->assertTrue($this->auth()->auth(false, 'userIdToken'));
+        $this->stubClass()->container()->setSession('token', 'userIdToken');
+        $this->stubClass()->container()->get('auth')->setToken('userIdToken');
+        $this->assertTrue($this->stubClass()->auth(false, 'userIdToken'));
 
-        $this->auth()->setToken(false);
-        $this->container()->unsetSession('token');
-        $this->assertFalse($this->auth()->auth(true, 'userIdToken'));
-        $this->assertNull($this->auth()->auth(false, 'userIdToken'));
+        $this->stubClass()->container()->get('auth')->setToken(false);
+        $this->stubClass()->container()->unsetSession('token');
+        $this->assertFalse($this->stubClass()->auth(true, 'userIdToken'));
+        $this->assertNull($this->stubClass()->auth(false, 'userIdToken'));
     }
-
 
     public function testCheck()
     {
-        $this->auth()->check();
-        $this->assertFalse($this->auth()->isToken());
+        $this->stubClass()->check();
+        $this->assertFalse($this->stubClass()->container()->get('auth')->isToken());
 
-        $this->container()->setSession('token', 'userIdToken');
-        $this->auth()->check();
-        $this->assertEquals('userIdToken', $this->container()->getSession('token'));
+        $this->stubClass()->container()->setSession('token', 'userIdToken');
+        $this->stubClass()->check();
+        $this->assertEquals('userIdToken', $this->stubClass()->container()->getSession('token'));
 
         /* Установка данных для remember_me */
-        $this->container()->setServer([
+        $this->stubClass()->container()->setServer([
             'REMOTE_ADDR'     => '127.0.0.1',
             'HTTP_USER_AGENT' => 'Mozilla'
         ]);
 
-        $this->container()->setCookie('RUDRA', md5($this->container()->getServer('REMOTE_ADDR')
-            . $this->container()->getServer('HTTP_USER_AGENT')));
+        $this->stubClass()->container()->setCookie('RUDRA', md5($this->stubClass()->container()->getServer('REMOTE_ADDR')
+            . $this->stubClass()->container()->getServer('HTTP_USER_AGENT')));
 
-        $this->container()->setCookie('RUDRA_INVOICE', $this->auth()->getUserToken('user', 'password'));
+        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', $this->stubClass()->container()->get('auth')->getUserToken('user', 'password'));
 
-        $this->auth()->check();
-        $this->assertEquals($this->auth()->getUserToken('user', 'password'), $this->container()->getSession('token'));
+        $this->stubClass()->check();
+        $this->assertEquals($this->stubClass()->container()->get('auth')->getUserToken('user', 'password'),
+            $this->stubClass()->container()->getSession('token'));
 
-        $this->container()->setServer([
+        $this->stubClass()->container()->setServer([
             'REMOTE_ADDR'     => '127.0.0.1',
             'HTTP_USER_AGENT' => 'Chrome'
         ]);
 
-        $this->container()->setCookie('RUDRA', md5($this->container()->getServer('REMOTE_ADDR')
-            . $this->container()->getServer('HTTP_USER_AGENT')));
+        $this->stubClass()->container()->setCookie('RUDRA', md5($this->stubClass()->container()->getServer('REMOTE_ADDR')
+            . $this->stubClass()->container()->getServer('HTTP_USER_AGENT')));
 
-        $this->container()->setCookie('RUDRA_INVOICE', $this->auth()->getUserToken('user', 'password'));
+        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', $this->stubClass()->container()->get('auth')->getUserToken('user', 'password'));
 
-        $this->assertNull($this->auth()->check());
+        $this->assertNull($this->stubClass()->check());
     }
 
     /**
      * @return mixed
      */
-    public function auth()
+    public function stubClass()
     {
-        return $this->auth;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function container()
-    {
-        return $this->container;
+        return $this->stubClass;
     }
 }
