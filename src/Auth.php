@@ -132,13 +132,13 @@ class Auth
             if (md5($this->container()->getServer('REMOTE_ADDR') . $this->container()->getServer('HTTP_USER_AGENT'))
                 == $this->container()->getCookie('RUDRA')
             ) {
-                $this->container()->setSession('token', $this->container()->hasCookie('RUDRA_INVOICE'));
-                $this->container()->setSession('auth', true);
-                $this->setToken($this->container()->getCookie('RUDRA_INVOICE'));
-
+                $this->container()->setSession('token', $this->container()->getCookie('RUDRA_INVOICE'));
+                $this->setToken($this->container()->getSession('token'));
             } else {
+                // @codeCoverageIgnoreStart
                 $this->container()->unsetCookie('RUDRA');
                 $this->container()->unsetCookie('RUDRA_INVOICE');
+                // @codeCoverageIgnoreEnd
                 $this->container()->get('redirect')->run('stargate');
             }
 
@@ -150,7 +150,6 @@ class Auth
                 $this->setToken(false);
             }
         }
-
     }
 
     /**
