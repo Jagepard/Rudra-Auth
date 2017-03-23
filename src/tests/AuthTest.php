@@ -16,6 +16,7 @@ use stub\Redirect;
  */
 class AuthTest extends PHPUnit_Framework_TestCase
 {
+
     protected $auth;
     protected $container;
 
@@ -50,6 +51,43 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->container()->unsetSession('token');
         $this->assertFalse($this->auth()->auth(true, 'userIdToken'));
         $this->assertNull($this->auth()->auth(false, 'userIdToken'));
+    }
+
+
+    public function testCheck()
+    {
+        $this->auth()->check();
+        $this->assertFalse($this->auth()->isToken());
+
+        $this->container()->setSession('token', 'userIdToken');
+        $this->auth()->check();
+        $this->assertEquals('userIdToken', $this->container()->getSession('token'));
+
+        /* Установка данных для remember_me */
+        $this->container()->setServer([
+            'REMOTE_ADDR'     => '127.0.0.1',
+            'HTTP_USER_AGENT' => 'Mozilla'
+        ]);
+
+        $this->container()->setCookie('RUDRA', md5($this->container()->getServer('REMOTE_ADDR')
+            . $this->container()->getServer('HTTP_USER_AGENT')));
+
+        $this->container()->setCookie('RUDRA_INVOICE', $this->auth()->getUserToken('user', 'password'));
+
+        $this->auth()->check();
+        $this->assertEquals($this->auth()->getUserToken('user', 'password'), $this->container()->getSession('token'));
+
+        $this->container()->setServer([
+            'REMOTE_ADDR'     => '127.0.0.1',
+            'HTTP_USER_AGENT' => 'Chrome'
+        ]);
+
+        $this->container()->setCookie('RUDRA', md5($this->container()->getServer('REMOTE_ADDR')
+            . $this->container()->getServer('HTTP_USER_AGENT')));
+
+        $this->container()->setCookie('RUDRA_INVOICE', $this->auth()->getUserToken('user', 'password'));
+
+        $this->assertNull($this->auth()->check());
     }
 
     /**
