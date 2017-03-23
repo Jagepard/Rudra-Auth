@@ -136,8 +136,8 @@ class Auth
                 $this->setToken($this->container()->getSession('token'));
             } else {
                 // @codeCoverageIgnoreStart
-                $this->container()->unsetCookie('RUDRA');
-                $this->container()->unsetCookie('RUDRA_INVOICE');
+                $this->container()->unsetCookie('RUDRA'); // @codeCoverageIgnore
+                $this->container()->unsetCookie('RUDRA_INVOICE'); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
                 $this->container()->get('redirect')->run('stargate');
             }
