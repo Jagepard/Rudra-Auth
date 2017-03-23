@@ -36,8 +36,15 @@ trait AuthTrait
         $this->container()->get('auth')->check();
     }
 
-    public function auth()
+    /**
+     * @param bool  $accessOrRedirect
+     * @param null  $userToken
+     * @param array $redirect
+     *
+     * @return mixed
+     */
+    public function auth($accessOrRedirect = false, $userToken = null, $redirect = ['', 'login'])
     {
-        $this->container()->get('auth')->auth();
+        return $this->container()->get('auth')->auth($accessOrRedirect, $userToken, $redirect);
     }
 }
