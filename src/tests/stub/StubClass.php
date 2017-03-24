@@ -12,13 +12,24 @@ use Rudra\AuthTrait;
 use Rudra\IContainer;
 use Rudra\Auth;
 
+/**
+ * Class StubClass
+ */
 class StubClass
 {
 
     use AuthTrait;
 
+    /**
+     * @var IContainer
+     */
     protected $container;
 
+    /**
+     * StubClass constructor.
+     *
+     * @param IContainer $container
+     */
     public function __construct(IContainer $container)
     {
         $this->container = $container;
