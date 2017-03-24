@@ -11,6 +11,11 @@
 namespace Rudra;
 
 
+/**
+ * Class AuthTrait
+ *
+ * @package Rudra
+ */
 trait AuthTrait
 {
 
