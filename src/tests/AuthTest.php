@@ -26,8 +26,9 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->stubClass = new StubClass(Container::app());
     }
 
-    public function testRegularAccess()
+    public function testAccess()
     {
+        /* Regular Access */
         $this->stubClass()->container()->setSession('token', true);
         $this->stubClass()->container()->get('auth')->setToken(true);
         $this->assertTrue($this->stubClass()->auth());
@@ -36,10 +37,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->stubClass()->container()->get('auth')->setToken(false);
         $this->assertFalse($this->stubClass()->auth(true));
         $this->assertNull($this->stubClass()->auth());
-    }
 
-    public function testUserAccess()
-    {
+        /* User Access */
         $this->stubClass()->container()->setSession('token', 'userIdToken');
         $this->stubClass()->container()->get('auth')->setToken('userIdToken');
         $this->assertTrue($this->stubClass()->auth(false, 'userIdToken'));
