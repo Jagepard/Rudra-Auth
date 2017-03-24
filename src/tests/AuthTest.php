@@ -73,8 +73,6 @@ class AuthTest extends PHPUnit_Framework_TestCase
             'REMOTE_ADDR'     => '127.0.0.1',
             'HTTP_USER_AGENT' => 'Chrome'
         ]);
-        $this->stubClass()->container()->setCookie('RUDRA', md5($this->stubClass()->container()->getServer('REMOTE_ADDR')
-            . $this->stubClass()->container()->getServer('HTTP_USER_AGENT')));
         $this->stubClass()->container()->setCookie('RUDRA_INVOICE', md5('user', 'password'));
         $this->assertNull($this->stubClass()->check());
     }
