@@ -82,7 +82,7 @@ class Auth
     {
         /* Если авторизован $this->container()->getSession('token') == true */
         if ($this->container()->hasSession('token')) {
-            if ($this->isToken() == $this->container()->getSession('token')) {
+            if ($this->getToken() == $this->container()->getSession('token')) {
                 return true;
             }
         }
@@ -108,7 +108,7 @@ class Auth
     {
         /* Если авторизован $this->container()->getSession('token') == true */
         if ($this->container()->hasSession('token')) {
-            if ($userToken === $this->isToken()) {
+            if ($userToken === $this->getToken()) {
                 return true;
             }
         }
@@ -136,9 +136,10 @@ class Auth
                 $this->setToken($this->container()->getSession('token'));
             } else {
                 // @codeCoverageIgnoreStart
-                $this->container()->unsetCookie('RUDRA'); // @codeCoverageIgnore
+                $this->container()->unsetCookie('RUDRA');         // @codeCoverageIgnore
                 $this->container()->unsetCookie('RUDRA_INVOICE'); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
+
                 $this->container()->get('redirect')->run('stargate');
             }
 
@@ -157,7 +158,6 @@ class Auth
      */
     public function logout()
     {
-        $this->container()->unsetSession('auth');
         $this->container()->unsetSession('token');
 
         /**
@@ -172,52 +172,39 @@ class Auth
     }
 
     /**
-     * @param $user
-     * @param $res
-     * @param $notice
+     * @param        $usersFromDb
+     * @param array  $inputData
+     * @param string $notice
      */
-    public function login($user, array $res, string $notice)
+    public function login($usersFromDb, array $inputData, string $notice)
     {
-        if (count($user) > 0) {
-            foreach ($user as $value) {
-                if ($value['pass'] == $res['pass']) {
+        if (count($usersFromDb) > 0) {
 
-                    $this->container()->setSession('auth', true);
+            foreach ($usersFromDb as $user) {
 
-                    $this->container()->setSession('token', $this->getUserToken($value['name'], $value['pass']));
+                if ($user['pass'] == $inputData['pass']) {
+                    $this->container()->setSession('token', md5($user['name'], $user['pass']));
 
                     if ($this->container()->hasPost('remember_me')) {
-                        setcookie("RUDRA", md5($this->container()->getServer('REMOTE_ADDR') . $this->container()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);
-                        setcookie("RUDRA_INVOICE", $this->getUserToken($value['name'], $value['pass']), time() + 3600 * 24 * 7);
+                        setcookie("RUDRA", md5($this->container()->getServer('REMOTE_ADDR')                    // @codeCoverageIgnore
+                            . $this->container()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);      // @codeCoverageIgnore
+                        setcookie("RUDRA_INVOICE", md5($user['name'], $user['pass']), time() + 3600 * 24 * 7); // @codeCoverageIgnore
                     }
 
-                    $this->container()->get('redirect')->run('admin');
-
-                } else {
-                    $this->loginRedirect($notice);
+                    return $this->container()->get('redirect')->run('admin');
                 }
+
+                return $this->loginRedirect($notice);
             }
-        } else {
-            $this->loginRedirect($notice);
         }
 
+        return $this->loginRedirect($notice);
     }
 
     protected function loginRedirect($notice)
     {
         $this->container()->setSession('alert', 'main', $notice);
         $this->container()->get('redirect')->run('stargate');
-    }
-
-    /**
-     * @param $name
-     * @param $pass
-     *
-     * @return string Возвращает токен пользователя
-     */
-    public function getUserToken($name, $pass)
-    {
-        return md5($name . $pass);
     }
 
     /**
@@ -231,7 +218,7 @@ class Auth
     /**
      * @return boolean
      */
-    public function isToken()
+    public function getToken()
     {
         return $this->token;
     }
