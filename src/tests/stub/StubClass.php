@@ -32,8 +32,14 @@ class StubClass
      */
     public function __construct(IContainer $container)
     {
+        $roles = [
+            'admin'    => 1,
+            'redactor' => 3,
+            'editor'   => 5
+        ];
+
         $this->container = $container;
-        $this->container->set('auth', new Auth($this->container), 'raw');
+        $this->container->set('auth', new Auth($this->container, $roles), 'raw');
         $this->container->set('redirect', $this, 'raw');
     }
 
