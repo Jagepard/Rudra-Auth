@@ -114,20 +114,20 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
     public function testRole()
     {
-        $this->assertTrue($this->stubClass()->container()->get('auth')->role('admin', 'admin'));
-        $this->assertTrue($this->stubClass()->container()->get('auth')->role('admin', 'redactor'));
-        $this->assertTrue($this->stubClass()->container()->get('auth')->role('admin', 'editor'));
+        $this->assertTrue($this->stubClass()->role('admin', 'admin'));
+        $this->assertTrue($this->stubClass()->role('admin', 'redactor'));
+        $this->assertTrue($this->stubClass()->role('admin', 'editor'));
 
-        $this->assertFalse($this->stubClass()->container()->get('auth')->role('redactor', 'admin'));
-        $this->assertNull($this->stubClass()->container()->get('auth')->role('redactor', 'admin', true));
-        $this->assertTrue($this->stubClass()->container()->get('auth')->role('redactor', 'redactor'));
-        $this->assertTrue($this->stubClass()->container()->get('auth')->role('redactor', 'editor'));
+        $this->assertFalse($this->stubClass()->role('redactor', 'admin'));
+        $this->assertNull($this->stubClass()->role('redactor', 'admin', true));
+        $this->assertTrue($this->stubClass()->role('redactor', 'redactor'));
+        $this->assertTrue($this->stubClass()->role('redactor', 'editor'));
 
-        $this->assertFalse($this->stubClass()->container()->get('auth')->role('editor', 'admin'));
-        $this->assertFalse($this->stubClass()->container()->get('auth')->role('editor', 'redactor'));
-        $this->assertNull($this->stubClass()->container()->get('auth')->role('editor', 'admin', true));
-        $this->assertNull($this->stubClass()->container()->get('auth')->role('editor', 'redactor', true));
-        $this->assertTrue($this->stubClass()->container()->get('auth')->role('editor', 'editor'));
+        $this->assertFalse($this->stubClass()->role('editor', 'admin'));
+        $this->assertFalse($this->stubClass()->role('editor', 'redactor'));
+        $this->assertNull($this->stubClass()->role('editor', 'admin', true));
+        $this->assertNull($this->stubClass()->role('editor', 'redactor', true));
+        $this->assertTrue($this->stubClass()->role('editor', 'editor'));
     }
 
     /**
