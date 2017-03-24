@@ -108,6 +108,13 @@ class AuthTest extends PHPUnit_Framework_TestCase
         ]));
     }
 
+    public function testLogout()
+    {
+        unset($_COOKIE['RUDRA']);
+        $this->assertNull($this->stubClass()->logout());
+        $this->assertFalse($this->stubClass()->container()->hasSession('token'));
+    }
+
     /**
      * @return mixed
      */
