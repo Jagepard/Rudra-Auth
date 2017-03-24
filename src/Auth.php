@@ -160,12 +160,11 @@ class Auth
     {
         $this->container()->unsetSession('token');
 
-        /**
-         * Если установлены cookie, то удаляем их
-         */
         if ($this->container()->hasCookie('RUDRA')) {
-            $this->container()->unsetCookie('RUDRA');
-            $this->container()->unsetCookie('RUDRA_INVOICE');
+            // @codeCoverageIgnoreStart
+            $this->container()->unsetCookie('RUDRA'); // @codeCoverageIgnore
+            $this->container()->unsetCookie('RUDRA_INVOICE'); // @codeCoverageIgnore
+            // @codeCoverageIgnoreEnd
         }
 
         $this->container()->get('redirect')->run('');
