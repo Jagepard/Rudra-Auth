@@ -65,25 +65,32 @@ class Auth
     public function auth($accessOrRedirect = false, $userToken = null, $redirect = ['', 'login'])
     {
         if (!isset($userToken)) {
-            return $this->regularAccess($accessOrRedirect, $redirect);
+            return $this->access($accessOrRedirect, null, $redirect[0]);
         }
 
-        return $this->userAccess($userToken, $accessOrRedirect, $redirect);
+        return $this->access($accessOrRedirect, $userToken, $redirect[1]);
     }
 
     /**
-     * @param $accessOrRedirect
-     * @param $redirect
+     * @param bool   $accessOrRedirect
+     * @param null   $userToken
+     * @param string $redirect
      *
-     * @return boolean
-     * Доступ для всех авторизованных
+     * @return bool
      */
-    public function regularAccess($accessOrRedirect = false, $redirect = ['', 'login'])
+    public function access($accessOrRedirect = false, $userToken = null, $redirect = '')
     {
         /* Если авторизован $this->container()->getSession('token') == true */
         if ($this->container()->hasSession('token')) {
-            if ($this->getToken() == $this->container()->getSession('token')) {
-                return true;
+
+            if (isset($userToken)) {
+                if ($userToken === $this->getToken()) {
+                    return true;
+                }
+            } else {
+                if ($this->getToken() == $this->container()->getSession('token')) {
+                    return true;
+                }
             }
         }
 
@@ -93,33 +100,7 @@ class Auth
         }
 
         /* Переадресация, если $accessOrRedirect не установлен*/
-        $this->container()->get('redirect')->run($redirect[0], 'https');
-    }
-
-    /**
-     * @param $userToken
-     * @param $accessOrRedirect
-     * @param $redirect
-     *
-     * @return boolean
-     * Для предоставления доступа определенному пользователю
-     */
-    public function userAccess($userToken, $accessOrRedirect = false, $redirect = ['', 'login'])
-    {
-        /* Если авторизован $this->container()->getSession('token') == true */
-        if ($this->container()->hasSession('token')) {
-            if ($userToken === $this->getToken()) {
-                return true;
-            }
-        }
-
-        /* Если не авторизован $this->container()->getSession('token') == 'undefined' */
-        if ($accessOrRedirect) {
-            return false;
-        }
-
-        /* Переадресация, если $accessOrRedirect не установлен*/
-        $this->container()->get('redirect')->run($redirect[1]);
+        $this->container()->get('redirect')->run($redirect, 'https');
     }
 
     /**
