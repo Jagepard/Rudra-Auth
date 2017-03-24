@@ -46,10 +46,12 @@ class Auth
      * Auth constructor.
      *
      * @param IContainer $container
+     * @param array      $roles
      */
-    public function __construct(IContainer $container)
+    public function __construct(IContainer $container, array $roles = [])
     {
         $this->container = $container;
+        $this->role      = $roles;
     }
 
     /**
@@ -170,10 +172,26 @@ class Auth
         return $this->loginRedirect($notice);
     }
 
-    protected function loginRedirect($notice)
+    /**
+     * @param        $role
+     * @param        $privilege
+     * @param bool   $redirectOrAccess
+     * @param string $redirect
+     *
+     * @return bool
+     */
+    public function role($role, $privilege, $redirectOrAccess = false, $redirect = '')
     {
-        $this->container()->setSession('alert', 'main', $notice);
-        $this->container()->get('redirect')->run('stargate');
+        if ($this->getRole($role) <= $this->getRole($privilege)) {
+            return true;
+        }
+
+        /* Если не авторизован $this->container()->getSession('token') == 'undefined' */
+        if (!$redirectOrAccess) {
+            return false;
+        }
+
+        $this->container()->get('redirect')->run($redirect);
     }
 
     /**
@@ -200,27 +218,20 @@ class Auth
         $this->token = $token;
     }
 
-    public function getRole()
+    /**
+     * @param $key
+     *
+     * @return mixed
+     */
+    public function getRole($key)
     {
-        return Config::ROLE[$this->role];
+        return $this->role[$key];
     }
 
-    /**
-     * @param $role
-     * @param $redirect
-     * @param $notice
-     * Проверка на соответсвие прав доступа
-     */
-    public function role($role, $redirect, $notice = 'Недостаточно прав')
+    protected function loginRedirect($notice)
     {
-        if ($this->getRole() <= Config::ROLE[$role]) {
-            return;
-        } else {
-            $this->container()->setSession(
-                'alert', 'main', $this->container()->get('notice')->noticeErrorMessage($notice)
-            );
-            $this->container()->get('redirect')->run($redirect);
-        }
+        $this->container()->setSession('alert', 'main', $notice);
+        $this->container()->get('redirect')->run('stargate');
     }
 
     protected function unsetCookie()
