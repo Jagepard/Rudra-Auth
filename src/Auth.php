@@ -135,11 +135,7 @@ class Auth
                 $this->container()->setSession('token', $this->container()->getCookie('RUDRA_INVOICE'));
                 $this->setToken($this->container()->getSession('token'));
             } else {
-                // @codeCoverageIgnoreStart
-                $this->container()->unsetCookie('RUDRA');         // @codeCoverageIgnore
-                $this->container()->unsetCookie('RUDRA_INVOICE'); // @codeCoverageIgnore
-                // @codeCoverageIgnoreEnd
-
+                $this->unsetCookie();
                 $this->container()->get('redirect')->run('stargate');
             }
 
@@ -159,14 +155,7 @@ class Auth
     public function logout()
     {
         $this->container()->unsetSession('token');
-
-        if ($this->container()->hasCookie('RUDRA')) {
-            // @codeCoverageIgnoreStart
-            $this->container()->unsetCookie('RUDRA'); // @codeCoverageIgnore
-            $this->container()->unsetCookie('RUDRA_INVOICE'); // @codeCoverageIgnore
-            // @codeCoverageIgnoreEnd
-        }
-
+        $this->unsetCookie();
         $this->container()->get('redirect')->run('');
     }
 
@@ -250,6 +239,18 @@ class Auth
                 'alert', 'main', $this->container()->get('notice')->noticeErrorMessage($notice)
             );
             $this->container()->get('redirect')->run($redirect);
+        }
+    }
+
+    protected function unsetCookie()
+    {
+        if (DEV !== 'test') {
+            // @codeCoverageIgnoreStart
+            if ($this->container()->hasCookie('RUDRA')) {
+                $this->container()->unsetCookie('RUDRA'); // @codeCoverageIgnore
+                $this->container()->unsetCookie('RUDRA_INVOICE'); // @codeCoverageIgnore
+                // @codeCoverageIgnoreEnd
+            }
         }
     }
 }
