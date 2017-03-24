@@ -9,6 +9,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
 
+define('DEV', 'test');
 
 require_once dirname(__DIR__) . '/Auth.php';
 require_once dirname(__DIR__) . '/AuthTrait.php';
