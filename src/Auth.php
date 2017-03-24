@@ -11,8 +11,6 @@
 
 namespace Rudra;
 
-use App\Config;
-
 /**
  * Class Auth
  *
