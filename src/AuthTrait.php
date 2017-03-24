@@ -52,4 +52,17 @@ trait AuthTrait
     {
         return $this->container()->get('auth')->auth($accessOrRedirect, $userToken, $redirect);
     }
+
+    /**
+     * @param        $role
+     * @param        $privilege
+     * @param bool   $redirectOrAccess
+     * @param string $redirect
+     *
+     * @return mixed
+     */
+    public function role($role, $privilege, $redirectOrAccess = false, $redirect = '')
+    {
+        return $this->container()->get('auth')->role($role, $privilege, $redirectOrAccess, $redirect);
+    }
 }
