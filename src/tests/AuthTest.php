@@ -1,7 +1,6 @@
 <?php
 
-use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
-use Rudra\Container;
+declare(strict_types = 1);
 
 /**
  * Date: 17.02.17
@@ -13,6 +12,15 @@ use Rudra\Container;
  *
  *  phpunit src/tests/AuthTest --coverage-html src/tests/build/coverage-html
  */
+
+
+use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
+use Rudra\Container;
+
+
+/**
+ * Class AuthTest
+ */
 class AuthTest extends PHPUnit_Framework_TestCase
 {
 
@@ -21,15 +29,15 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     protected $stubClass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->stubClass = new StubClass(Container::app());
     }
 
-    public function testAccess()
+    public function testAccess(): void
     {
         /* Regular Access */
-        $this->stubClass()->container()->setSession('token', true);
+        $this->stubClass()->container()->setSession('token', '1');
         $this->stubClass()->container()->get('auth')->setToken(true);
         $this->assertTrue($this->stubClass()->auth());
 
@@ -49,7 +57,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->stubClass()->auth(false, 'userIdToken'));
     }
 
-    public function testCheck()
+    public function testCheck(): void
     {
         $this->stubClass()->check();
         $this->assertFalse($this->stubClass()->container()->get('auth')->getToken());
@@ -64,19 +72,19 @@ class AuthTest extends PHPUnit_Framework_TestCase
         ]);
         $this->stubClass()->container()->setCookie('RUDRA', md5($this->stubClass()->container()->getServer('REMOTE_ADDR')
             . $this->stubClass()->container()->getServer('HTTP_USER_AGENT')));
-        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', md5('user', 'password'));
+        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', md5('user' . 'password'));
         $this->stubClass()->check();
-        $this->assertEquals(md5('user', 'password'), $this->stubClass()->container()->getSession('token'));
+        $this->assertEquals(md5('user' . 'password'), $this->stubClass()->container()->getSession('token'));
 
         $this->stubClass()->container()->setServer([
             'REMOTE_ADDR'     => '127.0.0.1',
             'HTTP_USER_AGENT' => 'Chrome'
         ]);
-        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', md5('user', 'password'));
+        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', md5('user' . 'password'));
         $this->assertNull($this->stubClass()->check());
     }
 
-    public function testLogin()
+    public function testLogin(): void
     {
         $usersFromDb = [[
             'id'   => '1',
@@ -90,7 +98,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
             'pass' => 'password'
         ]));
 
-        $this->assertEquals(md5('user', 'password'), $this->stubClass()->container()->getSession('token'));
+        $this->assertEquals(md5('user' . 'password'), $this->stubClass()->container()->getSession('token'));
 
         $this->assertNull($this->stubClass()->login($usersFromDb, [
             'name' => 'userFalse',
@@ -105,14 +113,14 @@ class AuthTest extends PHPUnit_Framework_TestCase
         ]));
     }
 
-    public function testLogout()
+    public function testLogout(): void
     {
         unset($_COOKIE['RUDRA']);
         $this->assertNull($this->stubClass()->logout());
         $this->assertFalse($this->stubClass()->container()->hasSession('token'));
     }
 
-    public function testRole()
+    public function testRole(): void
     {
         $this->assertTrue($this->stubClass()->role('admin', 'admin'));
         $this->assertTrue($this->stubClass()->role('admin', 'redactor'));
@@ -131,9 +139,9 @@ class AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return mixed
+     * @return StubClass
      */
-    public function stubClass()
+    public function stubClass(): StubClass
     {
         return $this->stubClass;
     }

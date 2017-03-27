@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Date: 23.03.17
  * Time: 14:31
@@ -8,9 +11,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
 
+
 use Rudra\AuthTrait;
 use Rudra\IContainer;
 use Rudra\Auth;
+
 
 /**
  * Class StubClass
@@ -54,9 +59,9 @@ class StubClass
     }
 
     /**
-     * @return mixed
+     * @return IContainer
      */
-    public function container()
+    public function container(): IContainer
     {
         return $this->container;
     }
