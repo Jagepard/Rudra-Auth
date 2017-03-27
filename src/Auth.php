@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Date: 14.09.16
  * Time: 11:16
@@ -25,7 +27,7 @@ class Auth
     protected $container;
 
     /**
-     * @var
+     * @var string
      */
     protected $userToken;
 
@@ -36,7 +38,7 @@ class Auth
     protected $token = false;
 
     /**
-     * @var
+     * @var array
      */
     protected $role;
 
@@ -53,16 +55,16 @@ class Auth
     }
 
     /**
-     * @param null  $userToken
-     * @param bool  $accessOrRedirect
-     * @param array $redirect
+     * @param bool        $accessOrRedirect
+     * @param string|null $userToken
+     * @param array       $redirect
      *
-     * @return bool
      * Проверяет авторизован ли пользователь
      * Если да, то пропускаем выполнение скрипта дальше,
      * Если нет, то редиректим на страницу регистрации
+     * @return bool
      */
-    public function auth($accessOrRedirect = false, $userToken = null, $redirect = ['', 'login'])
+    public function auth(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login'])
     {
         if (!isset($userToken)) {
             return $this->access($accessOrRedirect, null, $redirect[0]);
@@ -72,13 +74,13 @@ class Auth
     }
 
     /**
-     * @param bool   $accessOrRedirect
-     * @param null   $userToken
-     * @param string $redirect
+     * @param bool        $accessOrRedirect
+     * @param string|null $userToken
+     * @param string      $redirect
      *
      * @return bool
      */
-    public function access($accessOrRedirect = false, $userToken = null, $redirect = '')
+    public function access(bool $accessOrRedirect = false, string $userToken = null, string $redirect = '')
     {
         /* Если авторизован $this->container()->getSession('token') == true */
         if ($this->container()->hasSession('token')) {
@@ -106,7 +108,7 @@ class Auth
     /**
      * Проверка авторизации
      */
-    public function check()
+    public function check(): void
     {
         if ($this->container()->hasCookie('RUDRA')) {
 
@@ -133,7 +135,7 @@ class Auth
     /**
      * Завершить сессию
      */
-    public function logout()
+    public function logout(): void
     {
         $this->container()->unsetSession('token');
         $this->unsetCookie();
@@ -141,23 +143,23 @@ class Auth
     }
 
     /**
-     * @param        $usersFromDb
-     * @param array  $inputData
-     * @param string $notice
+     * @param iterable $usersFromDb
+     * @param array    $inputData
+     * @param string   $notice
      */
-    public function login($usersFromDb, array $inputData, string $notice)
+    public function login(iterable $usersFromDb, array $inputData, string $notice)
     {
         if (count($usersFromDb) > 0) {
 
             foreach ($usersFromDb as $user) {
 
                 if ($user['pass'] == $inputData['pass']) {
-                    $this->container()->setSession('token', md5($user['name'], $user['pass']));
+                    $this->container()->setSession('token', md5($user['name'] . $user['pass']));
 
                     if ($this->container()->hasPost('remember_me')) {
                         setcookie("RUDRA", md5($this->container()->getServer('REMOTE_ADDR')                    // @codeCoverageIgnore
                             . $this->container()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);      // @codeCoverageIgnore
-                        setcookie("RUDRA_INVOICE", md5($user['name'], $user['pass']), time() + 3600 * 24 * 7); // @codeCoverageIgnore
+                        setcookie("RUDRA_INVOICE", md5($user['name'] . $user['pass']), time() + 3600 * 24 * 7); // @codeCoverageIgnore
                     }
 
                     return $this->container()->get('redirect')->run('admin');
@@ -171,14 +173,14 @@ class Auth
     }
 
     /**
-     * @param        $role
-     * @param        $privilege
+     * @param string $role
+     * @param string $privilege
      * @param bool   $redirectOrAccess
      * @param string $redirect
      *
      * @return bool
      */
-    public function role($role, $privilege, $redirectOrAccess = false, $redirect = '')
+    public function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '')
     {
         if ($this->getRole($role) <= $this->getRole($privilege)) {
             return true;
@@ -201,7 +203,7 @@ class Auth
     }
 
     /**
-     * @return boolean
+     * @return bool|string
      */
     public function getToken()
     {
@@ -209,30 +211,33 @@ class Auth
     }
 
     /**
-     * @param boolean $token
+     * @param boolean|string $token
      */
-    public function setToken($token)
+    public function setToken($token): void
     {
         $this->token = $token;
     }
 
     /**
-     * @param $key
+     * @param string $key
      *
-     * @return mixed
+     * @return int
      */
-    public function getRole($key)
+    public function getRole(string $key): int
     {
         return $this->role[$key];
     }
 
-    protected function loginRedirect($notice)
+    /**
+     * @param string $notice
+     */
+    protected function loginRedirect(string $notice): void
     {
         $this->container()->setSession('alert', 'main', $notice);
         $this->container()->get('redirect')->run('stargate');
     }
 
-    protected function unsetCookie()
+    protected function unsetCookie(): void
     {
         if (DEV !== 'test') {
             // @codeCoverageIgnoreStart
