@@ -17,6 +17,8 @@ namespace Rudra;
  * Class Auth
  *
  * @package Rudra
+ *
+ * Класс работающий с аутентификацией и авторизацией пользователей
  */
 class Auth
 {
@@ -32,8 +34,7 @@ class Auth
     protected $userToken;
 
     /**
-     * @var bool
-     * Параметр необходимый для авторизации
+     * @var string
      */
     protected $token = false;
 
@@ -59,10 +60,11 @@ class Auth
      * @param string|null $userToken
      * @param array       $redirect
      *
+     * @return bool
+     *
      * Проверяет авторизован ли пользователь
      * Если да, то пропускаем выполнение скрипта дальше,
-     * Если нет, то редиректим на страницу регистрации
-     * @return bool
+     * Если нет, то редиректим на необходимую страницу
      */
     public function auth(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login'])
     {
@@ -79,6 +81,9 @@ class Auth
      * @param string      $redirect
      *
      * @return bool
+     *
+     * Предоставление доступа к общим ресурсам,
+     * либо личным ресурсам пользователя
      */
     public function access(bool $accessOrRedirect = false, string $userToken = null, string $redirect = '')
     {
@@ -86,10 +91,12 @@ class Auth
         if ($this->container()->hasSession('token')) {
 
             if (isset($userToken)) {
+                /* Предоставление доступа к личным ресурсам пользователя */
                 if ($userToken === $this->getToken()) {
                     return true;
                 }
             } else {
+                /* Предоставление доступа, к общим ресурсам */
                 if ($this->getToken() == $this->container()->getSession('token')) {
                     return true;
                 }
@@ -110,14 +117,18 @@ class Auth
      */
     public function check(): void
     {
+        /* Если пользователь зашел используя флаг remember_me */
         if ($this->container()->hasCookie('RUDRA')) {
 
+            /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie RUDRA */
             if (md5($this->container()->getServer('REMOTE_ADDR') . $this->container()->getServer('HTTP_USER_AGENT'))
                 == $this->container()->getCookie('RUDRA')
             ) {
+                /* Восстанавливаем сессию */
                 $this->container()->setSession('token', $this->container()->getCookie('RUDRA_INVOICE'));
                 $this->setToken($this->container()->getSession('token'));
             } else {
+                /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */
                 $this->unsetCookie();
                 $this->container()->get('redirect')->run('stargate');
             }
@@ -146,16 +157,18 @@ class Auth
      * @param iterable $usersFromDb
      * @param array    $inputData
      * @param string   $notice
+     *
+     * Аутентификация, Авторизация
      */
     public function login(iterable $usersFromDb, array $inputData, string $notice)
     {
         if (count($usersFromDb) > 0) {
-
             foreach ($usersFromDb as $user) {
 
                 if ($user['pass'] == $inputData['pass']) {
                     $this->container()->setSession('token', md5($user['name'] . $user['pass']));
 
+                    /* Если установлен флаг remember_me */
                     if ($this->container()->hasPost('remember_me')) {
                         setcookie("RUDRA", md5($this->container()->getServer('REMOTE_ADDR')                    // @codeCoverageIgnore
                             . $this->container()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);      // @codeCoverageIgnore
@@ -179,6 +192,8 @@ class Auth
      * @param string $redirect
      *
      * @return bool
+     *
+     * Проверка прав доступа
      */
     public function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '')
     {
@@ -186,7 +201,6 @@ class Auth
             return true;
         }
 
-        /* Если не авторизован $this->container()->getSession('token') == 'undefined' */
         if (!$redirectOrAccess) {
             return false;
         }
@@ -230,6 +244,8 @@ class Auth
 
     /**
      * @param string $notice
+     *
+     * Переадресация с добавлением уведомления в 'alert'
      */
     protected function loginRedirect(string $notice): void
     {
