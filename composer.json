@@ -21,11 +21,11 @@
         "skype": "jagepard.ru"
     },
     "require"     : {
-        "php": ">=7.1",
-        "rudra/container": "^1.0"
+        "php": ">=7.1"
     },
     "require-dev" : {
-        "satooshi/php-coveralls": "dev-master"
+        "satooshi/php-coveralls": "dev-master",
+        "rudra/container": "dev-master"
     },
     "autoload"    : {
         "psr-4": {
