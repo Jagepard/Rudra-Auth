@@ -1,7 +1,6 @@
 {
     "name"        : "rudra/auth",
     "description" : "The Rudra framework",
-    "version"     : "dev-master",
     "type"        : "library",
     "keywords"    : [
         "rudra",
@@ -32,5 +31,8 @@
             "Rudra\\": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "config": {
+        "optimize-autoloader": true
+    }
 }
