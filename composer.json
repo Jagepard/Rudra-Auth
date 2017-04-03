@@ -33,6 +33,7 @@
     },
     "minimum-stability" : "dev",
     "config"            : {
-        "optimize-autoloader" : true
+        "optimize-autoloader" : true,
+        "prefer-stable"       : true
     }
 }
