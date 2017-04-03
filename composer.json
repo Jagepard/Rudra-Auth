@@ -21,7 +21,7 @@
     },
     "require"           : {
         "php"             : ">=7.1",
-        "rudra/container" : "1.0.0"
+        "rudra/container" : "1.*"
     },
     "require-dev"       : {
         "satooshi/php-coveralls" : "dev-master"
