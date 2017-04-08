@@ -6,6 +6,8 @@
 [![Latest Stable Version](https://poser.pugx.org/rudra/auth/v/stable)](https://packagist.org/packages/rudra/auth)
 [![Total Downloads](https://poser.pugx.org/rudra/auth/downloads)](https://packagist.org/packages/rudra/auth)
 [![License](https://poser.pugx.org/rudra/auth/license)](https://packagist.org/packages/rudra/auth)
+
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/f21a265a-493e-4fa0-92b7-31ae32aad73f/big.png)](https://insight.sensiolabs.com/projects/f21a265a-493e-4fa0-92b7-31ae32aad73f)
 # Rudra-Auth
 Авторизация
 
