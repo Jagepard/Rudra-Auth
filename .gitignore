@@ -1,9 +1,4 @@
 # Created by .ignore support plugin (hsz.mobi)
 /vendor/
-/tests/
 /composer.lock
-/src/index.php
-/nbproject/private/
-/nbproject/
-/.idea/
 /src/tests/build/
