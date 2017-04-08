@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 
 use Rudra\AuthTrait;
-use Rudra\IContainer;
+use Rudra\ContainerInterface;
 use Rudra\Auth;
 
 
@@ -26,16 +26,16 @@ class StubClass
     use AuthTrait;
 
     /**
-     * @var IContainer
+     * @var ContainerInterface
      */
     protected $container;
 
     /**
      * StubClass constructor.
      *
-     * @param IContainer $container
+     * @param ContainerInterface $container
      */
-    public function __construct(IContainer $container)
+    public function __construct(ContainerInterface $container)
     {
         $roles = [
             'admin'    => 1,
@@ -59,9 +59,9 @@ class StubClass
     }
 
     /**
-     * @return IContainer
+     * @return ContainerInterface
      */
-    public function container(): IContainer
+    public function container(): ContainerInterface
     {
         return $this->container;
     }

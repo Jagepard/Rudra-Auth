@@ -24,7 +24,7 @@ class Auth
 {
 
     /**
-     * @var IContainer
+     * @var ContainerInterface
      */
     protected $container;
 
@@ -46,10 +46,10 @@ class Auth
     /**
      * Auth constructor.
      *
-     * @param IContainer $container
+     * @param ContainerInterface $container
      * @param array      $roles
      */
-    public function __construct(IContainer $container, array $roles = [])
+    public function __construct(ContainerInterface $container, array $roles = [])
     {
         $this->container = $container;
         $this->role      = $roles;
@@ -209,9 +209,9 @@ class Auth
     }
 
     /**
-     * @return IContainer
+     * @return ContainerInterface
      */
-    public function container(): IContainer
+    public function container(): ContainerInterface
     {
         return $this->container;
     }
