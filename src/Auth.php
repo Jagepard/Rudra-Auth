@@ -23,10 +23,7 @@ namespace Rudra;
 class Auth
 {
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use SetContainerTrait;
 
     /**
      * @var string
@@ -206,14 +203,6 @@ class Auth
         }
 
         $this->container()->get('redirect')->run($redirect);
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    public function container(): ContainerInterface
-    {
-        return $this->container;
     }
 
     /**
