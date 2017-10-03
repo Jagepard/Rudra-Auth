@@ -111,8 +111,10 @@ class Auth
 
     /**
      * Проверка авторизации
+     *
+     * @param string $redirect
      */
-    public function check(): void
+    public function check($redirect = 'stargate'): void
     {
         /* Если пользователь зашел используя флаг remember_me */
         if ($this->container()->hasCookie('RUDRA')) {
@@ -127,7 +129,7 @@ class Auth
             } else {
                 /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */
                 $this->unsetCookie();
-                $this->container()->get('redirect')->run('stargate');
+                $this->container()->get('redirect')->run($redirect);
             }
 
         } else {
@@ -142,22 +144,24 @@ class Auth
 
     /**
      * Завершить сессию
+     * @param string $redirect
      */
-    public function logout(): void
+    public function logout(string $redirect = ''): void
     {
         $this->container()->unsetSession('token');
         $this->unsetCookie();
-        $this->container()->get('redirect')->run('');
+        $this->container()->get('redirect')->run($redirect);
     }
 
     /**
      * @param iterable $usersFromDb
      * @param array    $inputData
+     * @param string   $redirect
      * @param string   $notice
      *
      * Аутентификация, Авторизация
      */
-    public function login(iterable $usersFromDb, array $inputData, string $notice)
+    public function login(iterable $usersFromDb, array $inputData, string $redirect = 'admin', string $notice)
     {
         if (count($usersFromDb) > 0) {
             foreach ($usersFromDb as $user) {
@@ -172,7 +176,7 @@ class Auth
                         setcookie("RUDRA_INVOICE", md5($user['name'] . $user['pass']), time() + 3600 * 24 * 7); // @codeCoverageIgnore
                     }
 
-                    return $this->container()->get('redirect')->run('admin');
+                    return $this->container()->get('redirect')->run($redirect);
                 }
 
                 return $this->loginRedirect($notice);
