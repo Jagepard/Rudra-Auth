@@ -136,21 +136,21 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->stubClass()->role('editor', 'editor'));
     }
 
-    /**
-     * @runInSeparateProcess
-     */
-    public function testJsonResponse()
-    {
-        /* Regular Access */
-        $this->stubClass()->container()->setSession('token', '1');
-        $this->stubClass()->container()->get('auth')->setToken(true);
-        $this->assertTrue($this->stubClass()->auth(false, null, ['API', 'API']));
-
-        $this->stubClass()->container()->setSession('token', 'undefined');
-        $this->stubClass()->container()->get('auth')->setToken(false);
-        $this->assertFalse($this->stubClass()->auth(true, null, ['API', 'API']));
-        $this->assertNull($this->stubClass()->auth(false, null, ['API', 'API']));
-    }
+//    /**
+//     * @runInSeparateProcess
+//     */
+//    public function testJsonResponse()
+//    {
+//        /* Regular Access */
+//        $this->stubClass()->container()->setSession('token', '1');
+//        $this->stubClass()->container()->get('auth')->setToken(true);
+//        $this->assertTrue($this->stubClass()->auth(false, null, ['API', 'API']));
+//
+//        $this->stubClass()->container()->setSession('token', 'undefined');
+//        $this->stubClass()->container()->get('auth')->setToken(false);
+//        $this->assertFalse($this->stubClass()->auth(true, null, ['API', 'API']));
+//        $this->assertNull($this->stubClass()->auth(false, null, ['API', 'API']));
+//    }
 
     /**
      * @return StubClass
