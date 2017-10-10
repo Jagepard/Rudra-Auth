@@ -158,8 +158,14 @@ abstract class AbstractAuth
      */
     public function handleResult(string $redirect, array $jsonResponse, callable $redirectCallable = null)
     {
-        return ($redirect == 'API')
-            ? $this->container()->jsonResponse($jsonResponse)
-            : (isset($redirectCallable)) ? $redirectCallable : $this->container()->get('redirect')->run($redirect);
+        if ($redirect == 'API') {
+            exit($this->container()->jsonResponse($jsonResponse));
+        } else {
+            if (isset($redirectCallable)) {
+                return $redirectCallable;
+            } else {
+                $this->container()->get('redirect')->run($redirect);
+            }
+        }
     }
 }
