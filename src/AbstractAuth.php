@@ -156,7 +156,7 @@ abstract class AbstractAuth
      *
      * @return callable
      */
-    protected function handleResult(string $redirect, array $jsonResponse, callable $redirectCallable = null)
+    public function handleResult(string $redirect, array $jsonResponse, callable $redirectCallable = null)
     {
         return ($redirect == 'API')
             ? $this->container()->jsonResponse($jsonResponse)
