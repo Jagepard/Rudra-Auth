@@ -20,37 +20,8 @@ namespace Rudra;
  *
  * Класс работающий с аутентификацией и авторизацией пользователей
  */
-class Auth
+class Auth extends AbstractAuth
 {
-
-    use SetContainerTrait;
-
-    /**
-     * @var string
-     */
-    protected $userToken;
-
-    /**
-     * @var string
-     */
-    protected $token = false;
-
-    /**
-     * @var array
-     */
-    protected $role;
-
-    /**
-     * Auth constructor.
-     *
-     * @param ContainerInterface $container
-     * @param array      $roles
-     */
-    public function __construct(ContainerInterface $container, array $roles = [])
-    {
-        $this->container = $container;
-        $this->role      = $roles;
-    }
 
     /**
      * @param bool        $accessOrRedirect
@@ -105,8 +76,8 @@ class Auth
             return false;
         }
 
-        /* Переадресация, если $accessOrRedirect не установлен*/
-        $this->container()->get('redirect')->run($redirect, 'https');
+        /* Переадресация, если $accessOrRedirect не установлен */
+        return $this->handleResult($redirect, ['status' => 'Access denied']);
     }
 
     /**
@@ -129,7 +100,7 @@ class Auth
             } else {
                 /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */
                 $this->unsetCookie();
-                $this->container()->get('redirect')->run($redirect);
+                $this->handleResult($redirect, ['status' => 'Authorization data expired']);
             }
 
         } else {
@@ -143,22 +114,12 @@ class Auth
     }
 
     /**
-     * Завершить сессию
-     * @param string $redirect
-     */
-    public function logout(string $redirect = ''): void
-    {
-        $this->container()->unsetSession('token');
-        $this->unsetCookie();
-        $this->container()->get('redirect')->run($redirect);
-    }
-
-    /**
      * @param iterable $usersFromDb
      * @param array    $inputData
      * @param string   $redirect
      * @param string   $notice
      *
+     * @return callable|void
      * Аутентификация, Авторизация
      */
     public function login(iterable $usersFromDb, array $inputData, string $redirect = 'admin', string $notice)
@@ -176,14 +137,30 @@ class Auth
                         setcookie("RUDRA_INVOICE", md5($user['name'] . $user['pass']), time() + 3600 * 24 * 7); // @codeCoverageIgnore
                     }
 
-                    return $this->container()->get('redirect')->run($redirect);
+                    return $this->handleResult($redirect, ['status' => 'Authorized']);
                 }
 
-                return $this->loginRedirect($notice);
+                return $this->handleResult($redirect, ['status' => 'Wrong access data'], function ($notice) {
+                    return $this->loginRedirectWithFlash($notice);
+                });
             }
         }
 
-        return $this->loginRedirect($notice);
+        return $this->handleResult($redirect, ['status' => 'User not found'], function ($notice) {
+            return $this->loginRedirectWithFlash($notice);
+        });
+    }
+
+    /**
+     * Завершить сессию
+     *
+     * @param string $redirect
+     */
+    public function logout(string $redirect = ''): void
+    {
+        $this->container()->unsetSession('token');
+        $this->unsetCookie();
+        $this->handleResult($redirect, ['status' => 'Logout']);
     }
 
     /**
@@ -206,33 +183,7 @@ class Auth
             return false;
         }
 
-        $this->container()->get('redirect')->run($redirect);
-    }
-
-    /**
-     * @return bool|string
-     */
-    public function getToken()
-    {
-        return $this->token;
-    }
-
-    /**
-     * @param boolean|string $token
-     */
-    public function setToken($token): void
-    {
-        $this->token = $token;
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return int
-     */
-    public function getRole(string $key): int
-    {
-        return $this->role[$key];
+        $this->handleResult($redirect, ['status' => 'Permissions denied']);
     }
 
     /**
@@ -240,21 +191,9 @@ class Auth
      *
      * Переадресация с добавлением уведомления в 'alert'
      */
-    protected function loginRedirect(string $notice): void
+    protected function loginRedirectWithFlash(string $notice): void
     {
         $this->container()->setSession('alert', 'main', $notice);
         $this->container()->get('redirect')->run('stargate');
-    }
-
-    protected function unsetCookie(): void
-    {
-        if (DEV !== 'test') {
-            // @codeCoverageIgnoreStart
-            if ($this->container()->hasCookie('RUDRA')) {
-                $this->container()->unsetCookie('RUDRA'); // @codeCoverageIgnore
-                $this->container()->unsetCookie('RUDRA_INVOICE'); // @codeCoverageIgnore
-                // @codeCoverageIgnoreEnd
-            }
-        }
     }
 }
