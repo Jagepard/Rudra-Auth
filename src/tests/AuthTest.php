@@ -149,7 +149,6 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->stubClass()->container()->setSession('token', 'undefined');
         $this->stubClass()->container()->get('auth')->setToken(false);
         $this->assertFalse($this->stubClass()->auth(true, null, ['API', 'API']));
-        $this->assertNull($this->stubClass()->auth(false, null, ['API', 'API']));
     }
 
     /**
