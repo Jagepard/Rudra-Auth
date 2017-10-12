@@ -141,13 +141,13 @@ class Auth extends AbstractAuth
                 }
 
                 return $this->handleResult($redirect, ['status' => 'Wrong access data'], function ($notice) {
-                    return $this->loginRedirectWithFlash($notice);
+                    return $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
                 });
             }
         }
 
         return $this->handleResult($redirect, ['status' => 'User not found'], function ($notice) {
-            return $this->loginRedirectWithFlash($notice);
+            return $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
         });
     }
 
@@ -187,6 +187,7 @@ class Auth extends AbstractAuth
     }
 
     /**
+     * @codeCoverageIgnore
      * @param string $notice
      *
      * Переадресация с добавлением уведомления в 'alert'
