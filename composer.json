@@ -21,7 +21,8 @@
     },
     "require"           : {
         "php"             : ">=7.1",
-        "rudra/container" : "self.version"
+        "rudra/container" : "self.version",
+        "phpunit/phpunit" : "^6.2"
     },
     "require-dev"       : {
         "satooshi/php-coveralls" : "dev-master"
