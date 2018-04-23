@@ -22,14 +22,14 @@ trait AuthTrait
 {
 
     /**
-     * @param iterable $user
-     * @param array    $res
-     * @param string   $redirect
-     * @param string   $message
+     * @param string $password
+     * @param string $hash
+     * @param string $redirect
+     * @param string $message
      */
-    public function login(iterable $user, array $res, string $redirect  = 'admin', string $message = 'Укажите верные данные'): void
+    public function login(string $password, string $hash, string $redirect  = 'admin', string $message = 'Укажите верные данные'): void
     {
-        $this->container()->get('auth')->login($user, $res, $redirect, $message);
+        $this->container()->get('auth')->login($password, $hash, $redirect, $message);
     }
 
     /**
