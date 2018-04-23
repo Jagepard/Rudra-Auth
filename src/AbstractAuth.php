@@ -26,27 +26,30 @@ abstract class AbstractAuth
      * @var string
      */
     protected $userToken;
-
     /**
      * @var string
      */
     protected $token = false;
-
     /**
      * @var array
      */
     protected $role;
+    /**
+     * @var string
+     */
+    protected $env;
 
     /**
-     * Auth constructor.
-     *
+     * AbstractAuth constructor.
      * @param ContainerInterface $container
+     * @param string             $env
      * @param array              $roles
      */
-    public function __construct(ContainerInterface $container, array $roles = [])
+    public function __construct(ContainerInterface $container, string $env, array $roles = [])
     {
         $this->container = $container;
         $this->role      = $roles;
+        $this->env       = $env;
     }
 
     /**
@@ -90,7 +93,7 @@ abstract class AbstractAuth
      * @return callable|void
      * Аутентификация, Авторизация
      */
-    public abstract function login(iterable $usersFromDb, array $inputData, string $redirect = 'admin', string $notice);
+//    public abstract function login(string $password, string $hash, string $redirect = 'admin', string $notice);
 
     /**
      * Завершить сессию
@@ -139,7 +142,7 @@ abstract class AbstractAuth
 
     protected function unsetCookie(): void
     {
-        if (DEV !== 'test') {
+        if ('test' !== $this->getEnv()) {
             // @codeCoverageIgnoreStart
             if ($this->container()->hasCookie('RUDRA')) {
                 $this->container()->unsetCookie('RUDRA'); // @codeCoverageIgnore
@@ -159,7 +162,7 @@ abstract class AbstractAuth
     public function handleResult(string $redirect, array $jsonResponse, callable $redirectCallable = null)
     {
         if ($redirect == 'API') {
-            exit($this->container()->jsonResponse($jsonResponse));
+            exit($this->container()->jsonResponse($jsonResponse)); // @codeCoverageIgnore
         } else {
             if (isset($redirectCallable)) {
                 return $redirectCallable;
@@ -167,5 +170,13 @@ abstract class AbstractAuth
                 $this->container()->get('redirect')->run($redirect);
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getEnv(): string
+    {
+        return $this->env;
     }
 }

@@ -84,31 +84,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
     public function testLogin(): void
     {
-        $usersFromDb = [[
-            'id'   => '1',
-            'name' => 'user',
-            'pass' => 'password',
-            'role' => 'admin'
-        ]];
-
-        $this->assertNull($this->stubClass()->login($usersFromDb, [
-            'name' => 'user',
-            'pass' => 'password'
-        ]));
-
-        $this->assertEquals(md5('user' . 'password'), $this->stubClass()->container()->getSession('token'));
-
-        $this->assertNull($this->stubClass()->login($usersFromDb, [
-            'name' => 'userFalse',
-            'pass' => 'passwordFalse'
-        ]));
-
-        $usersFromDb = [];
-
-        $this->assertNull($this->stubClass()->login($usersFromDb, [
-            'name' => 'userFalse',
-            'pass' => 'passwordFalse'
-        ]));
+        $this->assertNull($this->stubClass()->login('password', ''));
+        $this->assertNull($this->stubClass()->login(
+            'password',
+            password_hash('password', PASSWORD_BCRYPT, ['cost' => 10])
+        ));
     }
 
     public function testLogout(): void

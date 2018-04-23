@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * Date: 14.09.16
@@ -114,37 +114,30 @@ class Auth extends AbstractAuth
     }
 
     /**
-     * @param iterable $usersFromDb
-     * @param array    $inputData
-     * @param string   $redirect
-     * @param string   $notice
-     *
-     * @return callable|void
-     * Аутентификация, Авторизация
+     * @param string $password
+     * @param string $hash
+     * @param string $redirect
+     * @param string $notice
+     * @return callable
      */
-    public function login(iterable $usersFromDb, array $inputData, string $redirect = 'admin', string $notice)
+    public function login(string $password, string $hash, string $redirect = 'admin', string $notice)
     {
-        if (count($usersFromDb) > 0) {
-            foreach ($usersFromDb as $user) {
+        if (password_verify($password, $hash)) {
+            $this->container()->setSession('token', md5($password . $hash));
 
-                if ($user['pass'] == $inputData['pass']) {
-                    $this->container()->setSession('token', md5($user['name'] . $user['pass']));
-
-                    /* Если установлен флаг remember_me */
-                    if ($this->container()->hasPost('remember_me')) {
-                        setcookie("RUDRA", md5($this->container()->getServer('REMOTE_ADDR')                    // @codeCoverageIgnore
-                            . $this->container()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);      // @codeCoverageIgnore
-                        setcookie("RUDRA_INVOICE", md5($user['name'] . $user['pass']), time() + 3600 * 24 * 7); // @codeCoverageIgnore
-                    }
-
-                    return $this->handleResult($redirect, ['status' => 'Authorized']);
-                }
-
-                return $this->handleResult($redirect, ['status' => 'Wrong access data'], function ($notice) {
-                    return $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
-                });
+            /* Если установлен флаг remember_me */
+            if ($this->container()->hasPost('remember_me')) {
+                setcookie("RUDRA", md5($this->container()->getServer('REMOTE_ADDR')                    // @codeCoverageIgnore
+                    . $this->container()->getServer('HTTP_USER_AGENT')), time() + 3600 * 24 * 7);      // @codeCoverageIgnore
+                setcookie("RUDRA_INVOICE", md5($password . $hash), time() + 3600 * 24 * 7); // @codeCoverageIgnore
             }
+
+            return $this->handleResult($redirect, ['status' => 'Authorized']);
         }
+
+        return $this->handleResult($redirect, ['status' => 'Wrong access data'], function ($notice) {
+            return $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
+        });
 
         return $this->handleResult($redirect, ['status' => 'User not found'], function ($notice) {
             return $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
