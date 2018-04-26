@@ -44,7 +44,7 @@ class StubClass
         ];
 
         $this->container = $container;
-        $this->container->set('auth', new Auth($this->container, 'test', $roles), 'raw');
+        $this->container->set('auth', new Auth($this->container, 'test',$roles), 'raw');
         $this->container->set('redirect', $this, 'raw');
     }
 
