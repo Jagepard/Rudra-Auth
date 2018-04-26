@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * @author    : Korotkov Danila <dankorot@gmail.com>
@@ -48,8 +48,8 @@ abstract class AbstractAuth
     public function __construct(ContainerInterface $container, string $env, array $roles = [])
     {
         $this->container = $container;
-        $this->role      = $roles;
         $this->env       = $env;
+        $this->role      = $roles;
     }
 
     /**
@@ -85,15 +85,15 @@ abstract class AbstractAuth
     public abstract function check($redirect = 'stargate'): void;
 
     /**
-     * @param iterable $usersFromDb
-     * @param array    $inputData
-     * @param string   $redirect
-     * @param string   $notice
+     * @param string $password
+     * @param string $hash
+     * @param string $redirect
+     * @param string $notice
+     * @return mixed
      *
-     * @return callable|void
      * Аутентификация, Авторизация
      */
-//    public abstract function login(string $password, string $hash, string $redirect = 'admin', string $notice);
+    public abstract function login(string $password, string $hash, string $redirect = 'admin', string $notice);
 
     /**
      * Завершить сессию
@@ -161,15 +161,13 @@ abstract class AbstractAuth
      */
     public function handleResult(string $redirect, array $jsonResponse, callable $redirectCallable = null)
     {
-        if ($redirect == 'API') {
-            exit($this->container()->jsonResponse($jsonResponse)); // @codeCoverageIgnore
-        } else {
-            if (isset($redirectCallable)) {
-                return $redirectCallable;
-            } else {
-                $this->container()->get('redirect')->run($redirect);
-            }
+        ('API' !== $redirect) ?: exit($this->container()->jsonResponse($jsonResponse));
+
+        if (isset($redirectCallable)) {
+            return $redirectCallable;
         }
+
+        $this->container()->get('redirect')->run($redirect);
     }
 
     /**
