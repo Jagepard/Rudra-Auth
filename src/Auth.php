@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 /**
- * Date: 14.09.16
- * Time: 11:16
- *
  * @author    : Korotkov Danila <dankorot@gmail.com>
  * @copyright Copyright (c) 2016, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
@@ -15,7 +12,6 @@ namespace Rudra;
 
 /**
  * Class Auth
- *
  * @package Rudra
  *
  * Класс работающий с аутентификацией и авторизацией пользователей
@@ -27,7 +23,6 @@ class Auth extends AbstractAuth
      * @param bool        $accessOrRedirect
      * @param string|null $userToken
      * @param array       $redirect
-     *
      * @return bool
      *
      * Проверяет авторизован ли пользователь
@@ -48,7 +43,7 @@ class Auth extends AbstractAuth
      * @param string|null $userToken
      * @param string      $redirect
      *
-     * @return bool
+     * @return mixed
      *
      * Предоставление доступа к общим ресурсам,
      * либо личным ресурсам пользователя
@@ -145,9 +140,9 @@ class Auth extends AbstractAuth
     }
 
     /**
-     * Завершить сессию
-     *
      * @param string $redirect
+     *
+     * Завершить сессию
      */
     public function logout(string $redirect = ''): void
     {
@@ -161,7 +156,6 @@ class Auth extends AbstractAuth
      * @param string $privilege
      * @param bool   $redirectOrAccess
      * @param string $redirect
-     *
      * @return bool
      *
      * Проверка прав доступа
