@@ -57,7 +57,7 @@ trait AuthTrait
      */
     public function auth(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login'])
     {
-        return $this->container()->get('auth')->auth($accessOrRedirect, $userToken, $redirect);
+        return $this->container()->get('auth')->authenticate($accessOrRedirect, $userToken, $redirect);
     }
 
     /**
@@ -72,4 +72,9 @@ trait AuthTrait
     {
         return $this->container()->get('auth')->role($role, $privilege, $redirectOrAccess, $redirect);
     }
+
+    /**
+     * @return ContainerInterface
+     */
+    public abstract function container(): ContainerInterface;
 }
