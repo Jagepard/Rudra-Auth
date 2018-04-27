@@ -12,7 +12,6 @@ namespace Rudra;
 
 /**
  * Class AbstractAuth
- *
  * @package Rudra
  *
  * Класс работающий с аутентификацией и авторизацией пользователей
@@ -69,7 +68,6 @@ abstract class AbstractAuth
      * @param bool        $accessOrRedirect
      * @param string|null $userToken
      * @param string      $redirect
-     *
      * @return bool
      *
      * Предоставление доступа к общим ресурсам,
@@ -78,9 +76,9 @@ abstract class AbstractAuth
     public abstract function access(bool $accessOrRedirect = false, string $userToken = null, string $redirect = '');
 
     /**
-     * Проверка авторизации
-     *
      * @param string $redirect
+     *
+     * Проверка авторизации
      */
     public abstract function check($redirect = 'stargate'): void;
 
@@ -107,7 +105,6 @@ abstract class AbstractAuth
      * @param string $privilege
      * @param bool   $redirectOrAccess
      * @param string $redirect
-     *
      * @return bool
      *
      * Проверка прав доступа
@@ -132,8 +129,7 @@ abstract class AbstractAuth
 
     /**
      * @param string $key
-     *
-     * @return int
+     * @return mixed
      */
     public function getRole(string $key)
     {
@@ -156,7 +152,6 @@ abstract class AbstractAuth
      * @param string   $redirect
      * @param array    $jsonResponse
      * @param callable $redirectCallable
-     *
      * @return callable
      */
     public function handleResult(string $redirect, array $jsonResponse, callable $redirectCallable = null)
