@@ -23,7 +23,7 @@ class Auth extends AbstractAuth
      * @param bool        $accessOrRedirect
      * @param string|null $userToken
      * @param array       $redirect
-     * @return callable
+     * @return bool|callable
      *
      * Проверяет авторизован ли пользователь
      * Если да, то пропускаем выполнение скрипта дальше,
