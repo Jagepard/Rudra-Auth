@@ -42,7 +42,7 @@ class Auth extends AbstractAuth
      * @param bool        $accessOrRedirect
      * @param string|null $userToken
      * @param string      $redirect
-     * @return mixed
+     * @return bool|callable
      *
      * Предоставление доступа к общим ресурсам,
      * либо личным ресурсам пользователя
@@ -130,10 +130,6 @@ class Auth extends AbstractAuth
         }
 
         return $this->handleResult($redirect, ['status' => 'Wrong access data'], function ($notice) {
-            return $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
-        });
-
-        return $this->handleResult($redirect, ['status' => 'User not found'], function ($notice) {
             return $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
         });
     }
