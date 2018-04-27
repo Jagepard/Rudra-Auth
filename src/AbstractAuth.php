@@ -55,32 +55,31 @@ abstract class AbstractAuth
      * @param bool        $accessOrRedirect
      * @param string|null $userToken
      * @param array       $redirect
-     *
-     * @return bool
+     * @return callable
      *
      * Проверяет авторизован ли пользователь
      * Если да, то пропускаем выполнение скрипта дальше,
      * Если нет, то редиректим на необходимую страницу
      */
-    public abstract function auth(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login']);
+    abstract public function authenticate(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login']);
 
     /**
      * @param bool        $accessOrRedirect
      * @param string|null $userToken
      * @param string      $redirect
-     * @return bool
+     * @return callable
      *
      * Предоставление доступа к общим ресурсам,
      * либо личным ресурсам пользователя
      */
-    public abstract function access(bool $accessOrRedirect = false, string $userToken = null, string $redirect = '');
+    abstract public function access(bool $accessOrRedirect = false, string $userToken = null, string $redirect = '');
 
     /**
      * @param string $redirect
      *
      * Проверка авторизации
      */
-    public abstract function check($redirect = 'stargate'): void;
+    abstract public function check($redirect = 'stargate'): void;
 
     /**
      * @param string $password
@@ -91,14 +90,14 @@ abstract class AbstractAuth
      *
      * Аутентификация, Авторизация
      */
-    public abstract function login(string $password, string $hash, string $redirect = 'admin', string $notice);
+    abstract public function login(string $password, string $hash, string $redirect = 'admin', string $notice);
 
     /**
      * Завершить сессию
      *
      * @param string $redirect
      */
-    public abstract function logout(string $redirect = ''): void;
+    abstract public function logout(string $redirect = ''): void;
 
     /**
      * @param string $role
@@ -109,7 +108,7 @@ abstract class AbstractAuth
      *
      * Проверка прав доступа
      */
-    public abstract function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '');
+    abstract public function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '');
 
     /**
      * @return bool|string
@@ -120,7 +119,7 @@ abstract class AbstractAuth
     }
 
     /**
-     * @param boolean|string $token
+     * @param $token
      */
     public function setToken($token): void
     {

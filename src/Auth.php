@@ -23,13 +23,13 @@ class Auth extends AbstractAuth
      * @param bool        $accessOrRedirect
      * @param string|null $userToken
      * @param array       $redirect
-     * @return bool
+     * @return callable
      *
      * Проверяет авторизован ли пользователь
      * Если да, то пропускаем выполнение скрипта дальше,
      * Если нет, то редиректим на необходимую страницу
      */
-    public function auth(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login'])
+    public function authenticate(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login'])
     {
         if (!isset($userToken)) {
             return $this->access($accessOrRedirect, null, $redirect[0]);
@@ -42,7 +42,6 @@ class Auth extends AbstractAuth
      * @param bool        $accessOrRedirect
      * @param string|null $userToken
      * @param string      $redirect
-     *
      * @return mixed
      *
      * Предоставление доступа к общим ресурсам,
