@@ -104,6 +104,7 @@ abstract class AuthBase
     }
 
     /**
+     * @codeCoverageIgnore
      * @return int
      */
     public function getExpireTime(): int
