@@ -176,4 +176,14 @@ class Auth extends AbstractAuth
         $this->container()->setSession('alert', 'main', $notice);
         $this->container()->get('redirect')->run('stargate');
     }
+
+    /**
+     * @param string $password
+     * @param int    $cost
+     * @return bool|string
+     */
+    public static function bcrypt(string $password, int $cost = 10)
+    {
+        return password_hash($password, PASSWORD_BCRYPT, ['cost' => $cost]);
+    }
 }
