@@ -149,23 +149,23 @@ class Auth extends AuthBase implements AuthInterface
     /**
      * @param string $role
      * @param string $privilege
-     * @param bool   $redirectOrAccess
+     * @param bool   $access
      * @param string $redirect
      * @return bool
      *
      * Проверка прав доступа
      */
-    public function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '')
+    public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
     {
         if ($this->getRole($role) <= $this->getRole($privilege)) {
             return true;
         }
 
-        if (!$redirectOrAccess) {
-            return false;
+        if (!$access) {
+            $this->handleRedirect($redirect, ['status' => 'Permissions denied']);
         }
 
-        $this->handleRedirect($redirect, ['status' => 'Permissions denied']);
+        return false;
     }
 
     /**

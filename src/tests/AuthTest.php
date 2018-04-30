@@ -92,19 +92,19 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testRole(): void
     {
         $this->assertTrue($this->stubClass()->role('admin', 'admin'));
-        $this->assertTrue($this->stubClass()->role('admin', 'redactor'));
         $this->assertTrue($this->stubClass()->role('admin', 'editor'));
-
-        $this->assertFalse($this->stubClass()->role('redactor', 'admin'));
-        $this->assertNull($this->stubClass()->role('redactor', 'admin', true));
-        $this->assertTrue($this->stubClass()->role('redactor', 'redactor'));
-        $this->assertTrue($this->stubClass()->role('redactor', 'editor'));
+        $this->assertTrue($this->stubClass()->role('admin', 'user'));
 
         $this->assertFalse($this->stubClass()->role('editor', 'admin'));
-        $this->assertFalse($this->stubClass()->role('editor', 'redactor'));
-        $this->assertNull($this->stubClass()->role('editor', 'admin', true));
-        $this->assertNull($this->stubClass()->role('editor', 'redactor', true));
+        $this->assertFalse($this->stubClass()->role('editor', 'admin', true));
         $this->assertTrue($this->stubClass()->role('editor', 'editor'));
+        $this->assertTrue($this->stubClass()->role('editor', 'user'));
+
+        $this->assertFalse($this->stubClass()->role('user', 'admin'));
+        $this->assertFalse($this->stubClass()->role('user', 'editor'));
+        $this->assertFalse($this->stubClass()->role('user', 'admin', true));
+        $this->assertFalse($this->stubClass()->role('user', 'editor', true));
+        $this->assertTrue($this->stubClass()->role('user', 'user'));
     }
 
     /**

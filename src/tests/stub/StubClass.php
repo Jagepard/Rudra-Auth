@@ -35,9 +35,9 @@ class StubClass
     public function __construct(ContainerInterface $container)
     {
         $roles = [
-            'admin'    => 1,
-            'redactor' => 3,
-            'editor'   => 5
+            'admin'  => 1,
+            'editor' => 3,
+            'user'   => 5
         ];
 
         $this->container = $container;
