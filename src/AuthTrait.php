@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * Date: 22.03.17
@@ -27,7 +27,7 @@ trait AuthTrait
      * @param string $redirect
      * @param string $message
      */
-    public function login(string $password, string $hash, string $redirect  = 'admin', string $message = 'Укажите верные данные'): void
+    public function login(string $password, string $hash, string $redirect = 'admin', string $message = 'Укажите верные данные'): void
     {
         $this->container()->get('auth')->login($password, $hash, $redirect, $message);
     }
