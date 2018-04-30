@@ -63,9 +63,9 @@ class Auth extends AuthBase implements AuthInterface
             /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie RUDRA */
             if ($this->getSessionHash() == $this->container()->getCookie('RUDRA')) {
                 /* Восстанавливаем сессию */
-                $this->container()->setSession('token', $this->container()->getCookie('RUDRA_INVOICE'));
-                $this->setToken($this->container()->getSession('token'));
-                return;
+                $this->container()->setSession('token', $this->container()->getCookie('RUDRA_INVOICE')); // @codeCoverageIgnore
+                $this->setToken($this->container()->getSession('token')); // @codeCoverageIgnore
+                return; // @codeCoverageIgnore
             }
 
             /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */

@@ -42,7 +42,6 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->stubClass()->container()->unsetSession('token');
         $this->stubClass()->container()->get('auth')->setToken(false);
         $this->assertFalse($this->stubClass()->auth(true));
-        $this->assertNull($this->stubClass()->auth());
 
         /* User Access */
         $this->stubClass()->container()->setSession('token', 'userIdToken');
@@ -60,25 +59,18 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->stubClass()->check();
         $this->assertFalse($this->stubClass()->container()->get('auth')->getToken());
 
-        $this->stubClass()->container()->setSession('token', 'userIdToken');
+        $this->stubClass()->container()->setSession('token', 'check');
         $this->stubClass()->check();
-        $this->assertEquals('userIdToken', $this->stubClass()->container()->getSession('token'));
+        $this->assertEquals('check', $this->stubClass()->container()->getSession('token'));
 
         $this->stubClass()->container()->setServer('REMOTE_ADDR', '127.0.0.1');
         $this->stubClass()->container()->setServer('HTTP_USER_AGENT', 'Mozilla');
 
-        $this->stubClass()->container()->setCookie('RUDRA', md5($this->stubClass()->container()->getServer('REMOTE_ADDR')
-            . $this->stubClass()->container()->getServer('HTTP_USER_AGENT')));
-        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', md5('user' . 'password'));
+        $this->stubClass()->container()->setCookie('RUDRA', 'check');
+        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', 'check');
         $this->stubClass()->check();
 
-//        $this->assertEquals(md5('user' . 'password'), $this->stubClass()->container()->getSession('token'));
-
-        $this->stubClass()->container()->setServer('REMOTE_ADDR', '127.0.0.1');
-        $this->stubClass()->container()->setServer('HTTP_USER_AGENT', 'Chrome');
-
-        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', md5('user' . 'password'));
-        $this->assertNull($this->stubClass()->check());
+        $this->assertEquals($this->stubClass()->container()->getCookie('RUDRA_INVOICE'), $this->stubClass()->container()->getSession('token'));
     }
 
     public function testLogin(): void
