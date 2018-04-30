@@ -63,14 +63,14 @@ trait AuthTrait
     /**
      * @param string $role
      * @param string $privilege
-     * @param bool   $redirectOrAccess
+     * @param bool   $access
      * @param string $redirect
      *
      * @return mixed
      */
-    public function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '')
+    public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
     {
-        return $this->container()->get('auth')->role($role, $privilege, $redirectOrAccess, $redirect);
+        return $this->container()->get('auth')->role($role, $privilege, $access, $redirect);
     }
 
     /**
