@@ -70,5 +70,10 @@ trait AuthHelperTrait
     /**
      * @return ContainerInterface
      */
-    public abstract function container(): ContainerInterface;
+    abstract public function container(): ContainerInterface;
+
+    /**
+     * @return string
+     */
+    abstract public function getEnv(): string;
 }
