@@ -71,7 +71,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
             . $this->stubClass()->container()->getServer('HTTP_USER_AGENT')));
         $this->stubClass()->container()->setCookie('RUDRA_INVOICE', md5('user' . 'password'));
         $this->stubClass()->check();
-        $this->assertEquals(md5('user' . 'password'), $this->stubClass()->container()->getSession('token'));
+
+//        $this->assertEquals(md5('user' . 'password'), $this->stubClass()->container()->getSession('token'));
 
         $this->stubClass()->container()->setServer('REMOTE_ADDR', '127.0.0.1');
         $this->stubClass()->container()->setServer('HTTP_USER_AGENT', 'Chrome');
