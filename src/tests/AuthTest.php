@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 /**
  * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2016, Korotkov Danila
+ * @copyright Copyright (c) 2018, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  *
  *  phpunit src/tests/AuthTest --coverage-html src/tests/build/coverage-html
  */
 
 
-use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 use Rudra\Container;
+use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
 
 /**
@@ -38,7 +38,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->stubClass()->container()->get('auth')->setToken(true);
         $this->assertTrue($this->stubClass()->auth());
 
-        $this->stubClass()->container()->setSession('token', 'undefined');
+        $this->stubClass()->container()->unsetSession('token');
         $this->stubClass()->container()->get('auth')->setToken(false);
         $this->assertFalse($this->stubClass()->auth(true));
         $this->assertNull($this->stubClass()->auth());

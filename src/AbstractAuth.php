@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2017, Korotkov Danila
+ * @copyright Copyright (c) 2018, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
 
@@ -32,7 +32,7 @@ abstract class AbstractAuth
     /**
      * @var array
      */
-    protected $role;
+    protected $roles;
     /**
      * @var string
      */
@@ -43,16 +43,17 @@ abstract class AbstractAuth
      * @param ContainerInterface $container
      * @param string             $env
      * @param array              $roles
+     * @param string             $redirect
      */
-    public function __construct(ContainerInterface $container, string $env, array $roles = [])
+    public function __construct(ContainerInterface $container, string $env, array $roles = [], $redirect = 'login')
     {
-        $this->container = $container;
         $this->env       = $env;
-        $this->role      = $roles;
+        $this->roles     = $roles;
+        $this->container = $container;
     }
 
     /**
-     * @param bool        $accessOrRedirect
+     * @param bool        $access
      * @param string|null $userToken
      * @param array       $redirect
      * @return callable
@@ -61,10 +62,10 @@ abstract class AbstractAuth
      * Если да, то пропускаем выполнение скрипта дальше,
      * Если нет, то редиректим на необходимую страницу
      */
-    abstract public function authenticate(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login']);
+    abstract public function authenticate(bool $access = false, string $userToken = null, array $redirect = ['', 'login']);
 
     /**
-     * @param bool        $accessOrRedirect
+     * @param bool        $access
      * @param string|null $userToken
      * @param string      $redirect
      * @return callable
@@ -72,7 +73,7 @@ abstract class AbstractAuth
      * Предоставление доступа к общим ресурсам,
      * либо личным ресурсам пользователя
      */
-    abstract public function access(bool $accessOrRedirect = false, string $userToken = null, string $redirect = '');
+    abstract public function access(bool $access = false, string $userToken = null, string $redirect = '');
 
     /**
      * @param string $redirect
@@ -132,7 +133,7 @@ abstract class AbstractAuth
      */
     public function getRole(string $key)
     {
-        return $this->role[$key];
+        return $this->roles[$key];
     }
 
     protected function unsetCookie(): void

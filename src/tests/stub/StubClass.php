@@ -1,11 +1,8 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
- * Date: 23.03.17
- * Time: 14:31
- *
  * @author    : Korotkov Danila <dankorot@gmail.com>
  * @copyright Copyright (c) 2016, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
@@ -44,7 +41,7 @@ class StubClass
         ];
 
         $this->container = $container;
-        $this->container->set('auth', new Auth($this->container, 'test',$roles), 'raw');
+        $this->container->set('auth', new Auth($this->container, 'test', $roles), 'raw');
         $this->container->set('redirect', $this, 'raw');
     }
 
