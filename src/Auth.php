@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2016, Korotkov Danila
+ * @copyright Copyright (c) 2018, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
 
@@ -20,7 +20,7 @@ class Auth extends AbstractAuth
 {
 
     /**
-     * @param bool        $accessOrRedirect
+     * @param bool        $access
      * @param string|null $userToken
      * @param array       $redirect
      * @return bool|callable
@@ -29,17 +29,17 @@ class Auth extends AbstractAuth
      * Если да, то пропускаем выполнение скрипта дальше,
      * Если нет, то редиректим на необходимую страницу
      */
-    public function authenticate(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login'])
+    public function authenticate(bool $access = false, string $userToken = null, array $redirect = ['', 'login'])
     {
         if (!isset($userToken)) {
-            return $this->access($accessOrRedirect, null, $redirect[0]);
+            return $this->access($access, null, $redirect[0]);
         }
 
-        return $this->access($accessOrRedirect, $userToken, $redirect[1]);
+        return $this->access($access, $userToken, $redirect[1]);
     }
 
     /**
-     * @param bool        $accessOrRedirect
+     * @param bool        $access
      * @param string|null $userToken
      * @param string      $redirect
      * @return bool|callable
@@ -47,31 +47,28 @@ class Auth extends AbstractAuth
      * Предоставление доступа к общим ресурсам,
      * либо личным ресурсам пользователя
      */
-    public function access(bool $accessOrRedirect = false, string $userToken = null, string $redirect = '')
+    public function access(bool $access = false, string $userToken = null, string $redirect = '')
     {
-        /* Если авторизован $this->container()->getSession('token') == true */
+        /* Если авторизован */
         if ($this->container()->hasSession('token')) {
 
-            if (isset($userToken)) {
-                /* Предоставление доступа к личным ресурсам пользователя */
-                if ($userToken === $this->getToken()) {
-                    return true;
-                }
-            } else {
-                /* Предоставление доступа, к общим ресурсам */
-                if ($this->getToken() == $this->container()->getSession('token')) {
-                    return true;
-                }
+            /* Предоставление доступа к личным ресурсам пользователя */
+            if (isset($userToken) && ($userToken === $this->getToken())) {
+                return true;
+            }
+
+            /* Предоставление доступа, к общим ресурсам */
+            if ($this->getToken() == $this->container()->getSession('token')) {
+                return true;
             }
         }
 
-        /* Если не авторизован $this->container()->getSession('token') == 'undefined' */
-        if ($accessOrRedirect) {
-            return false;
+        /* Если не авторизован */
+        if (!$access) {
+            return $this->handleResult($redirect, ['status' => 'Access denied']);
         }
 
-        /* Переадресация, если $accessOrRedirect не установлен */
-        return $this->handleResult($redirect, ['status' => 'Access denied']);
+        return false;
     }
 
     /**
@@ -91,20 +88,20 @@ class Auth extends AbstractAuth
                 /* Восстанавливаем сессию */
                 $this->container()->setSession('token', $this->container()->getCookie('RUDRA_INVOICE'));
                 $this->setToken($this->container()->getSession('token'));
-            } else {
-                /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */
-                $this->unsetCookie();
-                $this->handleResult($redirect, ['status' => 'Authorization data expired']);
+                return;
             }
-
-        } else {
-
-            if ($this->container()->hasSession('token')) {
-                $this->setToken($this->container()->getSession('token'));
-            } else {
-                $this->setToken(false);
-            }
+            /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */
+            $this->unsetCookie();
+            $this->handleResult($redirect, ['status' => 'Authorization data expired']);
+            return;
         }
+
+        if ($this->container()->hasSession('token')) {
+            $this->setToken($this->container()->getSession('token'));
+            return;
+        }
+
+        $this->setToken(false);
     }
 
     /**
@@ -130,7 +127,7 @@ class Auth extends AbstractAuth
         }
 
         return $this->handleResult($redirect, ['status' => 'Wrong access data'], function ($notice) {
-            return $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
+            $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
         });
     }
 
