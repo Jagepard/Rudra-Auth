@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 
 
+use Rudra\Auth;
 use Rudra\Container;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
@@ -126,6 +127,17 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->stubClass()->container()->setSession('token', 'undefined');
         $this->stubClass()->container()->get('auth')->setToken(false);
         $this->assertFalse($this->stubClass()->auth(true, null, ['API', 'API']));
+    }
+
+    public function testHash()
+    {
+        $password = 'password';
+        $hash     = Auth::bcrypt($password);
+
+        $this->assertTrue(password_verify($password, $hash));
+
+        $this->stubClass()->container()->get('auth')->bcrypt($password);
+        $this->assertTrue(password_verify($password, $hash));
     }
 
     /**
