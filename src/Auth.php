@@ -86,7 +86,7 @@ class Auth extends AuthBase implements AuthInterface
      * @param bool        $access
      * @param string|null $userToken
      * @param array       $redirect
-     * @return bool|callable
+     * @return mixed
      *
      * Проверяет авторизован ли пользователь
      * Если да, то пропускаем выполнение скрипта дальше,
@@ -105,7 +105,7 @@ class Auth extends AuthBase implements AuthInterface
      * @param bool        $access
      * @param string|null $userToken
      * @param string      $redirect
-     * @return bool|callable
+     * @return mixed
      *
      * Предоставление доступа к общим ресурсам,
      * либо личным ресурсам пользователя

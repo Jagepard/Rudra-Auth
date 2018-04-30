@@ -47,13 +47,12 @@ abstract class AuthBase
     protected $sessionHash;
 
     /**
-     * AbstractAuth constructor.
+     * AuthBase constructor.
      * @param ContainerInterface $container
      * @param string             $env
      * @param array              $roles
-     * @param string             $redirect
      */
-    public function __construct(ContainerInterface $container, string $env, array $roles = [], $redirect = 'login')
+    public function __construct(ContainerInterface $container, string $env, array $roles = [])
     {
         $this->env           = $env;
         $this->roles         = $roles;
@@ -102,5 +101,13 @@ abstract class AuthBase
     public function getSessionHash(): string
     {
         return $this->sessionHash;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExpireTime(): int
+    {
+        return $this->expireTime;
     }
 }
