@@ -11,12 +11,12 @@ declare(strict_types=1);
 namespace Rudra;
 
 /**
- * Class AbstractAuth
+ * Class AuthBase
  * @package Rudra
  *
  * Класс работающий с аутентификацией и авторизацией пользователей
  */
-abstract class AuthBase
+class AuthBase
 {
 
     use SetContainerTrait;

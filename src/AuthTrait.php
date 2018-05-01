@@ -74,6 +74,16 @@ trait AuthTrait
     }
 
     /**
+     * @param string $password
+     * @param int    $cost
+     * @return bool|string
+     */
+    public function bcrypt(string $password, int $cost = 10): string
+    {
+        return $this->container()->get('auth')->bcrypt($password, $cost);
+    }
+
+    /**
      * @return ContainerInterface
      */
     abstract public function container(): ContainerInterface;
