@@ -173,7 +173,7 @@ class Auth extends AuthBase implements AuthInterface
      * @param int    $cost
      * @return bool|string
      */
-    public static function bcrypt(string $password, int $cost = 10): string
+    public function bcrypt(string $password, int $cost = 10): string
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $cost]);
     }
