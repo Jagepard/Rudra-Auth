@@ -125,11 +125,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testHash()
     {
         $password = 'password';
-        $hash     = Auth::bcrypt($password);
+        $hash     = $this->stubClass()->bcrypt($password);
 
-        $this->assertTrue(password_verify($password, $hash));
-
-        $this->stubClass()->container()->get('auth')->bcrypt($password);
         $this->assertTrue(password_verify($password, $hash));
     }
 
