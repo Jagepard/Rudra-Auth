@@ -78,5 +78,5 @@ interface AuthInterface
      * @param int    $cost
      * @return bool|string
      */
-    public static function bcrypt(string $password, int $cost = 10): string;
+    public function bcrypt(string $password, int $cost = 10): string;
 }
