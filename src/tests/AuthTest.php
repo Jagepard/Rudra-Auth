@@ -66,11 +66,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->stubClass()->container()->setServer('REMOTE_ADDR', '127.0.0.1');
         $this->stubClass()->container()->setServer('HTTP_USER_AGENT', 'Mozilla');
 
-        $this->stubClass()->container()->setCookie('RUDRA', 'check');
-        $this->stubClass()->container()->setCookie('RUDRA_INVOICE', 'check');
+        $this->stubClass()->container()->setCookie('RudraPermit', 'check');
+        $this->stubClass()->container()->setCookie('RudraToken', 'check');
         $this->stubClass()->check();
 
-        $this->assertEquals($this->stubClass()->container()->getCookie('RUDRA_INVOICE'), $this->stubClass()->container()->getSession('token'));
+        $this->assertEquals($this->stubClass()->container()->getCookie('RudraToken'), $this->stubClass()->container()->getSession('token'));
     }
 
     public function testLogin(): void
@@ -84,7 +84,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
     public function testLogout(): void
     {
-        unset($_COOKIE['RUDRA']);
+        unset($_COOKIE['RudraPermit']);
         $this->assertNull($this->stubClass()->logout());
         $this->assertFalse($this->stubClass()->container()->hasSession('token'));
     }

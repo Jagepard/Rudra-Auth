@@ -36,8 +36,8 @@ class Auth extends AuthBase implements AuthInterface
 
             /* Если установлен флаг remember_me */
             if ($this->container()->hasPost('remember_me')) {
-                $this->setCookie('RUDRA', $this->getSessionHash(), $this->getExpireTime()); // @codeCoverageIgnore
-                $this->setCookie('RUDRA_INVOICE', $sessionToken, $this->getExpireTime());   // @codeCoverageIgnore
+                $this->setCookie('RudraPermit', $this->getSessionHash(), $this->getExpireTime()); // @codeCoverageIgnore
+                $this->setCookie('RudraToken', $sessionToken, $this->getExpireTime());   // @codeCoverageIgnore
             }
 
             $this->container()->setSession('token', $sessionToken);
@@ -58,12 +58,12 @@ class Auth extends AuthBase implements AuthInterface
     public function check($redirect = 'stargate'): void
     {
         /* Если пользователь зашел используя флаг remember_me */
-        if ($this->container()->hasCookie('RUDRA')) {
+        if ($this->container()->hasCookie('RudraPermit')) {
 
-            /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie RUDRA */
-            if ($this->getSessionHash() == $this->container()->getCookie('RUDRA')) {
+            /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie Rudra */
+            if ($this->getSessionHash() == $this->container()->getCookie('RudraPermit')) {
                 /* Восстанавливаем сессию */
-                $this->container()->setSession('token', $this->container()->getCookie('RUDRA_INVOICE')); // @codeCoverageIgnore
+                $this->container()->setSession('token', $this->container()->getCookie('RudraToken')); // @codeCoverageIgnore
                 $this->setToken($this->container()->getSession('token')); // @codeCoverageIgnore
                 return; // @codeCoverageIgnore
             }
