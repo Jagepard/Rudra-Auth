@@ -59,9 +59,9 @@ trait AuthHelperTrait
     {
         if ('test' !== $this->getEnv()) {
             // @codeCoverageIgnoreStart
-            if ($this->container()->hasCookie('RUDRA')) {
-                $this->container()->unsetCookie('RUDRA'); // @codeCoverageIgnore
-                $this->container()->unsetCookie('RUDRA_INVOICE'); // @codeCoverageIgnore
+            if ($this->container()->hasCookie('RudraPermit')) {
+                $this->container()->unsetCookie('RudraPermit'); // @codeCoverageIgnore
+                $this->container()->unsetCookie('RudraToken'); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
             }
         }
