@@ -53,16 +53,14 @@ class Auth extends AuthBase implements AuthInterface
      *
      * @param string $redirect
      */
-    public function check($redirect = 'stargate'): void
+    public function checkCookie($redirect = 'stargate'): void
     {
         /* Если пользователь зашел используя флаг remember_me */
         if ($this->container->hasCookie('RudraPermit')) {
-
             /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie Rudra */
             if ($this->sessionHash == $this->container->getCookie('RudraPermit')) {
                 /* Восстанавливаем сессию */
                 $this->container->setSession('token', $this->container->getCookie('RudraToken')); // @codeCoverageIgnore
-                $this->setTokens();
                 return; // @codeCoverageIgnore
             }
 
@@ -71,32 +69,6 @@ class Auth extends AuthBase implements AuthInterface
             $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
             return;
         }
-
-        if ($this->container->hasSession('token')) {
-            $this->setTokens();
-            return;
-        }
-
-        $this->token = false;
-    }
-
-    /**
-     * @param bool        $access
-     * @param string|null $userToken
-     * @param array       $redirect
-     * @return mixed
-     *
-     * Проверяет авторизован ли пользователь
-     * Если да, то пропускаем выполнение скрипта дальше,
-     * Если нет, то редиректим на необходимую страницу
-     */
-    public function authenticate(bool $access = false, string $userToken = null, array $redirect = ['', 'login'])
-    {
-        if (!isset($userToken)) {
-            return $this->access($access, null, $redirect[0]);
-        }
-
-        return $this->access($access, $userToken, $redirect[1]);
     }
 
     /**
@@ -112,13 +84,15 @@ class Auth extends AuthBase implements AuthInterface
     {
         /* Если авторизован */
         if ($this->container->hasSession('token')) {
-            /* Предоставление доступа к личным ресурсам пользователя */
-            if (isset($userToken) && ($userToken === $this->userToken)) {
+            /* Предоставление доступа к общим ресурсам пользователя */
+            if (!isset($userToken)) {
                 return true;
             }
 
-            /* Предоставление доступа, к общим ресурсам */
-            return $this->token;
+            /* Предоставление доступа к личным ресурсам пользователя */
+            if ($userToken === $this->container()->getSession('token')) {
+                return true;
+            }
         }
 
         /* Если не авторизован */
