@@ -16,7 +16,7 @@ namespace Rudra;
  *
  * Класс работающий с аутентификацией и авторизацией пользователей
  */
-class Auth extends AbstractAuth implements AuthInterface
+class Auth extends AuthBase implements AuthInterface
 {
 
     /**
@@ -34,17 +34,17 @@ class Auth extends AbstractAuth implements AuthInterface
 
             /* Если установлен флаг remember_me */
             if ($this->container->hasPost('remember_me')) {
-                $this->support->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
-                $this->support->setCookie('RudraToken', $sessionToken, $this->expireTime);   // @codeCoverageIgnore
+                $this->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
+                $this->setCookie('RudraToken', $sessionToken, $this->expireTime);   // @codeCoverageIgnore
             }
 
             $this->container->setSession('token', $sessionToken);
 
-            return $this->support->handleRedirect($redirect, ['status' => 'Authorized']);
+            return $this->handleRedirect($redirect, ['status' => 'Authorized']);
         }
 
-        return $this->support->handleRedirect($redirect, ['status' => 'Wrong access data'], function ($notice) {
-            $this->support->loginRedirectWithFlash($notice); // @codeCoverageIgnore
+        return $this->handleRedirect($redirect, ['status' => 'Wrong access data'], function ($notice) {
+            $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
         });
     }
 
@@ -62,24 +62,18 @@ class Auth extends AbstractAuth implements AuthInterface
             if ($this->sessionHash == $this->container->getCookie('RudraPermit')) {
                 /* Восстанавливаем сессию */
                 $this->container->setSession('token', $this->container->getCookie('RudraToken')); // @codeCoverageIgnore
-                $this->token = $this->container->getSession('token'); // @codeCoverageIgnore
+                $this->setTokens();
                 return; // @codeCoverageIgnore
             }
 
             /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */
-            $this->support->unsetCookie();
-            $this->support->handleRedirect($redirect, ['status' => 'Authorization data expired']);
+            $this->unsetCookie();
+            $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
             return;
         }
 
         if ($this->container->hasSession('token')) {
-            if (is_bool($this->container->getSession('token'))) {
-                $this->token = $this->container->getSession('token');
-                return;
-            }
-
-            $this->userToken = $this->container->getSession('token');
-            $this->token     = true;
+            $this->setTokens();
             return;
         }
 
@@ -118,21 +112,18 @@ class Auth extends AbstractAuth implements AuthInterface
     {
         /* Если авторизован */
         if ($this->container->hasSession('token')) {
-
             /* Предоставление доступа к личным ресурсам пользователя */
             if (isset($userToken) && ($userToken === $this->userToken)) {
                 return true;
             }
 
             /* Предоставление доступа, к общим ресурсам */
-            if ($this->token == $this->container->getSession('token')) {
-                return true;
-            }
+            return $this->token;
         }
 
         /* Если не авторизован */
         if (!$access) {
-            return $this->support->handleRedirect($redirect, ['status' => 'Access denied']);
+            return $this->handleRedirect($redirect, ['status' => 'Access denied']);
         }
 
         return false;
@@ -146,8 +137,8 @@ class Auth extends AbstractAuth implements AuthInterface
     public function logout(string $redirect = ''): void
     {
         $this->container->unsetSession('token');
-        $this->support->unsetCookie();
-        $this->support->handleRedirect($redirect, ['status' => 'Logout']);
+        $this->unsetCookie();
+        $this->handleRedirect($redirect, ['status' => 'Logout']);
     }
 
     /**
@@ -166,7 +157,7 @@ class Auth extends AbstractAuth implements AuthInterface
         }
 
         if (!$access) {
-            $this->support->handleRedirect($redirect, ['status' => 'Permissions denied']);
+            $this->handleRedirect($redirect, ['status' => 'Permissions denied']);
         }
 
         return false;
