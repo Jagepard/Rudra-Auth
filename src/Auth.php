@@ -16,10 +16,8 @@ namespace Rudra;
  *
  * Класс работающий с аутентификацией и авторизацией пользователей
  */
-class Auth extends AuthBase implements AuthInterface
+class Auth extends AbstractAuth implements AuthInterface
 {
-
-    use AuthHelperTrait;
 
     /**
      * @param string $password
@@ -35,18 +33,18 @@ class Auth extends AuthBase implements AuthInterface
             $sessionToken = md5($password . $hash);
 
             /* Если установлен флаг remember_me */
-            if ($this->container()->hasPost('remember_me')) {
-                $this->setCookie('RudraPermit', $this->getSessionHash(), $this->getExpireTime()); // @codeCoverageIgnore
-                $this->setCookie('RudraToken', $sessionToken, $this->getExpireTime());   // @codeCoverageIgnore
+            if ($this->container->hasPost('remember_me')) {
+                $this->support->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
+                $this->support->setCookie('RudraToken', $sessionToken, $this->expireTime);   // @codeCoverageIgnore
             }
 
-            $this->container()->setSession('token', $sessionToken);
+            $this->container->setSession('token', $sessionToken);
 
-            return $this->handleRedirect($redirect, ['status' => 'Authorized']);
+            return $this->support->handleRedirect($redirect, ['status' => 'Authorized']);
         }
 
-        return $this->handleRedirect($redirect, ['status' => 'Wrong access data'], function ($notice) {
-            $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
+        return $this->support->handleRedirect($redirect, ['status' => 'Wrong access data'], function ($notice) {
+            $this->support->loginRedirectWithFlash($notice); // @codeCoverageIgnore
         });
     }
 
@@ -58,28 +56,34 @@ class Auth extends AuthBase implements AuthInterface
     public function check($redirect = 'stargate'): void
     {
         /* Если пользователь зашел используя флаг remember_me */
-        if ($this->container()->hasCookie('RudraPermit')) {
+        if ($this->container->hasCookie('RudraPermit')) {
 
             /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie Rudra */
-            if ($this->getSessionHash() == $this->container()->getCookie('RudraPermit')) {
+            if ($this->sessionHash == $this->container->getCookie('RudraPermit')) {
                 /* Восстанавливаем сессию */
-                $this->container()->setSession('token', $this->container()->getCookie('RudraToken')); // @codeCoverageIgnore
-                $this->setToken($this->container()->getSession('token')); // @codeCoverageIgnore
+                $this->container->setSession('token', $this->container->getCookie('RudraToken')); // @codeCoverageIgnore
+                $this->token = $this->container->getSession('token'); // @codeCoverageIgnore
                 return; // @codeCoverageIgnore
             }
 
             /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */
-            $this->unsetCookie();
-            $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
+            $this->support->unsetCookie();
+            $this->support->handleRedirect($redirect, ['status' => 'Authorization data expired']);
             return;
         }
 
-        if ($this->container()->hasSession('token')) {
-            $this->setToken($this->container()->getSession('token'));
+        if ($this->container->hasSession('token')) {
+            if (is_bool($this->container->getSession('token'))) {
+                $this->token = $this->container->getSession('token');
+                return;
+            }
+
+            $this->userToken = $this->container->getSession('token');
+            $this->token     = true;
             return;
         }
 
-        $this->setToken(false);
+        $this->token = false;
     }
 
     /**
@@ -113,22 +117,22 @@ class Auth extends AuthBase implements AuthInterface
     public function access(bool $access = false, string $userToken = null, string $redirect = '')
     {
         /* Если авторизован */
-        if ($this->container()->hasSession('token')) {
+        if ($this->container->hasSession('token')) {
 
             /* Предоставление доступа к личным ресурсам пользователя */
-            if (isset($userToken) && ($userToken === $this->getToken())) {
+            if (isset($userToken) && ($userToken === $this->userToken)) {
                 return true;
             }
 
             /* Предоставление доступа, к общим ресурсам */
-            if ($this->getToken() == $this->container()->getSession('token')) {
+            if ($this->token == $this->container->getSession('token')) {
                 return true;
             }
         }
 
         /* Если не авторизован */
         if (!$access) {
-            return $this->handleRedirect($redirect, ['status' => 'Access denied']);
+            return $this->support->handleRedirect($redirect, ['status' => 'Access denied']);
         }
 
         return false;
@@ -141,9 +145,9 @@ class Auth extends AuthBase implements AuthInterface
      */
     public function logout(string $redirect = ''): void
     {
-        $this->container()->unsetSession('token');
-        $this->unsetCookie();
-        $this->handleRedirect($redirect, ['status' => 'Logout']);
+        $this->container->unsetSession('token');
+        $this->support->unsetCookie();
+        $this->support->handleRedirect($redirect, ['status' => 'Logout']);
     }
 
     /**
@@ -157,12 +161,12 @@ class Auth extends AuthBase implements AuthInterface
      */
     public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
     {
-        if ($this->getRole($role) <= $this->getRole($privilege)) {
+        if ($this->roles[$role] <= $this->roles[$privilege]) {
             return true;
         }
 
         if (!$access) {
-            $this->handleRedirect($redirect, ['status' => 'Permissions denied']);
+            $this->support->handleRedirect($redirect, ['status' => 'Permissions denied']);
         }
 
         return false;
