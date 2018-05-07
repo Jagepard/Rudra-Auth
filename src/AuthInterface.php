@@ -31,19 +31,7 @@ interface AuthInterface
      *
      * Проверка авторизации
      */
-    public function check($redirect = 'stargate'): void;
-
-    /**
-     * @param bool        $access
-     * @param string|null $userToken
-     * @param array       $redirect
-     * @return callable
-     *
-     * Проверяет авторизован ли пользователь
-     * Если да, то пропускаем выполнение скрипта дальше,
-     * Если нет, то редиректим на необходимую страницу
-     */
-    public function authenticate(bool $access = false, string $userToken = null, array $redirect = ['', 'login']);
+    public function checkCookie($redirect = 'stargate'): void;
 
     /**
      * @param bool        $access
