@@ -10,11 +10,10 @@ declare(strict_types=1);
  *  phpunit src/tests/AuthTest --coverage-html src/tests/build/coverage-html
  */
 
+namespace Rudra\Tests;
 
-use Rudra\Auth;
 use Rudra\Container;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
-
 
 /**
  * Class AuthTest
@@ -35,40 +34,35 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testAccess(): void
     {
         /* Regular Access */
-        $this->stubClass()->container()->setSession('token', '1');
-        $this->stubClass()->container()->get('auth')->setToken(true);
+        $this->stubClass()->container()->setSession('token', 'token');
         $this->assertTrue($this->stubClass()->auth());
 
         $this->stubClass()->container()->unsetSession('token');
-        $this->stubClass()->container()->get('auth')->setToken(false);
-        $this->assertFalse($this->stubClass()->auth(true));
+        $this->assertNull($this->stubClass()->auth('someToken'));
 
         /* User Access */
         $this->stubClass()->container()->setSession('token', 'userIdToken');
-        $this->stubClass()->container()->get('auth')->setToken('userIdToken');
-        $this->assertTrue($this->stubClass()->auth(false, 'userIdToken'));
+        $this->assertTrue($this->stubClass()->auth( 'userIdToken'));
 
-        $this->stubClass()->container()->get('auth')->setToken(false);
         $this->stubClass()->container()->unsetSession('token');
-        $this->assertFalse($this->stubClass()->auth(true, 'userIdToken'));
-        $this->assertNull($this->stubClass()->auth(false, 'userIdToken'));
+        $this->assertFalse($this->stubClass()->container()->get('auth')->access(true, 'userIdToken', ''));
+        $this->assertNull($this->stubClass()->container()->get('auth')->access(false, 'userIdToken', ''));
     }
 
     public function testCheck(): void
     {
-        $this->stubClass()->check();
-        $this->assertFalse($this->stubClass()->container()->get('auth')->getToken());
+        $this->assertNull($this->stubClass()->checkCookie());
 
-        $this->stubClass()->container()->setSession('token', 'check');
-        $this->stubClass()->check();
-        $this->assertEquals('check', $this->stubClass()->container()->getSession('token'));
+        $this->stubClass()->container()->setSession('token', 'userIdToken');
+        $this->stubClass()->checkCookie();
+        $this->assertEquals('userIdToken', $this->stubClass()->container()->getSession('token'));
 
         $this->stubClass()->container()->setServer('REMOTE_ADDR', '127.0.0.1');
         $this->stubClass()->container()->setServer('HTTP_USER_AGENT', 'Mozilla');
 
-        $this->stubClass()->container()->setCookie('RudraPermit', 'check');
-        $this->stubClass()->container()->setCookie('RudraToken', 'check');
-        $this->stubClass()->check();
+        $this->stubClass()->container()->setCookie('RudraPermit', 'userIdToken');
+        $this->stubClass()->container()->setCookie('RudraToken', 'userIdToken');
+        $this->stubClass()->checkCookie();
 
         $this->assertEquals($this->stubClass()->container()->getCookie('RudraToken'), $this->stubClass()->container()->getSession('token'));
     }
@@ -113,13 +107,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testJsonResponse()
     {
         /* Regular Access */
-        $this->stubClass()->container()->setSession('token', '1');
-        $this->stubClass()->container()->get('auth')->setToken(true);
-        $this->assertTrue($this->stubClass()->auth(false, null, ['API', 'API']));
+        $this->stubClass()->container()->setSession('token', 'token');
+        $this->assertTrue($this->stubClass()->container()->get('auth')->access(false, null, 'API'));
 
-        $this->stubClass()->container()->setSession('token', 'undefined');
-        $this->stubClass()->container()->get('auth')->setToken(false);
-        $this->assertFalse($this->stubClass()->auth(true, null, ['API', 'API']));
+        $this->stubClass()->logout();
+        $this->assertFalse($this->stubClass()->container()->get('auth')->access(true, null, 'API'));
     }
 
     public function testHash()
@@ -128,6 +120,12 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $hash     = $this->stubClass()->bcrypt($password);
 
         $this->assertTrue(password_verify($password, $hash));
+    }
+
+    public function testUserToken()
+    {
+        $this->stubClass()->container()->setSession('token', 'someToken');
+        $this->assertEquals($this->stubClass()->userToken(), $this->stubClass()->container()->getSession('token'));
     }
 
     /**
