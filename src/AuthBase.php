@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Rudra;
 
 /**
- * Class AbstractAuth
+ * Class AuthBase
  * @package Rudra
  *
  * Класс работающий с аутентификацией и авторизацией пользователей
@@ -24,10 +24,6 @@ class AuthBase
     }
 
     /**
-     * @var bool
-     */
-    protected $token = false;
-    /**
      * @var string
      */
     protected $env;
@@ -35,10 +31,6 @@ class AuthBase
      * @var array
      */
     protected $roles;
-    /**
-     * @var string
-     */
-    protected $userToken;
     /**
      * @var integer
      */
@@ -88,7 +80,7 @@ class AuthBase
             return $redirectCallable;
         }
 
-        $this->container()->get('redirect')->run($redirect);
+        $this->container->get('redirect')->run($redirect);
     }
 
     /**
@@ -99,49 +91,19 @@ class AuthBase
      */
     protected function loginRedirectWithFlash(string $notice): void
     {
-        $this->container()->setSession('alert', 'main', $notice);
-        $this->container()->get('redirect')->run('stargate');
+        $this->container->setSession('alert', 'main', $notice);
+        $this->container->get('redirect')->run('stargate');
     }
 
     protected function unsetCookie(): void
     {
         if ('test' !== $this->env) {
             // @codeCoverageIgnoreStart
-            if ($this->container()->hasCookie('RudraPermit')) {
-                $this->container()->unsetCookie('RudraPermit'); // @codeCoverageIgnore
-                $this->container()->unsetCookie('RudraToken'); // @codeCoverageIgnore
+            if ($this->container->hasCookie('RudraPermit')) {
+                $this->container->unsetCookie('RudraPermit'); // @codeCoverageIgnore
+                $this->container->unsetCookie('RudraToken'); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
             }
         }
-    }
-
-    protected function setTokens(): void
-    {
-        $this->userToken = $this->container->getSession('token');
-        $this->token     = true;
-    }
-
-    /**
-     * @param string $userToken
-     */
-    public function setUserToken(string $userToken): void
-    {
-        $this->userToken = $userToken;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getToken(): bool
-    {
-        return $this->token;
-    }
-
-    /**
-     * @param bool $token
-     */
-    public function setToken(bool $token): void
-    {
-        $this->token = $token;
     }
 }
