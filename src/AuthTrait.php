@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 /**
- * Date: 22.03.17
- * Time: 13:03
- *
  * @author    : Korotkov Danila <dankorot@gmail.com>
  * @copyright Copyright (c) 2016, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
@@ -43,21 +40,20 @@ trait AuthTrait
     /**
      * @param string $redirect
      */
-    public function check(string $redirect = ''): void
+    public function checkCookie(string $redirect = ''): void
     {
-        $this->container()->get('auth')->check($redirect);
+        $this->container()->get('auth')->checkCookie($redirect);
     }
 
     /**
-     * @param bool        $accessOrRedirect
      * @param string|null $userToken
-     * @param array       $redirect
+     * @param string      $redirect
      *
      * @return mixed
      */
-    public function auth(bool $accessOrRedirect = false, string $userToken = null, array $redirect = ['', 'login'])
+    public function auth(string $userToken = null, string $redirect = '')
     {
-        return $this->container()->get('auth')->authenticate($accessOrRedirect, $userToken, $redirect);
+        return $this->container()->get('auth')->access(false, $userToken, $redirect);
     }
 
     /**
@@ -81,6 +77,14 @@ trait AuthTrait
     public function bcrypt(string $password, int $cost = 10): string
     {
         return $this->container()->get('auth')->bcrypt($password, $cost);
+    }
+
+    /**
+     * @return string
+     */
+    public function userToken(): string
+    {
+        return $this->container()->getSession('token');
     }
 
     /**

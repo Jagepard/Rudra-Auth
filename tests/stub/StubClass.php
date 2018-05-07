@@ -8,11 +8,11 @@ declare(strict_types=1);
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
 
+namespace Rudra\Tests;
 
 use Rudra\AuthTrait;
 use Rudra\ContainerInterface;
 use Rudra\Auth;
-
 
 /**
  * Class StubClass

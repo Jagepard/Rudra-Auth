@@ -19,8 +19,6 @@ namespace Rudra;
 class Auth extends AuthBase implements AuthInterface
 {
 
-    use AuthHelperTrait;
-
     /**
      * @param string $password
      * @param string $hash
@@ -35,12 +33,12 @@ class Auth extends AuthBase implements AuthInterface
             $sessionToken = md5($password . $hash);
 
             /* Если установлен флаг remember_me */
-            if ($this->container()->hasPost('remember_me')) {
-                $this->setCookie('RudraPermit', $this->getSessionHash(), $this->getExpireTime()); // @codeCoverageIgnore
-                $this->setCookie('RudraToken', $sessionToken, $this->getExpireTime());   // @codeCoverageIgnore
+            if ($this->container->hasPost('remember_me')) {
+                $this->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
+                $this->setCookie('RudraToken', $sessionToken, $this->expireTime);   // @codeCoverageIgnore
             }
 
-            $this->container()->setSession('token', $sessionToken);
+            $this->container->setSession('token', $sessionToken);
 
             return $this->handleRedirect($redirect, ['status' => 'Authorized']);
         }
@@ -55,16 +53,14 @@ class Auth extends AuthBase implements AuthInterface
      *
      * @param string $redirect
      */
-    public function check($redirect = 'stargate'): void
+    public function checkCookie($redirect = 'stargate'): void
     {
         /* Если пользователь зашел используя флаг remember_me */
-        if ($this->container()->hasCookie('RudraPermit')) {
-
+        if ($this->container->hasCookie('RudraPermit')) {
             /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie Rudra */
-            if ($this->getSessionHash() == $this->container()->getCookie('RudraPermit')) {
+            if ($this->sessionHash == $this->container->getCookie('RudraPermit')) {
                 /* Восстанавливаем сессию */
-                $this->container()->setSession('token', $this->container()->getCookie('RudraToken')); // @codeCoverageIgnore
-                $this->setToken($this->container()->getSession('token')); // @codeCoverageIgnore
+                $this->container->setSession('token', $this->container->getCookie('RudraToken')); // @codeCoverageIgnore
                 return; // @codeCoverageIgnore
             }
 
@@ -73,32 +69,6 @@ class Auth extends AuthBase implements AuthInterface
             $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
             return;
         }
-
-        if ($this->container()->hasSession('token')) {
-            $this->setToken($this->container()->getSession('token'));
-            return;
-        }
-
-        $this->setToken(false);
-    }
-
-    /**
-     * @param bool        $access
-     * @param string|null $userToken
-     * @param array       $redirect
-     * @return mixed
-     *
-     * Проверяет авторизован ли пользователь
-     * Если да, то пропускаем выполнение скрипта дальше,
-     * Если нет, то редиректим на необходимую страницу
-     */
-    public function authenticate(bool $access = false, string $userToken = null, array $redirect = ['', 'login'])
-    {
-        if (!isset($userToken)) {
-            return $this->access($access, null, $redirect[0]);
-        }
-
-        return $this->access($access, $userToken, $redirect[1]);
     }
 
     /**
@@ -113,15 +83,14 @@ class Auth extends AuthBase implements AuthInterface
     public function access(bool $access = false, string $userToken = null, string $redirect = '')
     {
         /* Если авторизован */
-        if ($this->container()->hasSession('token')) {
-
-            /* Предоставление доступа к личным ресурсам пользователя */
-            if (isset($userToken) && ($userToken === $this->getToken())) {
+        if ($this->container->hasSession('token')) {
+            /* Предоставление доступа к общим ресурсам пользователя */
+            if (!isset($userToken)) {
                 return true;
             }
 
-            /* Предоставление доступа, к общим ресурсам */
-            if ($this->getToken() == $this->container()->getSession('token')) {
+            /* Предоставление доступа к личным ресурсам пользователя */
+            if ($userToken === $this->container()->getSession('token')) {
                 return true;
             }
         }
@@ -141,7 +110,7 @@ class Auth extends AuthBase implements AuthInterface
      */
     public function logout(string $redirect = ''): void
     {
-        $this->container()->unsetSession('token');
+        $this->container->unsetSession('token');
         $this->unsetCookie();
         $this->handleRedirect($redirect, ['status' => 'Logout']);
     }
@@ -157,7 +126,7 @@ class Auth extends AuthBase implements AuthInterface
      */
     public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
     {
-        if ($this->getRole($role) <= $this->getRole($privilege)) {
+        if ($this->roles[$role] <= $this->roles[$privilege]) {
             return true;
         }
 
