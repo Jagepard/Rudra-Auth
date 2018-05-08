@@ -13,6 +13,7 @@
 Авторизация
 
 Установка / Install
+
 ```composer require rudra/auth```
 
 ## WIP
