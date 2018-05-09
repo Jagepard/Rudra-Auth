@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Rudra\Tests;
 
 use Rudra\AuthTrait;
-use Rudra\ContainerInterface;
+use Rudra\Interfaces\ContainerInterface;
 use Rudra\Auth;
 
 /**

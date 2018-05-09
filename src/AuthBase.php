@@ -10,6 +10,9 @@ declare(strict_types=1);
 
 namespace Rudra;
 
+use Rudra\ExternalTraits\SetContainerTrait;
+use Rudra\Interfaces\ContainerInterface;
+
 /**
  * Class AuthBase
  * @package Rudra
