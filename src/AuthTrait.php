@@ -10,9 +10,10 @@ declare(strict_types=1);
 
 namespace Rudra;
 
+use Rudra\Interfaces\ContainerInterface;
+
 /**
- * Class AuthTrait
- *
+ * Trait AuthTrait
  * @package Rudra
  */
 trait AuthTrait
