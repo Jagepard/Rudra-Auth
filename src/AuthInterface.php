@@ -31,7 +31,7 @@ interface AuthInterface
      *
      * Проверка авторизации
      */
-    public function checkCookie($redirect = 'stargate'): void;
+    public function checkCookie($redirect = 'login'): void;
 
     /**
      * @param bool        $access
