@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 /**
  * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2016, Korotkov Danila
+ * @copyright Copyright (c) 2018, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
 
 namespace Rudra;
 
+use Rudra\Interfaces\ContainerInterface;
+
 /**
- * Class AuthTrait
- *
+ * Trait AuthTrait
  * @package Rudra
  */
 trait AuthTrait

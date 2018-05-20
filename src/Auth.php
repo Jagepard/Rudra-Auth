@@ -53,7 +53,7 @@ class Auth extends AuthBase implements AuthInterface
      *
      * @param string $redirect
      */
-    public function checkCookie($redirect = 'stargate'): void
+    public function checkCookie($redirect = 'login'): void
     {
         /* Если пользователь зашел используя флаг remember_me */
         if ($this->container->hasCookie('RudraPermit')) {
