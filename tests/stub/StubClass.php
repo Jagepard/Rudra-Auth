@@ -10,9 +10,9 @@ declare(strict_types=1);
 
 namespace Rudra\Tests;
 
-use Rudra\AuthTrait;
-use Rudra\Interfaces\ContainerInterface;
 use Rudra\Auth;
+use Rudra\ContainerInterface;
+use Rudra\ExternalTraits\AuthTrait;
 
 /**
  * Class StubClass

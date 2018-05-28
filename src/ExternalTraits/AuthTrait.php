@@ -8,9 +8,9 @@ declare(strict_types=1);
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  */
 
-namespace Rudra;
+namespace Rudra\ExternalTraits;
 
-use Rudra\Interfaces\ContainerInterface;
+use Rudra\ContainerInterface;
 
 /**
  * Trait AuthTrait
