@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Rudra;
 
+use Rudra\Interfaces\ContainerInterface;
 use Rudra\ExternalTraits\SetContainerTrait;
 
 /**
