@@ -23,23 +23,25 @@ class Auth extends AuthBase implements AuthInterface
 
     /**
      * @param string $password
-     * @param string $hash
+     * @param array  $user
      * @param string $redirect
      * @param string $notice
      * @return callable
      */
-    public function login(string $password, string $hash, string $redirect = 'admin', string $notice)
+    public function login(string $password, array $user, string $redirect = 'admin', string $notice)
     {
-        if (password_verify($password, $hash)) {
+        if (password_verify($password, $user['password'])) {
 
-            $sessionToken = md5($password . $hash);
+            $sessionToken = md5($password . $user['password']);
 
             /* Если установлен флаг remember_me */
             if ($this->container->hasPost('remember_me')) {
                 $this->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
                 $this->setCookie('RudraToken', $sessionToken, $this->expireTime);   // @codeCoverageIgnore
+                $this->setCookie('RudraUserId', $user['id'], $this->expireTime);   // @codeCoverageIgnore
             }
 
+            $this->container->setSession('id', $user['id']);
             $this->container->setSession('token', $sessionToken);
 
             return $this->handleRedirect($redirect, ['status' => 'Authorized']);
@@ -62,6 +64,7 @@ class Auth extends AuthBase implements AuthInterface
             /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie Rudra */
             if ($this->sessionHash == $this->container->getCookie('RudraPermit')) {
                 /* Восстанавливаем сессию */
+                $this->container->setSession('id', $this->container->getCookie('RudraUserId')); // @codeCoverageIgnore
                 $this->container->setSession('token', $this->container->getCookie('RudraToken')); // @codeCoverageIgnore
                 return; // @codeCoverageIgnore
             }

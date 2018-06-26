@@ -19,14 +19,14 @@ interface AuthInterface
 
     /**
      * @param string $password
-     * @param string $hash
+     * @param array  $user
      * @param string $redirect
      * @param string $notice
      * @return mixed
      *
      * Аутентификация, Авторизация
      */
-    public function login(string $password, string $hash, string $redirect = 'admin', string $notice);
+    public function login(string $password, array $user, string $redirect = 'admin', string $notice);
 
     /**
      * @param string $redirect
