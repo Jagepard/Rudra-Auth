@@ -10,10 +10,45 @@
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-498e7f.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # Rudra-Auth
-Авторизация
+### Авторизация / Auth
 
-Установка / Install
-
+#### Установка / Install
 ```composer require rudra/auth```
-
-## WIP 
+#### Использование / Usage
+```php
+use Rudra\Auth;
+use Rudra\Container;
+use Rudra\ContainerInterface;
+```
+```php
+$rudra = Container::app();
+$role  = [
+    'admin'     => 1
+    'editor'    => 2
+    'moderator' => 3
+];
+```
+##### Вызов из контейнера / use container
+```php
+$services = [
+    'contracts' => [
+        ContainerInterface::class => $rudra,
+    ],
+    
+    'services' => [
+        // Another services
+        
+        'auth' => ['Rudra\Auth', ['env' => 'development', 'role' => $role],
+        
+        // Another services
+    ]
+];
+```
+```php
+$rudra->setServices($services); 
+```
+```php
+$rudra->get('auth')->login($password, $hash, 'admin', $message);
+$rudra->get('auth')->logout('');
+$rudra->get('auth')->checkCookie('');
+```

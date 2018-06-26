@@ -69,10 +69,9 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
     public function testLogin(): void
     {
-        $this->assertNull($this->stubClass()->login('password', ''));
+        $this->assertNull($this->stubClass()->login('password', ['id' => 1, 'password' => '']));
         $this->assertNull($this->stubClass()->login(
-            'password',
-            password_hash('password', PASSWORD_BCRYPT, ['cost' => 10])
+            'password',['id' => 1, 'password' => password_hash('password', PASSWORD_BCRYPT, ['cost' => 10])]
         ));
     }
 

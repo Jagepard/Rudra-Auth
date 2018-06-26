@@ -21,13 +21,13 @@ trait AuthTrait
 
     /**
      * @param string $password
-     * @param string $hash
+     * @param array  $user
      * @param string $redirect
      * @param string $message
      */
-    public function login(string $password, string $hash, string $redirect = 'admin', string $message = 'Укажите верные данные'): void
+    public function login(string $password, array $user, string $redirect = 'admin', string $message = 'Укажите верные данные'): void
     {
-        $this->container()->get('auth')->login($password, $hash, $redirect, $message);
+        $this->container()->get('auth')->login($password, $user, $redirect, $message);
     }
 
     /**
