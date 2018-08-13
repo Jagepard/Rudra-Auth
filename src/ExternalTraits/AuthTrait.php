@@ -20,6 +20,8 @@ trait AuthTrait
 {
 
     /**
+     * Аутентификация, Авторизация
+     *
      * @param string $password
      * @param array  $user
      * @param string $redirect
@@ -31,6 +33,8 @@ trait AuthTrait
     }
 
     /**
+     * Завершить сессию
+     *
      * @param string $redirect
      */
     public function logout(string $redirect = ''): void
@@ -39,6 +43,8 @@ trait AuthTrait
     }
 
     /**
+     * Проверка авторизации
+     *
      * @param string $redirect
      */
     public function checkCookie(string $redirect = ''): void
@@ -47,6 +53,9 @@ trait AuthTrait
     }
 
     /**
+     * Предоставление доступа к общим ресурсам,
+     * либо личным ресурсам пользователя
+     *
      * @param string|null $userToken
      * @param string      $redirect
      *
@@ -58,6 +67,8 @@ trait AuthTrait
     }
 
     /**
+     * Проверка прав доступа
+     *
      * @param string $role
      * @param string $privilege
      * @param bool   $access
@@ -71,6 +82,8 @@ trait AuthTrait
     }
 
     /**
+     * Получить хеш пароля
+     *
      * @param string $password
      * @param int    $cost
      * @return bool|string
@@ -81,6 +94,8 @@ trait AuthTrait
     }
 
     /**
+     * Получить токен сессии
+     *
      * @return string
      */
     public function userToken(): string

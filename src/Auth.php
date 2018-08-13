@@ -22,6 +22,8 @@ class Auth extends AuthBase implements AuthInterface
 {
 
     /**
+     * Аутентификация, Авторизация
+     *
      * @param string $password
      * @param array  $user
      * @param string $redirect
@@ -77,13 +79,13 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
+     * Предоставление доступа к общим ресурсам,
+     * либо личным ресурсам пользователя
+     *
      * @param bool        $access
      * @param string|null $userToken
      * @param string      $redirect
      * @return mixed
-     *
-     * Предоставление доступа к общим ресурсам,
-     * либо личным ресурсам пользователя
      */
     public function access(bool $access = false, string $userToken = null, string $redirect = '')
     {
@@ -109,9 +111,9 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
-     * @param string $redirect
-     *
      * Завершить сессию
+     *
+     * @param string $redirect
      */
     public function logout(string $redirect = ''): void
     {
@@ -121,13 +123,13 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
+     * Проверка прав доступа
+     *
      * @param string $role
      * @param string $privilege
      * @param bool   $access
      * @param string $redirect
      * @return bool
-     *
-     * Проверка прав доступа
      */
     public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
     {
@@ -143,6 +145,8 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
+     * Получить хеш пароля
+     *
      * @param string $password
      * @param int    $cost
      * @return bool|string

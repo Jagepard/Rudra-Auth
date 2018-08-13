@@ -18,31 +18,31 @@ interface AuthInterface
 {
 
     /**
+     * Аутентификация, Авторизация
+     *
      * @param string $password
      * @param array  $user
      * @param string $redirect
      * @param string $notice
      * @return mixed
-     *
-     * Аутентификация, Авторизация
      */
     public function login(string $password, array $user, string $redirect = 'admin', string $notice);
 
     /**
-     * @param string $redirect
-     *
      * Проверка авторизации
+     *
+     * @param string $redirect
      */
     public function checkCookie($redirect = 'login'): void;
 
     /**
+     * Предоставление доступа к общим ресурсам,
+     * либо личным ресурсам пользователя
+     *
      * @param bool        $access
      * @param string|null $userToken
      * @param string      $redirect
      * @return callable
-     *
-     * Предоставление доступа к общим ресурсам,
-     * либо личным ресурсам пользователя
      */
     public function access(bool $access = false, string $userToken = null, string $redirect = '');
 
@@ -54,17 +54,19 @@ interface AuthInterface
     public function logout(string $redirect = ''): void;
 
     /**
+     * Проверка прав доступа
+     *
      * @param string $role
      * @param string $privilege
      * @param bool   $redirectOrAccess
      * @param string $redirect
      * @return bool
-     *
-     * Проверка прав доступа
      */
     public function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '');
 
     /**
+     * Получить хеш пароля
+     *
      * @param string $password
      * @param int    $cost
      * @return bool|string
