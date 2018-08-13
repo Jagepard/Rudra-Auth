@@ -45,6 +45,8 @@ class AuthBase
 
     /**
      * AbstractAuth constructor.
+     * Устанавливает роли, окружение, время жизни куки, хеш сессии
+     *
      * @param ContainerInterface $container
      * @param string             $env
      * @param array              $roles
@@ -59,6 +61,8 @@ class AuthBase
     }
 
     /**
+     * Устанавливает куки
+     *
      * @codeCoverageIgnore
      * @param string $name
      * @param string $value
@@ -70,6 +74,8 @@ class AuthBase
     }
 
     /**
+     * Обрабатывает перенаправление
+     *
      * @param string   $redirect
      * @param array    $jsonResponse
      * @param callable $redirectCallable
@@ -87,10 +93,10 @@ class AuthBase
     }
 
     /**
+     * Переадресует с добавлением уведомления в 'alert'
+     *
      * @codeCoverageIgnore
      * @param string $notice
-     *
-     * Переадресация с добавлением уведомления в 'alert'
      */
     protected function loginRedirectWithFlash(string $notice): void
     {
@@ -98,6 +104,9 @@ class AuthBase
         $this->container->get('redirect')->run('stargate');
     }
 
+    /**
+     * Сбрасывает куки
+     */
     protected function unsetCookie(): void
     {
         if ('test' !== $this->env) {
