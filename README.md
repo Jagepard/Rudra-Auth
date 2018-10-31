@@ -52,3 +52,4 @@ $rudra->get('auth')->login($password, $hash, 'admin', $message);
 $rudra->get('auth')->logout('');
 $rudra->get('auth')->checkCookie('');
 ```
+![Rudra-Auth](https://github.com/Jagepard/Rudra-Auth/blob/master/UML.png)
