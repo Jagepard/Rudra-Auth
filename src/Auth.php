@@ -49,9 +49,7 @@ class Auth extends AuthBase implements AuthInterface
             return $this->handleRedirect($redirect, ['status' => 'Authorized']);
         }
 
-        return $this->handleRedirect($redirect, ['status' => 'Wrong access data'], function ($notice) {
-            $this->loginRedirectWithFlash($notice); // @codeCoverageIgnore
-        });
+        return $this->handleRedirect($redirect, ['status' => 'Wrong access data'], $this->loginRedirectWithFlash($notice));
     }
 
     /**
