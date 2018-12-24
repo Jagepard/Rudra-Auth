@@ -21,12 +21,12 @@ interface AuthInterface
      * Аутентификация, Авторизация
      *
      * @param string $password
-     * @param array  $user
+     * @param string $hash
      * @param string $redirect
      * @param string $notice
-     * @return mixed
+     * @return callable
      */
-    public function login(string $password, array $user, string $redirect = 'admin', string $notice);
+    public function login(string $password, string $hash, string $redirect = 'admin', string $notice);
 
     /**
      * Проверка авторизации
