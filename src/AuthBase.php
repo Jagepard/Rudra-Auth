@@ -100,7 +100,7 @@ class AuthBase
      */
     protected function loginRedirectWithFlash(string $notice): void
     {
-        $this->container->setSession('alert',  $notice, 'main');
+        $this->container->setSession('alert',  $notice, 'error');
         $this->container->get('redirect')->run('stargate');
     }
 
