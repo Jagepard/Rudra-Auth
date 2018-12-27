@@ -18,15 +18,13 @@ interface AuthInterface
 {
 
     /**
-     * Аутентификация, Авторизация
-     *
      * @param string $password
-     * @param string $hash
+     * @param array $user
      * @param string $redirect
      * @param string $notice
      * @return callable
      */
-    public function login(string $password, string $hash, string $redirect = 'admin', string $notice);
+    public function login(string $password, array $user, string $redirect = 'admin', string $notice);
 
     /**
      * Проверка авторизации
@@ -36,15 +34,12 @@ interface AuthInterface
     public function checkCookie($redirect = 'login'): void;
 
     /**
-     * Предоставление доступа к общим ресурсам,
-     * либо личным ресурсам пользователя
-     *
-     * @param bool        $access
-     * @param string|null $userToken
-     * @param string      $redirect
-     * @return callable
+     * @param string $token
+     * @param bool   $access
+     * @param string $redirect
+     * @return mixed
      */
-    public function access(bool $access = false, string $userToken = null, string $redirect = '');
+    public function access(bool $access = false, string $token = null, string $redirect = '');
 
     /**
      * Завершить сессию

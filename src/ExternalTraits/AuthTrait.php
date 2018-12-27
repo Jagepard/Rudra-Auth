@@ -20,16 +20,14 @@ trait AuthTrait
 {
 
     /**
-     * Аутентификация, Авторизация
-     *
      * @param string $password
-     * @param string $hash
+     * @param array $user
      * @param string $redirect
-     * @param string $message
+     * @param string $notice
      */
-    public function login(string $password, string $hash, string $redirect = 'admin', string $message = 'Укажите верные данные'): void
+    public function login(string $password, array $user, string $redirect = 'admin', string $notice = 'Укажите верные данные'): void
     {
-        $this->container()->get('auth')->login($password, $hash, $redirect, $message);
+        $this->container()->get('auth')->login($password, $user, $redirect, $notice);
     }
 
     /**
