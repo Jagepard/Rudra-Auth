@@ -15,28 +15,29 @@ use Rudra\Interfaces\AuthInterface;
 /**
  * Class Auth
  * @package Rudra
- *
- * Класс работающий с аутентификацией и авторизацией пользователей
  */
 class Auth extends AuthBase implements AuthInterface
 {
 
     /**
-     * Аутентификация, Авторизация
-     *
      * @param string $password
-     * @param string $hash
+     * @param array  $user
      * @param string $redirect
      * @param string $notice
      * @return callable
      */
-    public function login(string $password, string $hash, string $redirect = 'admin', string $notice)
+    public function login(string $password, array $user, string $redirect = 'admin', string $notice)
     {
-        if (password_verify($password, $hash)) {
-            /* Если установлен флаг remember_me */
+        if (password_verify($password, $user['password'])) {
+            $token = md5($user['password'] . $user['email']);
             if ($this->container->hasPost('remember_me')) {
                 $this->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
+                $this->setCookie('RudraToken', $token, $this->expireTime);   // @codeCoverageIgnore
+                $this->setCookie('RudraUser', $user['email'], $this->expireTime);   // @codeCoverageIgnore
             }
+
+            $this->container->setSession('token', $token);
+            $this->container->setSession('user', $user['email']);
 
             return $this->handleRedirect($redirect, ['status' => 'Authorized']);
         }
@@ -55,11 +56,11 @@ class Auth extends AuthBase implements AuthInterface
         if ($this->container->hasCookie('RudraPermit')) {
             /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie Rudra */
             if ($this->sessionHash == $this->container->getCookie('RudraPermit')) {
-                /* Восстанавливаем сессию */
+                $this->container->setSession('token', $this->container->getCookie('RudraToken')); // @codeCoverageIgnore
+                $this->container->setSession('user', $this->container->getCookie('RudraUser')); // @codeCoverageIgnore
                 return; // @codeCoverageIgnore
             }
 
-            /* Уничтожаем устаревшие данные cookie, переадресуем на страницу авторизации */
             $this->unsetCookie();
             $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
             return;
@@ -71,31 +72,24 @@ class Auth extends AuthBase implements AuthInterface
      * либо личным ресурсам пользователя
      *
      * @param bool        $access
-     * @param string|null $userToken
+     * @param string|null $token
      * @param string      $redirect
      * @return mixed
      */
-    public function access(bool $access = false, string $userToken = null, string $redirect = '')
+    public function access(bool $access = false, string $token = null, string $redirect = '')
     {
         /* Если авторизован */
         if ($this->container->hasSession('token')) {
-            /* Предоставление доступа к общим ресурсам пользователя */
-            if (!isset($userToken)) {
+            /* Предоставление доступа к общим ресурсам */
+            if (!isset($token)) {
                 return true;
             }
 
             /* Предоставление доступа к личным ресурсам пользователя */
-            if ($userToken === $this->container()->getSession('token')) {
+            if ($token === 2) {
                 return true;
             }
         }
-
-        /* Если не авторизован */
-        if (!$access) {
-            return $this->handleRedirect($redirect, ['status' => 'Access denied']);
-        }
-
-        return false;
     }
 
     /**
