@@ -6,16 +6,13 @@ namespace Rudra\Tests;
 
 use Rudra\Auth;
 use Rudra\ExternalTraits\AuthTrait;
-use Rudra\Interfaces\ContainerInterface;
 
 class StubClass
 {
 
     use AuthTrait;
 
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct()
     {
         $roles = [
             'admin'  => 1,
@@ -23,18 +20,12 @@ class StubClass
             'user'   => 5
         ];
 
-        $this->container = $container;
-        $this->container->set('auth', new Auth($this->container, 'test', $roles), 'raw');
-        $this->container->set('redirect', $this, 'raw');
+        rudra()->set('auth', new Auth(rudra(), 'test', $roles), 'raw');
+        rudra()->set('redirect', $this, 'raw');
     }
 
     public function run(...$params)
     {
         return null;
-    }
-
-    public function container(): ContainerInterface
-    {
-        return $this->container;
     }
 }

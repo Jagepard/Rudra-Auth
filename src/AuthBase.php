@@ -83,13 +83,13 @@ class AuthBase
      */
     protected function handleRedirect(string $redirect, array $jsonResponse, callable $redirectCallable = null)
     {
-        ('API' !== $redirect) ?: exit($this->container->jsonResponse($jsonResponse));
+        ('API' !== $redirect) ?: exit($this->container()->jsonResponse($jsonResponse));
 
         if (isset($redirectCallable)) {
             return $redirectCallable;
         }
 
-        $this->container->get('redirect')->run($redirect);
+        $this->container()->get('redirect')->run($redirect);
     }
 
     /**
@@ -100,8 +100,8 @@ class AuthBase
      */
     protected function loginRedirectWithFlash(string $notice): void
     {
-        $this->container->setSession('alert',  $notice, 'error');
-        $this->container->get('redirect')->run('stargate');
+        $this->container()->setSession('alert',  $notice, 'error');
+        $this->container()->get('redirect')->run('stargate');
     }
 
     /**
@@ -109,13 +109,46 @@ class AuthBase
      */
     protected function unsetCookie(): void
     {
-        if ('test' !== $this->env) {
+        if ('test' !== $this->env()) {
             // @codeCoverageIgnoreStart
-            if ($this->container->hasCookie('RudraPermit')) {
-                $this->container->unsetCookie('RudraPermit'); // @codeCoverageIgnore
-                $this->container->unsetCookie('RudraToken'); // @codeCoverageIgnore
+            if ($this->container()->hasCookie('RudraPermit')) {
+                $this->container()->unsetCookie('RudraPermit'); // @codeCoverageIgnore
+                $this->container()->unsetCookie('RudraToken'); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function env(): string
+    {
+        return $this->env;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function roles(string $key)
+    {
+        return $this->roles[$key];
+    }
+
+    /**
+     * @return int
+     */
+    public function expireTime(): int
+    {
+        return $this->expireTime;
+    }
+
+    /**
+     * @return string
+     */
+    public function sessionHash(): string
+    {
+        return $this->sessionHash;
     }
 }
