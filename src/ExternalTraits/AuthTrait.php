@@ -63,18 +63,14 @@ trait AuthTrait
     }
 
     /**
-     * Проверка прав доступа
-     *
      * @param string $role
      * @param string $privilege
-     * @param bool   $access
      * @param string $redirect
-     *
      * @return mixed
      */
-    public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
+    public function role(string $role, string $privilege, string $redirect = '')
     {
-        return rudra()->get('auth')->role($role, $privilege, $access, $redirect);
+        return rudra()->get('auth')->role($role, $privilege, $redirect);
     }
 
     /**
