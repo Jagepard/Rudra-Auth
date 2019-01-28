@@ -85,10 +85,17 @@ class Auth extends AuthBase implements AuthInterface
             }
 
             /* Предоставление доступа к личным ресурсам пользователя */
-            if ($token === 2) {
+            if ($token === $this->container()->getSession('token')) {
                 return true;
             }
         }
+
+        /* Если не авторизован */
+        if (!$access) {
+            return $this->handleRedirect($redirect, ['status' => 'Access denied']);
+        }
+
+        return false;
     }
 
     /**
