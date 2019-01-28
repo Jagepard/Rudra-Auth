@@ -49,15 +49,12 @@ interface AuthInterface
     public function logout(string $redirect = ''): void;
 
     /**
-     * Проверка прав доступа
-     *
-     * @param string $role
-     * @param string $privilege
-     * @param bool   $redirectOrAccess
-     * @param string $redirect
+     * @param string      $role
+     * @param string      $privilege
+     * @param string|null $redirect
      * @return bool
      */
-    public function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '');
+    public function role(string $role, string $privilege, string $redirect = null);
 
     /**
      * Получить хеш пароля
