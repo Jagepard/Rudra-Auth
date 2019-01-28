@@ -27,7 +27,7 @@ trait AuthTrait
      */
     public function login(string $password, array $user, string $redirect = 'admin', string $notice = 'Укажите верные данные'): void
     {
-        $this->container()->get('auth')->login($password, $user, $redirect, $notice);
+        rudra()->get('auth')->login($password, $user, $redirect, $notice);
     }
 
     /**
@@ -37,7 +37,7 @@ trait AuthTrait
      */
     public function logout(string $redirect = ''): void
     {
-        $this->container()->get('auth')->logout($redirect);
+        rudra()->get('auth')->logout($redirect);
     }
 
     /**
@@ -47,7 +47,7 @@ trait AuthTrait
      */
     public function checkCookie(string $redirect = ''): void
     {
-        $this->container()->get('auth')->checkCookie($redirect);
+        rudra()->get('auth')->checkCookie($redirect);
     }
 
     /**
@@ -61,7 +61,7 @@ trait AuthTrait
      */
     public function auth(string $userToken = null, string $redirect = '')
     {
-        return $this->container()->get('auth')->access(false, $userToken, $redirect);
+        return rudra()->get('auth')->access(false, $userToken, $redirect);
     }
 
     /**
@@ -76,7 +76,7 @@ trait AuthTrait
      */
     public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
     {
-        return $this->container()->get('auth')->role($role, $privilege, $access, $redirect);
+        return rudra()->get('auth')->role($role, $privilege, $access, $redirect);
     }
 
     /**
@@ -88,7 +88,7 @@ trait AuthTrait
      */
     public function bcrypt(string $password, int $cost = 10): string
     {
-        return $this->container()->get('auth')->bcrypt($password, $cost);
+        return rudra()->get('auth')->bcrypt($password, $cost);
     }
 
     /**
@@ -98,7 +98,7 @@ trait AuthTrait
      */
     public function userToken(): string
     {
-        return $this->container()->getSession('token');
+        return rudra()->getSession('token');
     }
 
     /**
