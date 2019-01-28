@@ -70,12 +70,11 @@ class Auth extends AuthBase implements AuthInterface
      * Предоставление доступа к общим ресурсам,
      * либо личным ресурсам пользователя
      *
-     * @param bool        $access
      * @param string|null $token
-     * @param string      $redirect
-     * @return mixed
+     * @param string|null $redirect
+     * @return bool|callable|mixed
      */
-    public function access(bool $access = false, string $token = null, string $redirect = '')
+    public function access(string $token = null, string $redirect = null)
     {
         /* Если авторизован */
         if ($this->container()->hasSession('token')) {
@@ -91,7 +90,7 @@ class Auth extends AuthBase implements AuthInterface
         }
 
         /* Если не авторизован */
-        if (!$access) {
+        if (isset($redirect)) {
             return $this->handleRedirect($redirect, ['status' => 'Access denied']);
         }
 
@@ -122,7 +121,7 @@ class Auth extends AuthBase implements AuthInterface
             return true;
         }
 
-        if (!$redirect) {
+        if (isset($redirect)) {
             $this->handleRedirect($redirect, ['status' => 'Permissions denied']);
         }
 
