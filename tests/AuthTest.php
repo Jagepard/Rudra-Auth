@@ -46,8 +46,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->stubClass()->auth('userIdToken'));
 
         rudra()->unsetSession('token');
-        $this->assertFalse(rudra()->get('auth')->access(true, 'userIdToken', ''));
-        $this->assertNull(rudra()->get('auth')->access(false, 'userIdToken', ''));
+        $this->assertFalse(rudra()->get('auth')->access('userIdToken'));
+        $this->assertNull(rudra()->get('auth')->access('userIdToken', ''));
     }
 
     public function testCheck(): void
@@ -115,10 +115,10 @@ class AuthTest extends PHPUnit_Framework_TestCase
     {
         /* Regular Access */
         rudra()->setSession('token', 'token');
-        $this->assertTrue(rudra()->get('auth')->access(false, null, 'API'));
+        $this->assertTrue(rudra()->get('auth')->access(null, 'API'));
 
         $this->stubClass()->logout();
-        $this->assertFalse(rudra()->get('auth')->access(true, null, 'API'));
+        $this->assertNull(rudra()->get('auth')->access(null, 'API'));
     }
 
     public function testHash()
