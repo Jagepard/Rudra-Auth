@@ -83,7 +83,7 @@ class AuthBase
      */
     protected function handleRedirect(string $redirect, array $jsonResponse, callable $redirectCallable = null)
     {
-        ('API' !== $redirect) ?: exit($this->container()->jsonResponse($jsonResponse));
+        ('API' !== $redirect) ?: $this->container()->jsonResponse($jsonResponse);
 
         if (isset($redirectCallable)) {
             return $redirectCallable;
