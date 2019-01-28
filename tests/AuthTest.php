@@ -97,14 +97,14 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->stubClass()->role('admin', 'D'));
 
         $this->assertFalse($this->stubClass()->role('editor', 'D'));
-        $this->assertFalse($this->stubClass()->role('editor', 'D', true));
+        $this->assertFalse($this->stubClass()->role('editor', 'D', ''));
         $this->assertTrue($this->stubClass()->role('editor', 'C'));
         $this->assertTrue($this->stubClass()->role('editor', 'U'));
 
         $this->assertFalse($this->stubClass()->role('user', 'D'));
         $this->assertFalse($this->stubClass()->role('user', 'U'));
-        $this->assertFalse($this->stubClass()->role('user', 'D', true));
-        $this->assertFalse($this->stubClass()->role('user', 'U', true));
+        $this->assertFalse($this->stubClass()->role('user', 'D', ''));
+        $this->assertFalse($this->stubClass()->role('user', 'U', ''));
         $this->assertTrue($this->stubClass()->role('user', 'C'));
     }
 
