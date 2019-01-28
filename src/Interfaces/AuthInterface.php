@@ -34,12 +34,11 @@ interface AuthInterface
     public function checkCookie($redirect = 'login'): void;
 
     /**
-     * @param string $token
-     * @param bool   $access
-     * @param string $redirect
+     * @param string|null $token
+     * @param string|null $redirect
      * @return mixed
      */
-    public function access(bool $access = false, string $token = null, string $redirect = '');
+    public function access(string $token = null, string $redirect = null);
 
     /**
      * Завершить сессию
