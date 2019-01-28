@@ -59,7 +59,7 @@ trait AuthTrait
      */
     public function auth(string $userToken = null, string $redirect = '')
     {
-        return rudra()->get('auth')->access(false, $userToken, $redirect);
+        return rudra()->get('auth')->access($userToken, $redirect);
     }
 
     /**
