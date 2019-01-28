@@ -75,6 +75,12 @@ class AuthTest extends PHPUnit_Framework_TestCase
                 'email'    => '',
                 'password' => password_hash('password', PASSWORD_BCRYPT, ['cost' => 10])
             ]));
+
+        $this->assertNull(
+            $this->stubClass()->login('wrong', [
+                'email'    => '',
+                'password' => password_hash('password', PASSWORD_BCRYPT, ['cost' => 10])
+            ]));
     }
 
     public function testLogout(): void
