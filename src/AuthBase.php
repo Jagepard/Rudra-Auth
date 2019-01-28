@@ -109,7 +109,7 @@ class AuthBase
      */
     protected function unsetCookie(): void
     {
-        if ('test' !== $this->env) {
+        if ('test' !== $this->env()) {
             // @codeCoverageIgnoreStart
             if ($this->container()->hasCookie('RudraPermit')) {
                 $this->container()->unsetCookie('RudraPermit'); // @codeCoverageIgnore
@@ -117,5 +117,38 @@ class AuthBase
                 // @codeCoverageIgnoreEnd
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function env(): string
+    {
+        return $this->env;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function roles(string $key)
+    {
+        return $this->roles[$key];
+    }
+
+    /**
+     * @return int
+     */
+    public function expireTime(): int
+    {
+        return $this->expireTime;
+    }
+
+    /**
+     * @return string
+     */
+    public function sessionHash(): string
+    {
+        return $this->sessionHash;
     }
 }
