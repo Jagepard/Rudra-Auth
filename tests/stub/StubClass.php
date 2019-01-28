@@ -15,9 +15,9 @@ class StubClass
     public function __construct()
     {
         $roles = [
-            'admin'  => 1,
-            'editor' => 3,
-            'user'   => 5
+            'admin'  => ['C', 'U', 'D'],
+            'editor' => ['C', 'U'],
+            'user'   => ['C']
         ];
 
         rudra()->set('auth', new Auth(rudra(), 'test', $roles), 'raw');
