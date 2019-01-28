@@ -46,8 +46,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->stubClass()->auth('userIdToken'));
 
         rudra()->unsetSession('token');
-        $this->assertFalse(rudra()->get('auth')->access(true, 'userIdToken', ''));
-        $this->assertNull(rudra()->get('auth')->access(false, 'userIdToken', ''));
+        $this->assertFalse(rudra()->get('auth')->access('userIdToken'));
+        $this->assertNull(rudra()->get('auth')->access('userIdToken', ''));
     }
 
     public function testCheck(): void
@@ -92,20 +92,20 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
     public function testRole(): void
     {
-        $this->assertTrue($this->stubClass()->role('admin', 'admin'));
-        $this->assertTrue($this->stubClass()->role('admin', 'editor'));
-        $this->assertTrue($this->stubClass()->role('admin', 'user'));
+        $this->assertTrue($this->stubClass()->role('admin', 'C'));
+        $this->assertTrue($this->stubClass()->role('admin', 'U'));
+        $this->assertTrue($this->stubClass()->role('admin', 'D'));
 
-        $this->assertFalse($this->stubClass()->role('editor', 'admin'));
-        $this->assertFalse($this->stubClass()->role('editor', 'admin', true));
-        $this->assertTrue($this->stubClass()->role('editor', 'editor'));
-        $this->assertTrue($this->stubClass()->role('editor', 'user'));
+        $this->assertFalse($this->stubClass()->role('editor', 'D'));
+        $this->assertFalse($this->stubClass()->role('editor', 'D', ''));
+        $this->assertTrue($this->stubClass()->role('editor', 'C'));
+        $this->assertTrue($this->stubClass()->role('editor', 'U'));
 
-        $this->assertFalse($this->stubClass()->role('user', 'admin'));
-        $this->assertFalse($this->stubClass()->role('user', 'editor'));
-        $this->assertFalse($this->stubClass()->role('user', 'admin', true));
-        $this->assertFalse($this->stubClass()->role('user', 'editor', true));
-        $this->assertTrue($this->stubClass()->role('user', 'user'));
+        $this->assertFalse($this->stubClass()->role('user', 'D'));
+        $this->assertFalse($this->stubClass()->role('user', 'U'));
+        $this->assertFalse($this->stubClass()->role('user', 'D', ''));
+        $this->assertFalse($this->stubClass()->role('user', 'U', ''));
+        $this->assertTrue($this->stubClass()->role('user', 'C'));
     }
 
     /**
@@ -115,10 +115,10 @@ class AuthTest extends PHPUnit_Framework_TestCase
     {
         /* Regular Access */
         rudra()->setSession('token', 'token');
-        $this->assertTrue(rudra()->get('auth')->access(false, null, 'API'));
+        $this->assertTrue(rudra()->get('auth')->access(null, 'API'));
 
         $this->stubClass()->logout();
-        $this->assertFalse(rudra()->get('auth')->access(true, null, 'API'));
+        $this->assertNull(rudra()->get('auth')->access(null, 'API'));
     }
 
     public function testHash()

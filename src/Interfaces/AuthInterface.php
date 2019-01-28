@@ -34,12 +34,11 @@ interface AuthInterface
     public function checkCookie($redirect = 'login'): void;
 
     /**
-     * @param string $token
-     * @param bool   $access
-     * @param string $redirect
+     * @param string|null $token
+     * @param string|null $redirect
      * @return mixed
      */
-    public function access(bool $access = false, string $token = null, string $redirect = '');
+    public function access(string $token = null, string $redirect = null);
 
     /**
      * Завершить сессию
@@ -49,15 +48,12 @@ interface AuthInterface
     public function logout(string $redirect = ''): void;
 
     /**
-     * Проверка прав доступа
-     *
-     * @param string $role
-     * @param string $privilege
-     * @param bool   $redirectOrAccess
-     * @param string $redirect
+     * @param string      $role
+     * @param string      $privilege
+     * @param string|null $redirect
      * @return bool
      */
-    public function role(string $role, string $privilege, bool $redirectOrAccess = false, string $redirect = '');
+    public function role(string $role, string $privilege, string $redirect = null);
 
     /**
      * Получить хеш пароля

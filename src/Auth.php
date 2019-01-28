@@ -70,12 +70,11 @@ class Auth extends AuthBase implements AuthInterface
      * Предоставление доступа к общим ресурсам,
      * либо личным ресурсам пользователя
      *
-     * @param bool        $access
      * @param string|null $token
-     * @param string      $redirect
-     * @return mixed
+     * @param string|null $redirect
+     * @return bool|callable|mixed
      */
-    public function access(bool $access = false, string $token = null, string $redirect = '')
+    public function access(string $token = null, string $redirect = null)
     {
         /* Если авторизован */
         if ($this->container()->hasSession('token')) {
@@ -91,7 +90,7 @@ class Auth extends AuthBase implements AuthInterface
         }
 
         /* Если не авторизован */
-        if (!$access) {
+        if (isset($redirect)) {
             return $this->handleRedirect($redirect, ['status' => 'Access denied']);
         }
 
@@ -111,21 +110,18 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
-     * Проверка прав доступа
-     *
-     * @param string $role
-     * @param string $privilege
-     * @param bool   $access
-     * @param string $redirect
+     * @param string      $role
+     * @param string      $privilege
+     * @param string|null $redirect
      * @return bool
      */
-    public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
+    public function role(string $role, string $privilege, string $redirect = null)
     {
-        if ($this->roles($role) <= $this->roles($privilege)) {
+        if (in_array($privilege, $this->roles($role))) {
             return true;
         }
 
-        if (!$access) {
+        if (isset($redirect)) {
             $this->handleRedirect($redirect, ['status' => 'Permissions denied']);
         }
 
