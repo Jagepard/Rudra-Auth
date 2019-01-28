@@ -30,14 +30,14 @@ class Auth extends AuthBase implements AuthInterface
     {
         if (password_verify($password, $user['password'])) {
             $token = md5($user['password'] . $user['email']);
-            if ($this->container->hasPost('remember_me')) {
-                $this->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
-                $this->setCookie('RudraToken', $token, $this->expireTime);   // @codeCoverageIgnore
-                $this->setCookie('RudraUser', $user['email'], $this->expireTime);   // @codeCoverageIgnore
+            if ($this->container()->hasPost('remember_me')) {
+                $this->setCookie('RudraPermit', $this->sessionHash(), $this->expireTime()); // @codeCoverageIgnore
+                $this->setCookie('RudraToken', $token, $this->expireTime());   // @codeCoverageIgnore
+                $this->setCookie('RudraUser', $user['email'], $this->expireTime());   // @codeCoverageIgnore
             }
 
-            $this->container->setSession('token', $token);
-            $this->container->setSession('user', $user['email']);
+            $this->container()->setSession('token', $token);
+            $this->container()->setSession('user', $user['email']);
 
             return $this->handleRedirect($redirect, ['status' => 'Authorized']);
         }
@@ -53,17 +53,16 @@ class Auth extends AuthBase implements AuthInterface
     public function checkCookie($redirect = 'login'): void
     {
         /* Если пользователь зашел используя флаг remember_me */
-        if ($this->container->hasCookie('RudraPermit')) {
+        if ($this->container()->hasCookie('RudraPermit')) {
             /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie Rudra */
-            if ($this->sessionHash == $this->container->getCookie('RudraPermit')) {
-                $this->container->setSession('token', $this->container->getCookie('RudraToken')); // @codeCoverageIgnore
-                $this->container->setSession('user', $this->container->getCookie('RudraUser')); // @codeCoverageIgnore
+            if ($this->sessionHash() == $this->container()->getCookie('RudraPermit')) {
+                $this->container()->setSession('token', $this->container()->getCookie('RudraToken')); // @codeCoverageIgnore
+                $this->container()->setSession('user', $this->container()->getCookie('RudraUser')); // @codeCoverageIgnore
                 return; // @codeCoverageIgnore
             }
 
             $this->unsetCookie();
             $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
-            return;
         }
     }
 
@@ -79,7 +78,7 @@ class Auth extends AuthBase implements AuthInterface
     public function access(bool $access = false, string $token = null, string $redirect = '')
     {
         /* Если авторизован */
-        if ($this->container->hasSession('token')) {
+        if ($this->container()->hasSession('token')) {
             /* Предоставление доступа к общим ресурсам */
             if (!isset($token)) {
                 return true;
@@ -99,7 +98,7 @@ class Auth extends AuthBase implements AuthInterface
      */
     public function logout(string $redirect = ''): void
     {
-        $this->container->unsetSession('token');
+        $this->container()->unsetSession('token');
         $this->unsetCookie();
         $this->handleRedirect($redirect, ['status' => 'Logout']);
     }
@@ -115,7 +114,7 @@ class Auth extends AuthBase implements AuthInterface
      */
     public function role(string $role, string $privilege, bool $access = false, string $redirect = '')
     {
-        if ($this->roles[$role] <= $this->roles[$privilege]) {
+        if ($this->roles($role) <= $this->roles($privilege)) {
             return true;
         }
 
