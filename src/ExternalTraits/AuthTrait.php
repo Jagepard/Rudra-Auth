@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace Rudra\ExternalTraits;
 
-use Rudra\Interfaces\ContainerInterface;
-
 /**
  * Trait AuthTrait
  * @package Rudra
@@ -100,9 +98,4 @@ trait AuthTrait
     {
         return rudra()->getSession('token');
     }
-
-    /**
-     * @return ContainerInterface
-     */
-    abstract public function container(): ContainerInterface;
 }
