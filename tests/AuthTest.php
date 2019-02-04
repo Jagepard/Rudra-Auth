@@ -23,7 +23,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
     /**
      * @var StubClass
      */
-    protected $stubClass;
+    private $stubClass;
 
     protected function setUp(): void
     {
