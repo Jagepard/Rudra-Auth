@@ -6,18 +6,17 @@
         "rudra",
         "auth"
     ],
-    "license"           : "GPL-3.0-or-later",
+    "license"           : "MIT",
     "authors"           : [
         {
-            "name"     : "Danila Korotkov (Jagepard)",
-            "email"    : "jagepard@yandex.ru",
-            "homepage" : "https://jagepard.ru",
-            "role"     : "Developer"
+            "name"    : "Jagepard",
+            "email"   : "jagepard@yandex.ru",
+            "homepage": "https://jagepard.ru",
+            "role"    : "Developer"
         }
     ],
     "support"           : {
-        "email" : "jagepard@yandex.ru",
-        "skype" : "jagepard.ru"
+        "email" : "jagepard@yandex.ru"
     },
     "require"           : {
         "php"             : ">=7.1",
