@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rudra\Tests;
 
 use Rudra\Auth;
@@ -9,7 +7,6 @@ use Rudra\ExternalTraits\AuthTrait;
 
 class StubClass
 {
-
     use AuthTrait;
 
     public function __construct()
