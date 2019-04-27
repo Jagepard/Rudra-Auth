@@ -3,20 +3,15 @@
 declare(strict_types=1);
 
 /**
- * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2018, Korotkov Danila
- * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
+ * @author    : Jagepard <jagepard@yandex.ru">
+ * @copyright Copyright (c) 2019, Jagepard
+ * @license   https://mit-license.org/ MIT
  */
 
 namespace Rudra\ExternalTraits;
 
-/**
- * Trait AuthTrait
- * @package Rudra
- */
 trait AuthTrait
 {
-
     /**
      * @param string $password
      * @param array $user
@@ -29,8 +24,6 @@ trait AuthTrait
     }
 
     /**
-     * Завершить сессию
-     *
      * @param string $redirect
      */
     public function logout(string $redirect = ''): void
@@ -39,8 +32,6 @@ trait AuthTrait
     }
 
     /**
-     * Проверка авторизации
-     *
      * @param string $redirect
      */
     public function checkCookie(string $redirect = ''): void
@@ -74,8 +65,6 @@ trait AuthTrait
     }
 
     /**
-     * Получить хеш пароля
-     *
      * @param string $password
      * @param int    $cost
      * @return bool|string
@@ -86,8 +75,6 @@ trait AuthTrait
     }
 
     /**
-     * Получить токен сессии
-     *
      * @return string
      */
     public function userToken(): string

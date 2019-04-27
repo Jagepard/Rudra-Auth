@@ -1,22 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
 /**
- * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2018, Korotkov Danila
- * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
+ * @author    : Jagepard <jagepard@yandex.ru">
+ * @copyright Copyright (c) 2019, Jagepard
+ * @license   https://mit-license.org/ MIT
  */
 
 namespace Rudra\Interfaces;
 
-/**
- * Interface AuthInterface
- * @package Rudra
- */
 interface AuthInterface
 {
-
     /**
      * @param string $password
      * @param array $user
@@ -24,14 +17,12 @@ interface AuthInterface
      * @param string $notice
      * @return callable
      */
-    public function login(string $password, array $user, string $redirect = 'admin', string $notice);
+    public function login(string $password, array $user, string $redirect, string $notice);
 
     /**
-     * Проверка авторизации
-     *
      * @param string $redirect
      */
-    public function checkCookie($redirect = 'login'): void;
+    public function checkCookie($redirect): void;
 
     /**
      * @param string|null $token
@@ -41,11 +32,9 @@ interface AuthInterface
     public function access(string $token = null, string $redirect = null);
 
     /**
-     * Завершить сессию
-     *
      * @param string $redirect
      */
-    public function logout(string $redirect = ''): void;
+    public function logout(string $redirect): void;
 
     /**
      * @param string      $role
@@ -56,8 +45,6 @@ interface AuthInterface
     public function role(string $role, string $privilege, string $redirect = null);
 
     /**
-     * Получить хеш пароля
-     *
      * @param string $password
      * @param int    $cost
      * @return bool|string
