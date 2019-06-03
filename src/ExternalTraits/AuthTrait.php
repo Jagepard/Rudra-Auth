@@ -34,9 +34,9 @@ trait AuthTrait
     /**
      * @param string $redirect
      */
-    public function checkCookie(string $redirect = ''): void
+    public function updateSessionIfSetRememberMe(string $redirect = ''): void
     {
-        rudra()->get('auth')->checkCookie($redirect);
+        rudra()->get('auth')->updateSessionIfSetRememberMe($redirect);
     }
 
     /**
