@@ -48,10 +48,10 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
     public function testCheck(): void
     {
-        $this->assertNull($this->stubClass()->checkCookie());
+        $this->assertNull($this->stubClass()->updateSessionIfSetRememberMe());
 
         rudra()->setSession('token', 'userIdToken');
-        $this->stubClass()->checkCookie();
+        $this->stubClass()->updateSessionIfSetRememberMe();
         $this->assertEquals('userIdToken', rudra()->getSession('token'));
 
         rudra()->setServer('REMOTE_ADDR', '127.0.0.1');
@@ -59,7 +59,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
         rudra()->setCookie('RudraPermit', 'userIdToken');
         rudra()->setCookie('RudraToken', 'userIdToken');
-        $this->stubClass()->checkCookie();
+        $this->stubClass()->updateSessionIfSetRememberMe();
 
         $this->assertEquals(rudra()->getCookie('RudraToken'), rudra()->getSession('token'));
     }
