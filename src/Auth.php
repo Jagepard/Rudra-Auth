@@ -25,14 +25,8 @@ class Auth extends AuthBase implements AuthInterface
     {
         if (password_verify($password, $user['password'])) {
             $token = md5($user['password'] . $user['email']);
-            if ($this->container()->hasPost('remember_me')) {
-                $this->setCookie('RudraPermit', $this->sessionHash(), $this->expireTime()); // @codeCoverageIgnore
-                $this->setCookie('RudraToken', $token, $this->expireTime());   // @codeCoverageIgnore
-                $this->setCookie('RudraUser', $user['email'], $this->expireTime());   // @codeCoverageIgnore
-            }
-
-            $this->container()->setSession('token', $token);
-            $this->container()->setSession('user', $user['email']);
+            $this->ifSetRememberMe($user, $token);
+            $this->setAuthSession($user['email'], $token);
 
             return $this->handleRedirect($redirect, ['status' => 'Authorized']);
         }
@@ -43,14 +37,15 @@ class Auth extends AuthBase implements AuthInterface
     /**
      * @param string $redirect
      */
-    public function checkCookie($redirect = 'login'): void
+    public function updateSessionIfSetRememberMe($redirect = 'login'): void
     {
         /* Если пользователь зашел используя флаг remember_me */
         if ($this->container()->hasCookie('RudraPermit')) {
-            /* Если REMOTE_ADDR . HTTP_USER_AGENT совпадают с cookie Rudra */
-            if ($this->sessionHash() == $this->container()->getCookie('RudraPermit')) {
-                $this->container()->setSession('token', $this->container()->getCookie('RudraToken')); // @codeCoverageIgnore
-                $this->container()->setSession('user', $this->container()->getCookie('RudraUser')); // @codeCoverageIgnore
+            if ($this->sessionHash() === $this->container()->getCookie('RudraPermit')) {
+                $this->setAuthSession(
+                    $this->container()->getCookie('RudraUser'),
+                    $this->container()->getCookie('RudraToken')
+                );
                 return; // @codeCoverageIgnore
             }
 
@@ -124,5 +119,28 @@ class Auth extends AuthBase implements AuthInterface
     public function bcrypt(string $password, int $cost = 10): string
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $cost]);
+    }
+
+    /**
+     * @param array  $user
+     * @param string $token
+     */
+    protected function ifSetRememberMe(array $user, string $token): void
+    {
+        if ($this->container()->hasPost('remember_me')) {
+            $this->container()->setCookie('RudraPermit', $this->sessionHash(), $this->expireTime()); // @codeCoverageIgnore
+            $this->container()->setCookie('RudraToken', $token, $this->expireTime());   // @codeCoverageIgnore
+            $this->container()->setCookie('RudraUser', $user['email'], $this->expireTime());   // @codeCoverageIgnore
+        }
+    }
+
+    /**
+     * @param string $email
+     * @param string $token
+     */
+    protected function setAuthSession(string $email, string $token): void
+    {
+        $this->container()->setSession('token', $token);
+        $this->container()->setSession('user', $email);
     }
 }

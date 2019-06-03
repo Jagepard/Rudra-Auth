@@ -22,7 +22,7 @@ interface AuthInterface
     /**
      * @param string $redirect
      */
-    public function checkCookie($redirect): void;
+    public function updateSessionIfSetRememberMe($redirect): void;
 
     /**
      * @param string|null $token
