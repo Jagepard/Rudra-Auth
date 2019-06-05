@@ -21,18 +21,17 @@ use Rudra\Container;
 use Rudra\ContainerInterface;
 ```
 ```php
-$rudra = Container::app();
 $role  = [
-    'admin'     => 1
-    'editor'    => 2
-    'moderator' => 3
+    'admin' => ['C', 'U', 'D']
+    'editor' => ['C', 'U']
+    'moderator' => ['U']
 ];
 ```
 ##### Вызов из контейнера / use container
 ```php
 $services = [
     'contracts' => [
-        ContainerInterface::class => $rudra,
+        ContainerInterface::class => rudra(),
     ],
     
     'services' => [
@@ -48,8 +47,11 @@ $services = [
 $rudra->setServices($services); 
 ```
 ```php
-$rudra->get('auth')->login($password, $hash, 'admin', $message);
+$rudra->get('auth')->login('somePassword', $user = [
+    'email'    => 'some@email.com',
+    'password' => 'someHash'
+], 'dashboard', 'Укажите верные данные');
 $rudra->get('auth')->logout('');
-$rudra->get('auth')->checkCookie('');
+$rudra->get('auth')->updateSessionIfSetRememberMe('login');
 ```
 ![Rudra-Auth](https://github.com/Jagepard/Rudra-Auth/blob/master/UML.png)
