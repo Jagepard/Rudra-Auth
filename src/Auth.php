@@ -25,7 +25,7 @@ class Auth extends AuthBase implements AuthInterface
     {
         if (password_verify($password, $user['password'])) {
             $token = md5($user['password'] . $user['email']);
-            $this->ifSetRememberMe($user, $token);
+            $this->setCookiesIfSetRememberMe($user, $token);
             $this->setAuthSession($user['email'], $token);
 
             return $this->handleRedirect($redirect, ['status' => 'Authorized']);
@@ -37,21 +37,11 @@ class Auth extends AuthBase implements AuthInterface
     /**
      * @param string $redirect
      */
-    public function updateSessionIfSetRememberMe($redirect = 'login'): void
+    public function logout(string $redirect = ''): void
     {
-        /* Если пользователь зашел используя флаг remember_me */
-        if ($this->container()->hasCookie('RudraPermit')) {
-            if ($this->sessionHash() === $this->container()->getCookie('RudraPermit')) {
-                $this->setAuthSession(
-                    $this->container()->getCookie('RudraUser'),
-                    $this->container()->getCookie('RudraToken')
-                );
-                return; // @codeCoverageIgnore
-            }
-
-            $this->unsetCookie();
-            $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
-        }
+        $this->container()->unsetSession('token');
+        $this->unsetCookie();
+        $this->handleRedirect($redirect, ['status' => 'Logout']);
     }
 
     /**
@@ -83,16 +73,6 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
-     * @param string $redirect
-     */
-    public function logout(string $redirect = ''): void
-    {
-        $this->container()->unsetSession('token');
-        $this->unsetCookie();
-        $this->handleRedirect($redirect, ['status' => 'Logout']);
-    }
-
-    /**
      * @param string      $role
      * @param string      $privilege
      * @param string|null $redirect
@@ -100,7 +80,7 @@ class Auth extends AuthBase implements AuthInterface
      */
     public function role(string $role, string $privilege, string $redirect = null)
     {
-        if (in_array($privilege, $this->roles($role))) {
+        if (in_array($privilege, $this->roles[$role])) {
             return true;
         }
 
@@ -112,29 +92,6 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
-     * @param string $password
-     * @param int    $cost
-     * @return bool|string
-     */
-    public function bcrypt(string $password, int $cost = 10): string
-    {
-        return password_hash($password, PASSWORD_BCRYPT, ['cost' => $cost]);
-    }
-
-    /**
-     * @param array  $user
-     * @param string $token
-     */
-    protected function ifSetRememberMe(array $user, string $token): void
-    {
-        if ($this->container()->hasPost('remember_me')) {
-            $this->container()->setCookie('RudraPermit', $this->sessionHash(), $this->expireTime()); // @codeCoverageIgnore
-            $this->container()->setCookie('RudraToken', $token, $this->expireTime());   // @codeCoverageIgnore
-            $this->container()->setCookie('RudraUser', $user['email'], $this->expireTime());   // @codeCoverageIgnore
-        }
-    }
-
-    /**
      * @param string $email
      * @param string $token
      */
@@ -142,5 +99,48 @@ class Auth extends AuthBase implements AuthInterface
     {
         $this->container()->setSession('token', $token);
         $this->container()->setSession('user', $email);
+    }
+
+    /**
+     * @param string $redirect
+     */
+    public function updateSessionIfSetRememberMe($redirect = 'login'): void
+    {
+        /* Если пользователь зашел используя флаг remember_me */
+        if ($this->container()->hasCookie('RudraPermit')) {
+            if ($this->sessionHash === $this->container()->getCookie('RudraPermit')) {
+                $this->setAuthSession(
+                    $this->container()->getCookie('RudraUser'),
+                    $this->container()->getCookie('RudraToken')
+                );
+                return; // @codeCoverageIgnore
+            }
+
+            $this->unsetCookie();
+            $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
+        }
+    }
+
+    /**
+     * @param array  $user
+     * @param string $token
+     */
+    protected function setCookiesIfSetRememberMe(array $user, string $token): void
+    {
+        if ($this->container()->hasPost('remember_me')) {
+            $this->container()->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
+            $this->container()->setCookie('RudraToken', $token, $this->expireTime);   // @codeCoverageIgnore
+            $this->container()->setCookie('RudraUser', $user['email'], $this->expireTime);   // @codeCoverageIgnore
+        }
+    }
+
+    /**
+     * @param string $password
+     * @param int    $cost
+     * @return bool|string
+     */
+    public function bcrypt(string $password, int $cost = 10): string
+    {
+        return password_hash($password, PASSWORD_BCRYPT, ['cost' => $cost]);
     }
 }

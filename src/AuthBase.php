@@ -46,8 +46,8 @@ class AuthBase
      */
     public function __construct(ContainerInterface $container, string $env, array $roles = [])
     {
-        $this->roles       = $roles;
         $this->env         = $env;
+        $this->roles       = $roles;
         $this->expireTime  = time() + 3600 * 24 * 7;
         $this->sessionHash = md5($container->getServer('REMOTE_ADDR') . $container->getServer('HTTP_USER_AGENT'));
         $this->__setContainerTraitConstruct($container);
@@ -62,6 +62,18 @@ class AuthBase
     protected function setCookie(string $name, string $value, int $expire): void
     {
         setcookie($name, $value, $expire);
+    }
+
+    protected function unsetCookie(): void
+    {
+        if ('test' !== $this->env) {
+            // @codeCoverageIgnoreStart
+            if ($this->container()->hasCookie('RudraPermit')) {
+                $this->container()->unsetCookie('RudraPermit'); // @codeCoverageIgnore
+                $this->container()->unsetCookie('RudraToken'); // @codeCoverageIgnore
+                // @codeCoverageIgnoreEnd
+            }
+        }
     }
 
     /**
@@ -85,54 +97,9 @@ class AuthBase
      * @codeCoverageIgnore
      * @param string $notice
      */
-    protected function loginRedirectWithFlash(string $notice): void
+    protected function loginRedirectWithFlash(string $notice)
     {
         $this->container()->setSession('alert',  $notice, 'error');
         $this->container()->get('redirect')->run('stargate');
-    }
-
-    protected function unsetCookie(): void
-    {
-        if ('test' !== $this->env()) {
-            // @codeCoverageIgnoreStart
-            if ($this->container()->hasCookie('RudraPermit')) {
-                $this->container()->unsetCookie('RudraPermit'); // @codeCoverageIgnore
-                $this->container()->unsetCookie('RudraToken'); // @codeCoverageIgnore
-                // @codeCoverageIgnoreEnd
-            }
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function env(): string
-    {
-        return $this->env;
-    }
-
-    /**
-     * @param string $key
-     * @return mixed
-     */
-    public function roles(string $key)
-    {
-        return $this->roles[$key];
-    }
-
-    /**
-     * @return int
-     */
-    public function expireTime(): int
-    {
-        return $this->expireTime;
-    }
-
-    /**
-     * @return string
-     */
-    public function sessionHash(): string
-    {
-        return $this->sessionHash;
     }
 }
