@@ -16,11 +16,6 @@
 ```composer require rudra/auth```
 #### Использование / Usage
 ```php
-use Rudra\Auth;
-use Rudra\Container;
-use Rudra\ContainerInterface;
-```
-```php
 $role  = [
     'admin' => ['C', 'U', 'D']
     'editor' => ['C', 'U']
@@ -29,6 +24,8 @@ $role  = [
 ```
 ##### Вызов из контейнера / use container
 ```php
+use Rudra\ContainerInterface;
+
 $services = [
     'contracts' => [
         ContainerInterface::class => rudra(),
@@ -44,14 +41,15 @@ $services = [
 ];
 ```
 ```php
-$rudra->setServices($services); 
+rudra()->setServices($services); 
 ```
 ```php
-$rudra->get('auth')->login('somePassword', $user = [
+$user = [
     'email'    => 'some@email.com',
     'password' => 'someHash'
-], 'dashboard', 'Укажите верные данные');
-$rudra->get('auth')->logout('');
-$rudra->get('auth')->updateSessionIfSetRememberMe('login');
+]
+    
+rudra()->get('auth')->login('somePassword', $user, 'dashboard', 'Укажите верные данные');
+rudra()->get('auth')->logout('');
+rudra()->get('auth')->updateSessionIfSetRememberMe('login');
 ```
-![Rudra-Auth](https://github.com/Jagepard/Rudra-Auth/blob/master/UML.png)
