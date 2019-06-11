@@ -92,16 +92,6 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
-     * @param string $email
-     * @param string $token
-     */
-    protected function setAuthSession(string $email, string $token): void
-    {
-        $this->container()->setSession('token', $token);
-        $this->container()->setSession('user', $email);
-    }
-
-    /**
      * @param string $redirect
      */
     public function updateSessionIfSetRememberMe($redirect = 'login'): void
@@ -122,19 +112,6 @@ class Auth extends AuthBase implements AuthInterface
     }
 
     /**
-     * @param array  $user
-     * @param string $token
-     */
-    protected function setCookiesIfSetRememberMe(array $user, string $token): void
-    {
-        if ($this->container()->hasPost('remember_me')) {
-            $this->container()->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
-            $this->container()->setCookie('RudraToken', $token, $this->expireTime);   // @codeCoverageIgnore
-            $this->container()->setCookie('RudraUser', $user['email'], $this->expireTime);   // @codeCoverageIgnore
-        }
-    }
-
-    /**
      * @param string $password
      * @param int    $cost
      * @return bool|string
@@ -142,5 +119,28 @@ class Auth extends AuthBase implements AuthInterface
     public function bcrypt(string $password, int $cost = 10): string
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $cost]);
+    }
+
+    /**
+     * @param string $email
+     * @param string $token
+     */
+    private function setAuthSession(string $email, string $token): void
+    {
+        $this->container()->setSession('token', $token);
+        $this->container()->setSession('user', $email);
+    }
+
+    /**
+     * @param array  $user
+     * @param string $token
+     */
+    private function setCookiesIfSetRememberMe(array $user, string $token): void
+    {
+        if ($this->container()->hasPost('remember_me')) {
+            $this->container()->setCookie('RudraPermit', $this->sessionHash, $this->expireTime); // @codeCoverageIgnore
+            $this->container()->setCookie('RudraToken', $token, $this->expireTime);   // @codeCoverageIgnore
+            $this->container()->setCookie('RudraUser', $user['email'], $this->expireTime);   // @codeCoverageIgnore
+        }
     }
 }
