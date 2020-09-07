@@ -1,9 +1,10 @@
 <?php
 
-namespace Rudra\Tests;
+namespace Rudra\Auth\Tests\Stub;
 
-use Rudra\Auth;
-use Rudra\ExternalTraits\AuthTrait;
+use Rudra\Auth\Auth;
+use Rudra\Container\Application;
+use Rudra\Auth\Traits\AuthTrait;
 
 class StubClass
 {
@@ -17,8 +18,8 @@ class StubClass
             'user'   => ['C']
         ];
 
-        rudra()->set('auth', new Auth(rudra(), 'test', $roles), 'raw');
-        rudra()->set('redirect', $this, 'raw');
+        Application::run()->objects()->set(["auth", [new Auth(Application::run(), "test", $roles), "raw"]]);
+        Application::run()->objects()->set(["redirect", [$this, "raw"]]);
     }
 
     public function run(...$params)

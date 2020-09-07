@@ -4,60 +4,42 @@ declare(strict_types=1);
 
 /**
  * @author    : Jagepard <jagepard@yandex.ru">
- * @copyright Copyright (c) 2019, Jagepard
  * @license   https://mit-license.org/ MIT
  */
 
-namespace Rudra;
+namespace Rudra\Auth;
 
-use Rudra\Interfaces\ContainerInterface;
-use Rudra\ExternalTraits\SetContainerTrait;
+use Rudra\Container\Interfaces\ApplicationInterface;
+use Rudra\Container\Traits\SetApplicationContainersTrait;
 
 class AuthBase
 {
-    use SetContainerTrait {
-        SetContainerTrait::__construct as protected __setContainerTraitConstruct;
+    use SetApplicationContainersTrait {
+        SetApplicationContainersTrait::__construct as protected __setContainerTraitConstruct;
     }
 
-    /**
-     * @var string
-     */
-    protected $env;
-    /**
-     * @var array
-     */
-    protected $roles;
-    /**
-     * @var integer
-     */
-    protected $expireTime;
-    /**
-     * @var string
-     */
-    protected $sessionHash;
+    protected string $environment;
+    protected array $roles;
+    protected int $expireTime;
+    protected string $sessionHash;
 
     /**
-     * AbstractAuth constructor.
-     * Устанавливает роли, окружение, время жизни куки, хеш сессии
-     *
-     * @param ContainerInterface $container
-     * @param string             $env
-     * @param array              $roles
+     * Sets roles, environment, cookie lifetime, session hash
      */
-    public function __construct(ContainerInterface $container, string $env, array $roles = [])
+    public function __construct(ApplicationInterface $application, string $environment, array $roles = [])
     {
-        $this->env         = $env;
+        $this->environment = $environment;
         $this->roles       = $roles;
         $this->expireTime  = time() + 3600 * 24 * 7;
-        $this->sessionHash = md5($container->getServer('REMOTE_ADDR') . $container->getServer('HTTP_USER_AGENT'));
-        $this->__setContainerTraitConstruct($container);
+        $this->sessionHash = md5(
+            $application->request()->server()->get("REMOTE_ADDR") .
+            $application->request()->server()->get("HTTP_USER_AGENT")
+        );
+        $this->__setContainerTraitConstruct($application);
     }
 
     /**
      * @codeCoverageIgnore
-     * @param string $name
-     * @param string $value
-     * @param int    $expire
      */
     protected function setCookie(string $name, string $value, int $expire): void
     {
@@ -66,40 +48,33 @@ class AuthBase
 
     protected function unsetCookie(): void
     {
-        if ('test' !== $this->env) {
+        if ("test" !== $this->environment) {
             // @codeCoverageIgnoreStart
-            if ($this->container()->hasCookie('RudraPermit')) {
-                $this->container()->unsetCookie('RudraPermit'); // @codeCoverageIgnore
-                $this->container()->unsetCookie('RudraToken'); // @codeCoverageIgnore
+            if ($this->application()->cookie()->has("RudraPermit")) {
+                $this->application()->cookie()->unset("RudraPermit"); // @codeCoverageIgnore
+                $this->application()->cookie()->unset("RudraToken"); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
             }
         }
     }
 
-    /**
-     * @param string   $redirect
-     * @param array    $jsonResponse
-     * @param callable $redirectCallable
-     * @return callable
-     */
     protected function handleRedirect(string $redirect, array $jsonResponse, callable $redirectCallable = null)
     {
-        ('API' !== $redirect) ?: $this->container()->jsonResponse($jsonResponse);
+        ("API" !== $redirect) ?: $this->application()->response()->json($jsonResponse);
 
         if (isset($redirectCallable)) {
             return $redirectCallable;
         }
 
-        $this->container()->get('redirect')->run($redirect);
+        $this->application()->objects()->get('redirect')->run($redirect);
     }
 
     /**
      * @codeCoverageIgnore
-     * @param string $notice
      */
     protected function loginRedirectWithFlash(string $notice)
     {
-        $this->container()->setSession('alert',  $notice, 'error');
-        $this->container()->get('redirect')->run('stargate');
+        $this->application()->session()->set(["alert",  [$notice, "error"]]);
+        $this->application()->objects()->get("redirect")->run("stargate");
     }
 }
