@@ -23,7 +23,7 @@ trait AuthTrait
         Application::run()->objects()->get("auth")->logout($redirect);
     }
 
-    public function updateSessionIfSetRememberMe(string $redirect = ''): void
+    public function updateSessionIfSetRememberMe(string $redirect = ""): void
     {
         Application::run()->objects()->get("auth")->updateSessionIfSetRememberMe($redirect);
     }
@@ -32,12 +32,12 @@ trait AuthTrait
      * Providing access to shared resources,
      * or personal user resources
      */
-    public function auth(string $userToken = null, string $redirect = '')
+    public function auth(string $userToken = null, string $redirect = "")
     {
         return Application::run()->objects()->get("auth")->access($userToken, $redirect);
     }
 
-    public function role(string $role, string $privilege, string $redirect = '')
+    public function role(string $role, string $privilege, string $redirect = "")
     {
         return Application::run()->objects()->get("auth")->role($role, $privilege, $redirect);
     }

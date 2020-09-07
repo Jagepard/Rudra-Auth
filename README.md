@@ -10,11 +10,11 @@
 ![GitHub](https://img.shields.io/github/license/jagepard/Rudra-Auth.svg)
 
 # Rudra-Auth | [API](https://github.com/Jagepard/Rudra-Auth/blob/master/docs.md "Documentation API")
-### Авторизация / Auth
+### Authorization
 
-#### Установка / Install
+#### Install
 ```composer require rudra/auth```
-#### Использование / Usage
+#### Usage
 ```php
 $role  = [
     'admin' => ['C', 'U', 'D']
@@ -22,34 +22,35 @@ $role  = [
     'moderator' => ['U']
 ];
 ```
-##### Вызов из контейнера / use container
+##### use container
 ```php
-use Rudra\ContainerInterface;
+use Rudra\Container\Application;
+use Rudra\Container\Interfaces\ApplicationInterface;
 
 $services = [
-    'contracts' => [
-        ContainerInterface::class => rudra(),
+    "contracts" => [
+        ApplicationInterface::class => Application::run(),
     ],
     
-    'services' => [
+    "services" => [
         // Another services
         
-        'auth' => ['Rudra\Auth', ['env' => 'development', 'role' => $role],
+        "auth" => [Rudra\Auth\Auth::class, ["environment" => "development", "role" => $role],
         
         // Another services
     ]
 ];
 ```
 ```php
-rudra()->setServices($services); 
+Application::run()->setServices($services); 
 ```
 ```php
 $user = [
-    'email'    => 'some@email.com',
-    'password' => 'someHash'
-]
+    "email"    => "some@email.com",
+    "password" => "someHash"
+];
     
-rudra()->get('auth')->login('somePassword', $user, 'dashboard', 'Укажите верные данные');
-rudra()->get('auth')->logout('');
-rudra()->get('auth')->updateSessionIfSetRememberMe('login');
+Application::run()->objects()->get("auth")->login("somePassword", $user, "dashboard", "Please enter correct information");
+Application::run()->objects()->get("auth")->logout("");
+Application::run()->objects()->get("auth")->updateSessionIfSetRememberMe("login");
 ```

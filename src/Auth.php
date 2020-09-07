@@ -13,7 +13,7 @@ class Auth extends AuthBase implements AuthInterface
 {
     public function login(string $password, array $userData, string $redirect = "admin", string $notice = "Please enter correct information")
     {
-        $userData["uniq_name"] ??= "not set";
+        $userData["uniq_name"] ??= "uniq_name";
 
         if (password_verify($password, $userData["password"])) {
             $token = md5($userData["password"] . $userData["uniq_name"]);
