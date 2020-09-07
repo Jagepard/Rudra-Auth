@@ -66,13 +66,13 @@ class AuthBase
             return $redirectCallable;
         }
 
-        $this->application()->objects()->get('redirect')->run($redirect);
+        $this->application()->objects()->get("redirect")->run($redirect);
     }
 
     /**
      * @codeCoverageIgnore
      */
-    protected function loginRedirectWithFlash(string $notice)
+    protected function loginRedirectWithFlash(string $notice): void
     {
         $this->application()->session()->set(["alert",  [$notice, "error"]]);
         $this->application()->objects()->get("redirect")->run("stargate");

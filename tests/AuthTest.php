@@ -33,7 +33,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->stubClass->auth());
 
         Application::run()->session()->unset("token");
-        $this->assertNull($this->stubClass->auth('someToken'));
+        $this->assertNull($this->stubClass->auth("someToken"));
     }
 
     public function testUserAccess(): void
@@ -67,39 +67,38 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertNull(
             $this->stubClass->login("password", [
                 "email"    => "",
-                "password" => password_hash("password", PASSWORD_BCRYPT, ['cost' => 10])
+                "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
             ]));
 
         $this->assertNull(
-            $this->stubClass->login('wrong', [
-                "email"    => '',
-                "password" => password_hash("password", PASSWORD_BCRYPT, ['cost' => 10])
+            $this->stubClass->login("wrong", [
+                "email"    => "",
+                "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
             ]));
     }
 
     public function testLogout(): void
     {
-//        unset($_COOKIE['RudraPermit']);
         $this->assertNull($this->stubClass->logout());
         $this->assertFalse(Application::run()->session()->has("token"));
     }
 
     public function testRole(): void
     {
-        $this->assertTrue($this->stubClass->role('admin', 'C'));
-        $this->assertTrue($this->stubClass->role('admin', 'U'));
-        $this->assertTrue($this->stubClass->role('admin', 'D'));
+        $this->assertTrue($this->stubClass->role("admin", 'C'));
+        $this->assertTrue($this->stubClass->role("admin", 'U'));
+        $this->assertTrue($this->stubClass->role("admin", 'D'));
 
-        $this->assertFalse($this->stubClass->role('editor', 'D'));
-        $this->assertFalse($this->stubClass->role('editor', 'D', ''));
-        $this->assertTrue($this->stubClass->role('editor', 'C'));
-        $this->assertTrue($this->stubClass->role('editor', 'U'));
+        $this->assertFalse($this->stubClass->role("editor", 'D'));
+        $this->assertFalse($this->stubClass->role("editor", 'D', ''));
+        $this->assertTrue($this->stubClass->role("editor", 'C'));
+        $this->assertTrue($this->stubClass->role("editor", 'U'));
 
-        $this->assertFalse($this->stubClass->role('user', 'D'));
-        $this->assertFalse($this->stubClass->role('user', 'U'));
-        $this->assertFalse($this->stubClass->role('user', 'D', ''));
-        $this->assertFalse($this->stubClass->role('user', 'U', ''));
-        $this->assertTrue($this->stubClass->role('user', 'C'));
+        $this->assertFalse($this->stubClass->role("user", 'D'));
+        $this->assertFalse($this->stubClass->role("user", 'U'));
+        $this->assertFalse($this->stubClass->role("user", 'D', ''));
+        $this->assertFalse($this->stubClass->role("user", 'U', ''));
+        $this->assertTrue($this->stubClass->role("user", 'C'));
     }
 
     /**
