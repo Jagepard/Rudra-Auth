@@ -6,7 +6,7 @@
  * @license   https://mit-license.org/ MIT
  */
 
-namespace Rudra\Interfaces;
+namespace Rudra\Auth;
 
 interface AuthInterface
 {

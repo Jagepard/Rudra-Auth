@@ -19,20 +19,17 @@
         "email" : "jagepard@yandex.ru"
     },
     "require"           : {
-        "php"             : ">=7.2",
+        "php"             : ">=7.4",
         "rudra/container" : "self.version"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^7"
     },
     "autoload"          : {
         "psr-4" : {
-            "Rudra\\" : "src/"
+            "Rudra\\Auth\\" : "src/"
         }
     },
     "autoload-dev" : {
         "psr-4": {
-            "Rudra\\Tests\\" : "tests/"
+            "Rudra\\Auth\\Tests\\" : "tests/"
         }
     },
     "minimum-stability" : "dev",

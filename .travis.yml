@@ -2,11 +2,12 @@ language: php
 
 # Define the php versions against we want to test our code
 php:
-    - 7.2
+    - 7.4
 
 before_script:
     - wget http://getcomposer.org/composer.phar
     - php composer.phar install --dev --no-interaction
+    - composer require --dev phpunit/phpunit ^9
 
 script:
     - mkdir -p build/logs
