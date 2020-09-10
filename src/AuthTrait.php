@@ -7,7 +7,7 @@ declare(strict_types=1);
  * @license   https://mit-license.org/ MIT
  */
 
-namespace Rudra\Auth\Traits;
+namespace Rudra\Auth;
 
 use Rudra\Container\Application;
 
