@@ -28,7 +28,7 @@ class Auth extends AuthBase implements AuthInterface
 
     public function logout(string $redirect = ""): void
     {
-        $this->application()->session()->unset("token");
+        $this->rudra()->session()->unset("token");
         $this->unsetCookie();
         $this->handleRedirect($redirect, ["status" => "Logout"]);
     }
@@ -36,14 +36,14 @@ class Auth extends AuthBase implements AuthInterface
     public function access(string $token = null, string $redirect = null)
     {
         // If authorized
-        if ($this->application()->session()->has("token")) {
+        if ($this->rudra()->session()->has("token")) {
             // Providing access to shared resources
             if (!isset($token)) {
                 return true;
             }
 
             // Providing access to the user's personal resources
-            if ($token === $this->application()->session()->get("token")) {
+            if ($token === $this->rudra()->session()->get("token")) {
                 return true;
             }
         }
@@ -72,11 +72,11 @@ class Auth extends AuthBase implements AuthInterface
     public function updateSessionIfSetRememberMe($redirect = "login"): void
     {
         // If the user is logged in using the remember_me flag
-        if ($this->application()->cookie()->has("RudraPermit")) {
-            if ($this->sessionHash === $this->application()->cookie()->get("RudraPermit")) {
+        if ($this->rudra()->cookie()->has("RudraPermit")) {
+            if ($this->sessionHash === $this->rudra()->cookie()->get("RudraPermit")) {
                 $this->setAuthSession(
-                    $this->application()->cookie()->get("RudraUser"),
-                    $this->application()->cookie()->get("RudraToken")
+                    $this->rudra()->cookie()->get("RudraUser"),
+                    $this->rudra()->cookie()->get("RudraToken")
                 );
                 return; // @codeCoverageIgnore
             }
@@ -93,16 +93,16 @@ class Auth extends AuthBase implements AuthInterface
 
     private function setAuthSession(string $email, string $token): void
     {
-        $this->application()->session()->set(["token", $token]);
-        $this->application()->session()->set(["user", $email]);
+        $this->rudra()->session()->set(["token", $token]);
+        $this->rudra()->session()->set(["user", $email]);
     }
 
     private function setCookiesIfSetRememberMe(array $userData, string $token): void
     {
-        if ($this->application()->request()->post()->has("remember_me")) {
-            $this->application()->cookie()->set(["RudraPermit", [$this->sessionHash, $this->expireTime]]); // @codeCoverageIgnore
-            $this->application()->cookie()->set(["RudraToken", [$token, $this->expireTime]]);   // @codeCoverageIgnore
-            $this->application()->cookie()->set(["RudraUser", [$userData["email"], $this->expireTime]]);   // @codeCoverageIgnore
+        if ($this->rudra()->request()->post()->has("remember_me")) {
+            $this->rudra()->cookie()->set(["RudraPermit", [$this->sessionHash, $this->expireTime]]); // @codeCoverageIgnore
+            $this->rudra()->cookie()->set(["RudraToken", [$token, $this->expireTime]]);   // @codeCoverageIgnore
+            $this->rudra()->cookie()->set(["RudraUser", [$userData["email"], $this->expireTime]]);   // @codeCoverageIgnore
         }
     }
 }

@@ -9,13 +9,13 @@ declare(strict_types=1);
 
 namespace Rudra\Auth;
 
-use Rudra\Container\Interfaces\ApplicationInterface;
-use Rudra\Container\Traits\SetApplicationContainersTrait;
+use Rudra\Container\Interfaces\RudraInterface;
+use Rudra\Container\Traits\SetRudraContainersTrait;
 
 class AuthBase
 {
-    use SetApplicationContainersTrait {
-        SetApplicationContainersTrait::__construct as protected __setContainerTraitConstruct;
+    use SetRudraContainersTrait {
+        SetRudraContainersTrait::__construct as protected __setRudraContainersTrait;
     }
 
     protected string $environment;
@@ -26,16 +26,16 @@ class AuthBase
     /**
      * Sets roles, environment, cookie lifetime, session hash
      */
-    public function __construct(ApplicationInterface $application, string $environment, array $roles = [])
+    public function __construct(RudraInterface $rudra, string $environment, array $roles = [])
     {
         $this->environment = $environment;
         $this->roles       = $roles;
         $this->expireTime  = time() + 3600 * 24 * 7;
         $this->sessionHash = md5(
-            $application->request()->server()->get("REMOTE_ADDR") .
-            $application->request()->server()->get("HTTP_USER_AGENT")
+            $rudra->request()->server()->get("REMOTE_ADDR") .
+            $rudra->request()->server()->get("HTTP_USER_AGENT")
         );
-        $this->__setContainerTraitConstruct($application);
+        $this->__setRudraContainersTrait($rudra);
     }
 
     /**
@@ -50,9 +50,9 @@ class AuthBase
     {
         if ("test" !== $this->environment) {
             // @codeCoverageIgnoreStart
-            if ($this->application()->cookie()->has("RudraPermit")) {
-                $this->application()->cookie()->unset("RudraPermit"); // @codeCoverageIgnore
-                $this->application()->cookie()->unset("RudraToken"); // @codeCoverageIgnore
+            if ($this->rudra()->cookie()->has("RudraPermit")) {
+                $this->rudra()->cookie()->unset("RudraPermit"); // @codeCoverageIgnore
+                $this->rudra()->cookie()->unset("RudraToken"); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
             }
         }
@@ -60,13 +60,13 @@ class AuthBase
 
     protected function handleRedirect(string $redirect, array $jsonResponse, callable $redirectCallable = null)
     {
-        ("API" !== $redirect) ?: $this->application()->response()->json($jsonResponse);
+        ("API" !== $redirect) ?: $this->rudra()->response()->json($jsonResponse);
 
         if (isset($redirectCallable)) {
             return $redirectCallable;
         }
 
-        $this->application()->objects()->get("redirect")->run($redirect);
+        $this->rudra()->get("redirect")->run($redirect);
     }
 
     /**
@@ -74,7 +74,7 @@ class AuthBase
      */
     protected function loginRedirectWithFlash(string $notice): void
     {
-        $this->application()->session()->set(["alert",  [$notice, "error"]]);
-        $this->application()->objects()->get("redirect")->run("stargate");
+        $this->rudra()->session()->set(["alert",  [$notice, "error"]]);
+        $this->rudra()->get("redirect")->run("stargate");
     }
 }
