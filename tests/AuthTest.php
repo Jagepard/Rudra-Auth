@@ -13,7 +13,7 @@ namespace Rudra\Auth\Tests;
 
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 use Rudra\Auth\Tests\Stub\StubClass;
-use Rudra\Container\Application;
+use Rudra\Container\Facades\{RequestFacade as Request, RudraFacade as Rudra};
 
 class AuthTest extends PHPUnit_Framework_TestCase
 {
@@ -22,44 +22,45 @@ class AuthTest extends PHPUnit_Framework_TestCase
     protected function setUp(): void
     {
         $_SESSION = [];
-        Application::run()->request()->server()->set(["REMOTE_ADDR" => "127.0.0.1"]);
-        Application::run()->request()->server()->set(["HTTP_USER_AGENT" => "Mozilla"]);
+        Request::server()->set(["REMOTE_ADDR" => "127.0.0.1"]);
+        Request::server()->set(["REMOTE_ADDR" => "127.0.0.1"]);
+        Request::server()->set(["HTTP_USER_AGENT" => "Mozilla"]);
         $this->stubClass = new StubClass();
     }
 
     public function testRegularAccess()
     {
-        Application::run()->session()->set(["token", "token"]);
+        Rudra::session()->set(["token", "token"]);
         $this->assertTrue($this->stubClass->auth());
 
-        Application::run()->session()->unset("token");
+        Rudra::session()->unset("token");
         $this->assertNull($this->stubClass->auth("someToken"));
     }
 
     public function testUserAccess(): void
     {
         /* User Access */
-        Application::run()->session()->set(["token", "userIdToken"]);
+        Rudra::session()->set(["token", "userIdToken"]);
         $this->assertTrue($this->stubClass->auth("userIdToken"));
 
-        Application::run()->session()->unset("token");
-        $this->assertFalse(Application::run()->objects()->get("auth")->access("userIdToken"));
-        $this->assertNull(Application::run()->objects()->get("auth")->access("userIdToken", ''));
+        Rudra::session()->unset("token");
+        $this->assertFalse(Rudra::get("auth")->access("userIdToken"));
+        $this->assertNull(Rudra::get("auth")->access("userIdToken", ''));
     }
 
     public function testCheck(): void
     {
         $this->assertNull($this->stubClass->updateSessionIfSetRememberMe());
 
-        Application::run()->session()->set(["token", "userIdToken"]);
+        Rudra::session()->set(["token", "userIdToken"]);
         $this->stubClass->updateSessionIfSetRememberMe();
-        $this->assertEquals("userIdToken", Application::run()->session()->get("token"));
+        $this->assertEquals("userIdToken", Rudra::session()->get("token"));
 
-        Application::run()->cookie()->set(["RudraPermit", "userIdToken"]);
-        Application::run()->cookie()->set(["RudraToken", "userIdToken"]);
+        Rudra::cookie()->set(["RudraPermit", "userIdToken"]);
+        Rudra::cookie()->set(["RudraToken", "userIdToken"]);
         $this->stubClass->updateSessionIfSetRememberMe();
 
-        $this->assertEquals(Application::run()->cookie()->get("RudraToken"), Application::run()->session()->get("token"));
+        $this->assertEquals(Rudra::cookie()->get("RudraToken"), Rudra::session()->get("token"));
     }
 
     public function testLogin(): void
@@ -80,7 +81,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testLogout(): void
     {
         $this->assertNull($this->stubClass->logout());
-        $this->assertFalse(Application::run()->session()->has("token"));
+        $this->assertFalse(Rudra::session()->has("token"));
     }
 
     public function testRole(): void
@@ -107,11 +108,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testJsonResponse()
     {
         /* Regular Access */
-        Application::run()->session()->set(["token", "token"]);
-        $this->assertTrue(Application::run()->objects()->get("auth")->access(null, "API"));
+        Rudra::session()->set(["token", "token"]);
+        $this->assertTrue(Rudra::get("auth")->access(null, "API"));
 
         $this->stubClass->logout();
-        $this->assertNull(Application::run()->objects()->get("auth")->access(null, "API"));
+        $this->assertNull(Rudra::get("auth")->access(null, "API"));
     }
 
     public function testHash()
@@ -124,7 +125,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
     public function testUserToken()
     {
-        Application::run()->session()->set(["token", "someToken"]);
-        $this->assertEquals($this->stubClass->userToken(), Application::run()->session()->get("token"));
+        Rudra::session()->set(["token", "someToken"]);
+        $this->assertEquals($this->stubClass->userToken(), Rudra::session()->get("token"));
     }
 }

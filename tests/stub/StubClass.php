@@ -3,8 +3,8 @@
 namespace Rudra\Auth\Tests\Stub;
 
 use Rudra\Auth\Auth;
-use Rudra\Container\Application;
-use Rudra\Auth\Traits\AuthTrait;
+use Rudra\Container\Facades\RudraFacade as Rudra;
+use Rudra\Auth\AuthTrait;
 
 class StubClass
 {
@@ -13,13 +13,13 @@ class StubClass
     public function __construct()
     {
         $roles = [
-            'admin'  => ['C', 'U', 'D'],
-            'editor' => ['C', 'U'],
-            'user'   => ['C']
+            "admin"  => ['C', 'U', 'D'],
+            "editor" => ['C', 'U'],
+            "user"   => ['C']
         ];
 
-        Application::run()->objects()->set(["auth", [new Auth(Application::run(), "test", $roles), "raw"]]);
-        Application::run()->objects()->set(["redirect", [$this, "raw"]]);
+        Rudra::set(["auth", [new Auth(Rudra::run(), "test", $roles)]]);
+        Rudra::set(["redirect", [$this, "raw"]]);
     }
 
     public function run(...$params)
