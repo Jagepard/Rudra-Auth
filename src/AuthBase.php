@@ -11,6 +11,7 @@ namespace Rudra\Auth;
 
 use Rudra\Container\Interfaces\RudraInterface;
 use Rudra\Container\Traits\SetRudraContainersTrait;
+use Rudra\Redirect\Redirect;
 
 class AuthBase
 {
@@ -66,7 +67,7 @@ class AuthBase
             return $redirectCallable;
         }
 
-        $this->rudra()->get("redirect")->run($redirect);
+        $this->rudra()->get(Redirect::class)->run($redirect);
     }
 
     /**
@@ -75,6 +76,6 @@ class AuthBase
     protected function loginRedirectWithFlash(string $notice): void
     {
         $this->rudra()->session()->set(["alert",  [$notice, "error"]]);
-        $this->rudra()->get("redirect")->run("stargate");
+        $this->rudra()->get(Redirect::class)->run("stargate");
     }
 }
