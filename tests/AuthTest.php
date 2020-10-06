@@ -11,95 +11,129 @@ declare(strict_types=1);
 
 namespace Rudra\Auth\Tests;
 
+use Rudra\Redirect;
+use Rudra\Container\Facades\{Request, Rudra, Session};
+use Rudra\Auth\AuthFacade as Auth;
+use Rudra\Auth\Auth as AuthService;
+use Rudra\Container\Interfaces\RudraInterface;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
-use Rudra\Auth\Tests\Stub\StubClass;
-use Rudra\Container\Facades\{RequestFacade as Request, RudraFacade as Rudra};
 
 class AuthTest extends PHPUnit_Framework_TestCase
 {
-    private StubClass $stubClass;
-
     protected function setUp(): void
     {
         $_SESSION = [];
+        Rudra::setConfig([
+            "siteUrl" => "http://example.com",
+            "environment" => "test"
+        ]);
+        Rudra::setServices(
+            [
+                "contracts" => [
+                    RudraInterface::class => Rudra::run(),
+                ],
+                "services" => []
+            ]
+        );
         Request::server()->set(["REMOTE_ADDR" => "127.0.0.1"]);
         Request::server()->set(["REMOTE_ADDR" => "127.0.0.1"]);
         Request::server()->set(["HTTP_USER_AGENT" => "Mozilla"]);
-        $this->stubClass = new StubClass();
+        $roles = [
+            "admin"  => ['C', 'U', 'D'],
+            "editor" => ['C', 'U'],
+            "user"   => ['C']
+        ];
+
+        Rudra::set([\Rudra\Auth\Auth::class, [new AuthService(Rudra::run(), "test", $roles)]]);
+        Rudra::set([Redirect\Redirect::class, Redirect\Redirect::class]);
     }
 
     public function testRegularAccess()
     {
-        Rudra::session()->set(["token", "token"]);
-        $this->assertTrue($this->stubClass->auth());
+        Session::set(["token", "token"]);
+        $this->assertTrue(Auth::access());
 
-        Rudra::session()->unset("token");
-        $this->assertNull($this->stubClass->auth("someToken"));
+        Session::unset("token");
+        $this->assertFalse(Auth::access("someToken"));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testUserAccess(): void
     {
         /* User Access */
-        Rudra::session()->set(["token", "userIdToken"]);
-        $this->assertTrue($this->stubClass->auth("userIdToken"));
+        Session::set(["token", "userIdToken"]);
+        $this->assertTrue(Auth::access("userIdToken"));
 
-        Rudra::session()->unset("token");
-        $this->assertFalse(Rudra::get("auth")->access("userIdToken"));
-        $this->assertNull(Rudra::get("auth")->access("userIdToken", ''));
+        Session::unset("token");
+        $this->assertFalse(Auth::access("userIdToken"));
+        $this->assertNull(Auth::access("userIdToken", ''));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testCheck(): void
     {
-        $this->assertNull($this->stubClass->updateSessionIfSetRememberMe());
-
-        Rudra::session()->set(["token", "userIdToken"]);
-        $this->stubClass->updateSessionIfSetRememberMe();
-        $this->assertEquals("userIdToken", Rudra::session()->get("token"));
+        Auth::updateSessionIfSetRememberMe();
+        Session::set(["token", "userIdToken"]);
+        Auth::updateSessionIfSetRememberMe();
+        $this->assertEquals("userIdToken", Session::get("token"));
 
         Rudra::cookie()->set(["RudraPermit", "userIdToken"]);
         Rudra::cookie()->set(["RudraToken", "userIdToken"]);
-        $this->stubClass->updateSessionIfSetRememberMe();
+        Auth::updateSessionIfSetRememberMe();
 
-        $this->assertEquals(Rudra::cookie()->get("RudraToken"), Rudra::session()->get("token"));
+        $this->assertEquals(Rudra::cookie()->get("RudraToken"), Session::get("token"));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testLogin(): void
     {
         $this->assertNull(
-            $this->stubClass->login("password", [
+            Auth::login("password", [
                 "email"    => "",
                 "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
             ]));
 
         $this->assertNull(
-            $this->stubClass->login("wrong", [
+            Auth::login("wrong", [
                 "email"    => "",
                 "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
             ]));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testLogout(): void
     {
-        $this->assertNull($this->stubClass->logout());
-        $this->assertFalse(Rudra::session()->has("token"));
+        $this->assertNull(Auth::logout());
+        $this->assertFalse(Session::has("token"));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testRole(): void
     {
-        $this->assertTrue($this->stubClass->role("admin", 'C'));
-        $this->assertTrue($this->stubClass->role("admin", 'U'));
-        $this->assertTrue($this->stubClass->role("admin", 'D'));
+        $this->assertTrue(Auth::role("admin", 'C'));
+        $this->assertTrue(Auth::role("admin", 'U'));
+        $this->assertTrue(Auth::role("admin", 'D'));
 
-        $this->assertFalse($this->stubClass->role("editor", 'D'));
-        $this->assertFalse($this->stubClass->role("editor", 'D', ''));
-        $this->assertTrue($this->stubClass->role("editor", 'C'));
-        $this->assertTrue($this->stubClass->role("editor", 'U'));
+        $this->assertFalse(Auth::role("editor", 'D'));
+        $this->assertFalse(Auth::role("editor", 'D', ''));
+        $this->assertTrue(Auth::role("editor", 'C'));
+        $this->assertTrue(Auth::role("editor", 'U'));
 
-        $this->assertFalse($this->stubClass->role("user", 'D'));
-        $this->assertFalse($this->stubClass->role("user", 'U'));
-        $this->assertFalse($this->stubClass->role("user", 'D', ''));
-        $this->assertFalse($this->stubClass->role("user", 'U', ''));
-        $this->assertTrue($this->stubClass->role("user", 'C'));
+        $this->assertFalse(Auth::role("user", 'D'));
+        $this->assertFalse(Auth::role("user", 'U'));
+        $this->assertFalse(Auth::role("user", 'D', ''));
+        $this->assertFalse(Auth::role("user", 'U', ''));
+        $this->assertTrue(Auth::role("user", 'C'));
     }
 
     /**
@@ -108,24 +142,24 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testJsonResponse()
     {
         /* Regular Access */
-        Rudra::session()->set(["token", "token"]);
-        $this->assertTrue(Rudra::get("auth")->access(null, "API"));
+        Session::set(["token", "token"]);
+        $this->assertTrue(Auth::access(null, "API"));
 
-        $this->stubClass->logout();
-        $this->assertNull(Rudra::get("auth")->access(null, "API"));
+        Auth::logout();
+        $this->assertNull(Auth::access(null, "API"));
     }
 
     public function testHash()
     {
         $password = "password";
-        $hash     = $this->stubClass->bcrypt($password);
+        $hash     = Auth::bcrypt($password);
 
         $this->assertTrue(password_verify($password, $hash));
     }
 
     public function testUserToken()
     {
-        Rudra::session()->set(["token", "someToken"]);
-        $this->assertEquals($this->stubClass->userToken(), Rudra::session()->get("token"));
+        Session::set(["token", "someToken"]);
+        $this->assertEquals("someToken", Session::get("token"));
     }
 }
