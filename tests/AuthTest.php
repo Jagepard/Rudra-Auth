@@ -14,7 +14,6 @@ namespace Rudra\Auth\Tests;
 use Rudra\Redirect;
 use Rudra\Container\Facades\{Request, Rudra, Session};
 use Rudra\Auth\AuthFacade as Auth;
-use Rudra\Auth\Auth as AuthService;
 use Rudra\Container\Interfaces\RudraInterface;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
@@ -22,30 +21,30 @@ class AuthTest extends PHPUnit_Framework_TestCase
 {
     protected function setUp(): void
     {
-        $_SESSION = [];
         Rudra::setConfig([
             "siteUrl" => "http://example.com",
-            "environment" => "test"
+            "environment" => "test",
+            "roles" => [
+                "admin"  => ['C', 'U', 'D'],
+                "editor" => ['C', 'U'],
+                "user"   => ['C']
+            ]
         ]);
         Rudra::setServices(
             [
                 "contracts" => [
                     RudraInterface::class => Rudra::run(),
                 ],
-                "services" => []
+                "services" => [
+                    \Rudra\Auth\Auth::class => \Rudra\Auth\Auth::class,
+                    Redirect\Redirect::class => Redirect\Redirect::class
+                ]
             ]
         );
-        Request::server()->set(["REMOTE_ADDR" => "127.0.0.1"]);
-        Request::server()->set(["REMOTE_ADDR" => "127.0.0.1"]);
-        Request::server()->set(["HTTP_USER_AGENT" => "Mozilla"]);
-        $roles = [
-            "admin"  => ['C', 'U', 'D'],
-            "editor" => ['C', 'U'],
-            "user"   => ['C']
-        ];
-
-        Rudra::set([\Rudra\Auth\Auth::class, [new AuthService(Rudra::run(), "test", $roles)]]);
-        Rudra::set([Redirect\Redirect::class, Redirect\Redirect::class]);
+        Request::server()->set([
+            "REMOTE_ADDR" => "127.0.0.1",
+            "HTTP_USER_AGENT" => "Mozilla"
+        ]);
     }
 
     public function testRegularAccess()

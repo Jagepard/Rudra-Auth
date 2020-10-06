@@ -58,7 +58,9 @@ class Auth extends AuthBase implements AuthInterface
 
     public function role(string $role, string $privilege, string $redirect = null)
     {
-        if (in_array($privilege, $this->roles[$role])) {
+        $roles = $this->rudra()->config()->get("roles");
+
+        if (in_array($privilege, $roles[$role])) {
             return true;
         }
 
