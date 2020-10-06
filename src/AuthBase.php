@@ -18,19 +18,14 @@ class AuthBase
     use SetRudraContainersTrait {
         SetRudraContainersTrait::__construct as protected __setRudraContainersTrait;
     }
-
-    protected string $environment;
-    protected array $roles;
     protected int $expireTime;
     protected string $sessionHash;
 
     /**
      * Sets roles, environment, cookie lifetime, session hash
      */
-    public function __construct(RudraInterface $rudra, string $environment, array $roles = [])
+    public function __construct(RudraInterface $rudra)
     {
-        $this->environment = $environment;
-        $this->roles       = $roles;
         $this->expireTime  = time() + 3600 * 24 * 7;
         $this->sessionHash = md5(
             $rudra->request()->server()->get("REMOTE_ADDR") .
@@ -49,7 +44,7 @@ class AuthBase
 
     protected function unsetCookie(): void
     {
-        if ("test" !== $this->environment) {
+        if ("test" !== $this->rudra()->config()->get("environment")) {
             // @codeCoverageIgnoreStart
             if ($this->rudra()->cookie()->has("RudraPermit")) {
                 $this->rudra()->cookie()->unset("RudraPermit"); // @codeCoverageIgnore
