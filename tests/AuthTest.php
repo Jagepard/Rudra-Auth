@@ -21,7 +21,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
 {
     protected function setUp(): void
     {
-        Rudra::setConfig([
+        Rudra::config([
             "siteUrl" => "http://example.com",
             "environment" => "test",
             "roles" => [
@@ -30,17 +30,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
                 "user"   => ['C']
             ]
         ]);
-        Rudra::setServices(
-            [
-                "contracts" => [
-                    RudraInterface::class => Rudra::run(),
-                ],
-                "services" => [
-                    \Rudra\Auth\Auth::class => \Rudra\Auth\Auth::class,
-                    Redirect\Redirect::class => Redirect\Redirect::class
-                ]
-            ]
-        );
+        Rudra::binding([RudraInterface::class => Rudra::run()]);
+        Rudra::services([
+            \Rudra\Auth\Auth::class => \Rudra\Auth\Auth::class,
+            Redirect\Redirect::class => Redirect\Redirect::class
+        ]);
         Request::server()->set([
             "REMOTE_ADDR" => "127.0.0.1",
             "HTTP_USER_AGENT" => "Mozilla"
@@ -110,7 +104,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testLogout(): void
     {
-        $this->assertNull(Auth::logout());
+        Auth::logout();
         $this->assertFalse(Session::has("token"));
     }
 
