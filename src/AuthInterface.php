@@ -9,7 +9,7 @@ namespace Rudra\Auth;
 
 interface AuthInterface
 {
-    public function login(string $password, array $user, string $redirect = "admin", string $notice = "");
+    public function login(string $password, \stdClass $user, string $redirect = "admin", string $notice = "");
     public function updateSessionIfSetRememberMe($redirect): void;
     public function access(string $token = null, string $redirect = null);
     public function logout(string $redirect = ""): void;

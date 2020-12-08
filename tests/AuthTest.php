@@ -87,13 +87,13 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testLogin(): void
     {
         $this->assertNull(
-            Auth::login("password", [
+            Auth::login("password", (object) [
                 "email"    => "",
                 "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
             ]));
 
         $this->assertNull(
-            Auth::login("wrong", [
+            Auth::login("wrong", (object) [
                 "email"    => "",
                 "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
             ]));
