@@ -27,6 +27,7 @@ class Auth extends AuthBase implements AuthInterface
     public function logout(string $redirect = ""): void
     {
         $this->rudra()->session()->unset("token");
+        $this->rudra()->session()->unset("user");
         $this->unsetCookie();
         $this->handleRedirect($redirect, ["status" => "Logout"]);
     }
@@ -58,7 +59,7 @@ class Auth extends AuthBase implements AuthInterface
     {
         $roles = $this->rudra()->config()->get("roles");
 
-        if (in_array($privilege, $roles[$role])) {
+        if ($roles[$role] <= $roles[$privilege]) {
             return true;
         }
 
