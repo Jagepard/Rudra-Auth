@@ -25,9 +25,9 @@ class AuthTest extends PHPUnit_Framework_TestCase
             "siteUrl" => "http://example.com",
             "environment" => "test",
             "roles" => [
-                "admin"  => ['C', 'U', 'D'],
-                "editor" => ['C', 'U'],
-                "user"   => ['C']
+                "admin"  => 0,
+                "editor" => 1,
+                "user"   => 2
             ]
         ]);
         Rudra::binding([RudraInterface::class => Rudra::run()]);
@@ -113,20 +113,16 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testRole(): void
     {
-        $this->assertTrue(Auth::role("admin", 'C'));
-        $this->assertTrue(Auth::role("admin", 'U'));
-        $this->assertTrue(Auth::role("admin", 'D'));
+        $this->assertTrue(Auth::role("admin", "admin"));
+        $this->assertFalse(Auth::role("editor", "admin"));
+        $this->assertFalse(Auth::role("editor", "admin", ''));
+        $this->assertTrue(Auth::role("editor", "editor"));
 
-        $this->assertFalse(Auth::role("editor", 'D'));
-        $this->assertFalse(Auth::role("editor", 'D', ''));
-        $this->assertTrue(Auth::role("editor", 'C'));
-        $this->assertTrue(Auth::role("editor", 'U'));
-
-        $this->assertFalse(Auth::role("user", 'D'));
-        $this->assertFalse(Auth::role("user", 'U'));
-        $this->assertFalse(Auth::role("user", 'D', ''));
-        $this->assertFalse(Auth::role("user", 'U', ''));
-        $this->assertTrue(Auth::role("user", 'C'));
+        $this->assertFalse(Auth::role("user", "admin"));
+        $this->assertFalse(Auth::role("user", "editor"));
+        $this->assertFalse(Auth::role("user", "admin", ''));
+        $this->assertFalse(Auth::role("user", "editor", ''));
+        $this->assertTrue(Auth::role("user", "user"));
     }
 
     /**
