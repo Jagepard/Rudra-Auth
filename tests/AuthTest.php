@@ -69,16 +69,15 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testCheck(): void
     {
-        Auth::updateSessionIfSetRememberMe();
-        Session::set(["token", "userIdToken"]);
+        $_COOKIE["RudraPermit"] = md5(
+            Request::server()->get("REMOTE_ADDR") .
+            Request::server()->get("HTTP_USER_AGENT")
+        );;
+        $_COOKIE["RudraToken"] = "userIdToken";
+        $_COOKIE["RudraUser"] = json_encode((object)[]);
+
         Auth::updateSessionIfSetRememberMe();
         $this->assertEquals("userIdToken", Session::get("token"));
-
-        Rudra::cookie()->set(["RudraPermit", "userIdToken"]);
-        Rudra::cookie()->set(["RudraToken", "userIdToken"]);
-        Auth::updateSessionIfSetRememberMe();
-
-        $this->assertEquals(Rudra::cookie()->get("RudraToken"), Session::get("token"));
     }
 
     /**
