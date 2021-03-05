@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * @author    : Jagepard <jagepard@yandex.ru">
@@ -22,9 +22,9 @@ class AuthTest extends PHPUnit_Framework_TestCase
     protected function setUp(): void
     {
         Rudra::config([
-            "siteUrl" => "http://example.com",
+            "siteUrl"     => "http://example.com",
             "environment" => "test",
-            "roles" => [
+            "roles"       => [
                 "admin"  => 0,
                 "editor" => 1,
                 "user"   => 2
@@ -32,11 +32,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
         ]);
         Rudra::binding([RudraInterface::class => Rudra::run()]);
         Rudra::services([
-            \Rudra\Auth\Auth::class => \Rudra\Auth\Auth::class,
+            \Rudra\Auth\Auth::class  => \Rudra\Auth\Auth::class,
             Redirect\Redirect::class => Redirect\Redirect::class
         ]);
         Request::server()->set([
-            "REMOTE_ADDR" => "127.0.0.1",
+            "REMOTE_ADDR"     => "127.0.0.1",
             "HTTP_USER_AGENT" => "Mozilla"
         ]);
     }
@@ -44,10 +44,10 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testRegularAccess()
     {
         Session::set(["token", "token"]);
-        $this->assertTrue(Auth::access());
+        $this->assertTrue(Auth::authorization());
 
         Session::unset("token");
-        $this->assertFalse(Auth::access("someToken"));
+        $this->assertFalse(Auth::authorization("someToken"));
     }
 
     /**
@@ -57,11 +57,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
     {
         /* User Access */
         Session::set(["token", "userIdToken"]);
-        $this->assertTrue(Auth::access("userIdToken"));
+        $this->assertTrue(Auth::authorization("userIdToken"));
 
         Session::unset("token");
-        $this->assertFalse(Auth::access("userIdToken"));
-        $this->assertNull(Auth::access("userIdToken", ''));
+        $this->assertFalse(Auth::authorization("userIdToken"));
+        $this->assertNull(Auth::authorization("userIdToken", ''));
     }
 
     /**
@@ -74,9 +74,9 @@ class AuthTest extends PHPUnit_Framework_TestCase
             Request::server()->get("HTTP_USER_AGENT")
         );;
         $_COOKIE["RudraToken"] = "userIdToken";
-        $_COOKIE["RudraUser"] = json_encode((object)[]);
+        $_COOKIE["RudraUser"]  = json_encode((object)[]);
 
-        Auth::updateSessionIfSetRememberMe();
+        Auth::restoreSessionIfSetRememberMe();
         $this->assertEquals("userIdToken", Session::get("token"));
     }
 
@@ -86,16 +86,16 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testLogin(): void
     {
         $this->assertNull(
-            Auth::login("password", (object) [
+            Auth::authentication((object)[
                 "email"    => "",
                 "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
-            ]));
+            ], "password"));
 
         $this->assertNull(
-            Auth::login("wrong", (object) [
+            Auth::authentication((object)[
                 "email"    => "",
                 "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
-            ]));
+            ], "wrong"));
     }
 
     /**
@@ -103,7 +103,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testLogout(): void
     {
-        Auth::logout();
+        Auth::exitAuthenticationSession();
         $this->assertFalse(Session::has("token"));
     }
 
@@ -112,16 +112,16 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testRole(): void
     {
-        $this->assertTrue(Auth::role("admin", "admin"));
-        $this->assertFalse(Auth::role("editor", "admin"));
-        $this->assertFalse(Auth::role("editor", "admin", ''));
-        $this->assertTrue(Auth::role("editor", "editor"));
+        $this->assertTrue(Auth::roleBasedAccess("admin", "admin"));
+        $this->assertFalse(Auth::roleBasedAccess("editor", "admin"));
+        $this->assertFalse(Auth::roleBasedAccess("editor", "admin", ''));
+        $this->assertTrue(Auth::roleBasedAccess("editor", "editor"));
 
-        $this->assertFalse(Auth::role("user", "admin"));
-        $this->assertFalse(Auth::role("user", "editor"));
-        $this->assertFalse(Auth::role("user", "admin", ''));
-        $this->assertFalse(Auth::role("user", "editor", ''));
-        $this->assertTrue(Auth::role("user", "user"));
+        $this->assertFalse(Auth::roleBasedAccess("user", "admin"));
+        $this->assertFalse(Auth::roleBasedAccess("user", "editor"));
+        $this->assertFalse(Auth::roleBasedAccess("user", "admin", ''));
+        $this->assertFalse(Auth::roleBasedAccess("user", "editor", ''));
+        $this->assertTrue(Auth::roleBasedAccess("user", "user"));
     }
 
     /**
@@ -131,10 +131,10 @@ class AuthTest extends PHPUnit_Framework_TestCase
     {
         /* Regular Access */
         Session::set(["token", "token"]);
-        $this->assertTrue(Auth::access(null, "API"));
+        $this->assertTrue(Auth::authorization(null, "API"));
 
         Auth::logout();
-        $this->assertNull(Auth::access(null, "API"));
+        $this->assertNull(Auth::authorization(null, "API"));
     }
 
     public function testHash()
