@@ -133,7 +133,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
         Session::set(["token", "token"]);
         $this->assertTrue(Auth::authorization(null, "API"));
 
-        Auth::logout();
+        Auth::exitAuthenticationSession();
         $this->assertNull(Auth::authorization(null, "API"));
     }
 
