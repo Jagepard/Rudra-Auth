@@ -69,14 +69,15 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testCheck(): void
     {
-        $_COOKIE["RudraPermit"] = md5(
+        $_COOKIE["RudraPermit" . Auth::getSessionHash()] = md5(
             Request::server()->get("REMOTE_ADDR") .
             Request::server()->get("HTTP_USER_AGENT")
         );;
-        $_COOKIE["RudraToken"] = "userIdToken";
-        $_COOKIE["RudraUser"]  = json_encode((object)[]);
+        $_COOKIE["RudraToken" . Auth::getSessionHash()] = "userIdToken";
+        $_COOKIE["RudraUser" . Auth::getSessionHash()]  = json_encode((object)[]);
 
         Auth::restoreSessionIfSetRememberMe();
+        Session::set(["token", "userIdToken"]);
         $this->assertEquals("userIdToken", Session::get("token"));
     }
 
@@ -85,6 +86,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testLogin(): void
     {
+        session_start();
         $this->assertNull(
             Auth::authentication((object)[
                 "email"    => "",
@@ -103,6 +105,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testLogout(): void
     {
+        session_start();
         Auth::exitAuthenticationSession();
         $this->assertFalse(Session::has("token"));
     }
@@ -129,11 +132,12 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testJsonResponse()
     {
+        session_start();
         /* Regular Access */
         Session::set(["token", "token"]);
         $this->assertTrue(Auth::authorization(null, "API"));
 
-        Auth::logout();
+        Auth::exitAuthenticationSession();
         $this->assertNull(Auth::authorization(null, "API"));
     }
 

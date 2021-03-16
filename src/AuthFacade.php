@@ -16,6 +16,7 @@ use Rudra\Container\Traits\FacadeTrait;
  * @method static roleBasedAccess(string $role, string $privilege, string $redirect = null)
  * @method static void restoreSessionIfSetRememberMe($redirect = "login")
  * @method static string bcrypt(string $password, int $cost = 10)
+ * @method static string getSessionHash()
  *
  * @see Auth
  */
