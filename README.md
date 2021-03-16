@@ -12,30 +12,34 @@
 # Rudra-Auth | [API](https://github.com/Jagepard/Rudra-Auth/blob/master/docs.md "Documentation API")
 ### Authorization
 
-#### Install
+#### Install / Установка
 ```composer require rudra/auth```
-#### Usage
-```php
-$role  = [
-    'admin' => ['C', 'U', 'D']
-    'editor' => ['C', 'U']
-    'moderator' => ['U']
-];
+
+##### Setting up roles / Настройка ролей
 ```
+[
+    'admin'     => 0,
+    'editor'    => 1,
+    'moderator' => 2,
+    'user'      => 3
+]
+```
+#### Usage / Использование
 ##### use container
 ```php
-use Rudra\Container\Application;
-use Rudra\Container\Interfaces\ApplicationInterface;
+use Rudra\Auth\Auth;
+use Rudra\Container\Rudra;
+use Rudra\Container\Interfaces\RudraInterface;
 
 $services = [
     "contracts" => [
-        ApplicationInterface::class => Application::run(),
+        RudraInterface::class => Rudra::run(),
     ],
     
     "services" => [
         // Another services
         
-        "auth" => [Rudra\Auth\Auth::class, ["environment" => "development", "role" => $role],
+        Auth::class => Auth::class,
         
         // Another services
     ]
