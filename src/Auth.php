@@ -46,15 +46,17 @@ class Auth implements AuthInterface
      * --------------
      * Аутентификация
      */
-    public function authentication(\stdClass $user, string $password, string $redirect = "", string $notice = "")
+    public function authentication(array $user, string $password, string $redirect = "", string $notice = "")
     {
-        if (!isset($user->password)) {
+        $user = $user[0];
+
+        if (!isset($user['password'])) {
             throw new \InvalidArgumentException("Invalid user object received");
         }
 
-        if (password_verify($password, $user->password)) {
+        if (password_verify($password, $user['password'])) {
             session_regenerate_id();
-            $token = md5($user->password . $user->email . $this->sessionHash);
+            $token = md5($user['password'] . $user['email'] . $this->sessionHash);
             $this->setCookiesIfSetRememberMe($user, $token);
             $this->setAuthenticationSession($user, $token);
 
@@ -65,14 +67,14 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param \stdClass $user
+     * @param array $user
      * @param string $token
      *
      * Sets cookies if present $_POST["remember_me"]
      * ---------------------------------------------
      * Устанавливает cookies если есть $_POST["remember_me"]
      */
-    private function setCookiesIfSetRememberMe(\stdClass $user, string $token): void
+    private function setCookiesIfSetRememberMe(array $user, string $token): void
     {
         if (Request::post()->has("remember_me")) {
             Cookie::set([md5("RudraPermit" . $this->sessionHash), [$this->sessionHash, $this->expireTime]]); // @codeCoverageIgnore
@@ -82,14 +84,14 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param object $user
+     * @param array $user
      * @param string $token
      *
      * Sets session data on successful authentication
      * ----------------------------------------------
      * Устанавливает данные сессии при успешной аутентификации
      */
-    private function setAuthenticationSession(object $user, string $token): void
+    private function setAuthenticationSession(array $user, string $token): void
     {
         Session::set(["token", $token]);
         Session::set(["user", $user]);
