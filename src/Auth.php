@@ -51,7 +51,7 @@ class Auth implements AuthInterface
         $user = $user[0];
 
         if (!isset($user['password'])) {
-            throw new \InvalidArgumentException("Invalid user object received");
+            throw new \InvalidArgumentException("Invalid user's array received");
         }
 
         if (password_verify($password, $user['password'])) {
