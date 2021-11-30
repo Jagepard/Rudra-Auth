@@ -10,7 +10,7 @@ namespace Rudra\Auth;
 interface AuthInterface
 {
     /**
-     * @param \stdClass $user
+     * @param array $user
      * @param string $password
      * @param string $redirect
      * @param string $notice
@@ -20,7 +20,7 @@ interface AuthInterface
      * --------------
      * Аутентификация
      */
-    public function authentication(\stdClass $user, string $password, string $redirect = "", string $notice = "");
+    public function authentication(array $user, string $password, string $redirect = "", string $notice = "");
 
     /**
      * @param string $redirect
