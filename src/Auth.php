@@ -48,8 +48,6 @@ class Auth implements AuthInterface
      */
     public function authentication(array $user, string $password, string $redirect = "", string $notice = "")
     {
-        $user = $user[0];
-
         if (!isset($user['password'])) {
             throw new \InvalidArgumentException("Invalid user's array received");
         }
