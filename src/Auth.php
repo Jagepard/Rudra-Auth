@@ -75,9 +75,9 @@ class Auth implements AuthInterface
     private function setCookiesIfSetRememberMe(array $user, string $token): void
     {
         if (Request::post()->has("remember_me")) {
-            Cookie::set([md5("RudraPermit" . $this->sessionHash), [$this->sessionHash, $this->expireTime]]); // @codeCoverageIgnore
-            Cookie::set([md5("RudraToken" . $this->sessionHash), [$token, $this->expireTime]]);   // @codeCoverageIgnore
-            Cookie::set([md5("RudraUser" . $this->sessionHash), [json_encode($user), $this->expireTime]]);   // @codeCoverageIgnore
+            Cookie::set(["RP_" . $this->sessionHash, [$this->sessionHash, $this->expireTime]]); // @codeCoverageIgnore
+            Cookie::set(["RT_" . $this->sessionHash, [$token, $this->expireTime]]);   // @codeCoverageIgnore
+            Cookie::set(["RU_" . $this->sessionHash, [json_encode($user), $this->expireTime]]);   // @codeCoverageIgnore
         }
     }
 
@@ -120,10 +120,10 @@ class Auth implements AuthInterface
     {
         if ("test" !== Rudra::config()->get("environment")) {
             // @codeCoverageIgnoreStart
-            if (Cookie::has(md5("RudraPermit" . $this->sessionHash))) {
-                Cookie::unset(md5("RudraPermit" . $this->sessionHash)); // @codeCoverageIgnore
-                Cookie::unset(md5("RudraToken" . $this->sessionHash)); // @codeCoverageIgnore
-                Cookie::unset(md5("RudraUser" . $this->sessionHash)); // @codeCoverageIgnore
+            if (Cookie::has("RP_" . $this->sessionHash)) {
+                Cookie::unset("RP_" . $this->sessionHash); // @codeCoverageIgnore
+                Cookie::unset("RT_" . $this->sessionHash); // @codeCoverageIgnore
+                Cookie::unset("RU_" . $this->sessionHash); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
             }
         }
@@ -198,11 +198,11 @@ class Auth implements AuthInterface
     public function restoreSessionIfSetRememberMe($redirect = "login"): void
     {
         // If the user is logged in using the remember_me flag
-        if (Cookie::has(md5("RudraPermit" . $this->sessionHash))) {
-            if ($this->sessionHash === Cookie::get(md5("RudraPermit" . $this->sessionHash))) {
+        if (Cookie::has("RP_" . $this->sessionHash)) {
+            if ($this->sessionHash === Cookie::get("RP_" . $this->sessionHash)) {
                 $this->setAuthenticationSession(
-                    json_decode(Cookie::get(md5("RudraUser" . $this->sessionHash))),
-                    Cookie::get(md5("RudraToken" . $this->sessionHash))
+                    json_decode(Cookie::get("RU_" . $this->sessionHash)),
+                    Cookie::get("RT_" . $this->sessionHash)
                 );
                 return; // @codeCoverageIgnore
             }
