@@ -199,9 +199,10 @@ class Auth implements AuthInterface
     {
         // If the user is logged in using the remember_me flag
         if (Cookie::has(md5("RudraPermit" . $this->sessionHash))) {
+
             if ($this->sessionHash === Cookie::get(md5("RudraPermit" . $this->sessionHash))) {
                 $this->setAuthenticationSession(
-                    json_decode(Cookie::get(md5("RudraUser" . $this->sessionHash))),
+                    json_decode(Cookie::get(md5("RudraUser" . $this->sessionHash)), true),
                     Cookie::get(md5("RudraToken" . $this->sessionHash))
                 );
                 return; // @codeCoverageIgnore
