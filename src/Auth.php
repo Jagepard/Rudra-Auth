@@ -77,7 +77,7 @@ class Auth implements AuthInterface
         if (Request::post()->has("remember_me")) {
             Cookie::set([md5("RudraPermit" . $this->sessionHash), [$this->sessionHash, $this->expireTime]]); // @codeCoverageIgnore
             Cookie::set([md5("RudraToken" . $this->sessionHash), [$token, $this->expireTime]]);   // @codeCoverageIgnore
-            Cookie::set([md5("RudraUser" . $this->sessionHash), [json_encode($user), $this->expireTime]]);   // @codeCoverageIgnore
+            Cookie::set([md5("RudraUser" . $this->sessionHash), [$this->encrypt(json_encode($user), Rudra::config()->get('secret')), $this->expireTime]]);   // @codeCoverageIgnore
         }
     }
 
@@ -202,7 +202,7 @@ class Auth implements AuthInterface
 
             if ($this->sessionHash === Cookie::get(md5("RudraPermit" . $this->sessionHash))) {
                 $this->setAuthenticationSession(
-                    json_decode(Cookie::get(md5("RudraUser" . $this->sessionHash)), true),
+                    json_decode($this->decrypt(Cookie::get(md5("RudraUser" . $this->sessionHash)), Rudra::config()->get('secret')), true),
                     Cookie::get(md5("RudraToken" . $this->sessionHash))
                 );
                 return; // @codeCoverageIgnore
@@ -262,5 +262,34 @@ class Auth implements AuthInterface
     public function getSessionHash(): string
     {
         return $this->sessionHash;
+    }
+
+    /**
+     * @param  string $data
+     * @param  string $secret
+     * @return void
+     */
+    public function encrypt(string $data, string $secret)
+    {
+        $ciphering     = "AES-128-CTR";
+        $iv_length     = openssl_cipher_iv_length($ciphering);
+        $options       = 0;
+        $encryption_iv = '1234567891011121';
+
+        return openssl_encrypt($data, $ciphering, $secret, $options, $encryption_iv);
+    }
+
+    /**
+     * @param  string $data
+     * @param  string $secret
+     * @return void
+     */
+    public function decrypt(string $data, string $secret)
+    {
+        $ciphering     = "AES-128-CTR";
+        $options       = 0;
+        $decryption_iv = '1234567891011121';
+        
+        return openssl_decrypt($data, $ciphering, $secret, $options, $decryption_iv);
     }
 }
