@@ -20,8 +20,8 @@
     },
     "require"           : {
         "php"             : ">=7.4",
-        "rudra/container" : "self.version",
-        "rudra/redirect" : "self.version"
+        "rudra/container" : "dev-master",
+        "rudra/redirect" : "dev-master"
     },
     "autoload"          : {
         "psr-4" : {
