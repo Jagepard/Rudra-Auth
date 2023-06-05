@@ -153,8 +153,12 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(password_verify($password, $hash));
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testUserToken()
     {
+        session_start();
         Session::set(["token", "someToken"]);
         $this->assertEquals("someToken", Session::get("token"));
     }
