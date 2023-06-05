@@ -22,7 +22,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
     protected function setUp(): void
     {
         Rudra::config([
-            "siteUrl"     => "http://example.com",
+            "url"         => "http://example.com",
             "environment" => "test",
             "roles"       => [
                 "admin"  => 0,
@@ -41,8 +41,12 @@ class AuthTest extends PHPUnit_Framework_TestCase
         ]);
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testRegularAccess()
     {
+        session_start();
         Session::set(["token", "token"]);
         $this->assertTrue(Auth::authorization());
 
