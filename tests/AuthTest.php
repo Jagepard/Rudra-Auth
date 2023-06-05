@@ -60,6 +60,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testUserAccess(): void
     {
         /* User Access */
+        session_start();
         Session::set(["token", "userIdToken"]);
         $this->assertTrue(Auth::authorization("userIdToken"));
 
@@ -73,6 +74,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testCheck(): void
     {
+        session_start();
         $_COOKIE["RudraPermit" . Auth::getSessionHash()] = md5(
             Request::server()->get("REMOTE_ADDR") .
             Request::server()->get("HTTP_USER_AGENT")
