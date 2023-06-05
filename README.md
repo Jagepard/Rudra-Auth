@@ -1,12 +1,8 @@
-[![Build Status](https://travis-ci.org/Jagepard/Rudra-Auth.svg?branch=master)](https://travis-ci.org/Jagepard/Rudra-Auth)
-[![codecov](https://codecov.io/gh/Jagepard/Rudra-Auth/branch/master/graph/badge.svg)](https://codecov.io/gh/Jagepard/Rudra-Auth)
+[![PHPunit](https://github.com/Jagepard/Rudra-Auth/actions/workflows/php.yml/badge.svg)](https://github.com/Jagepard/Rudra-Auth/actions/workflows/php.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Jagepard/Rudra-Auth/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Jagepard/Rudra-Auth/?branch=master)
 [![Code Climate](https://codeclimate.com/github/Jagepard/Rudra-Auth/badges/gpa.svg)](https://codeclimate.com/github/Jagepard/Rudra-Auth)
------
-[![Code Intelligence Status](https://scrutinizer-ci.com/g/Jagepard/Rudra-Auth/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
-[![Latest Stable Version](https://poser.pugx.org/rudra/auth/v/stable)](https://packagist.org/packages/rudra/auth)
-[![Total Downloads](https://poser.pugx.org/rudra/auth/downloads)](https://packagist.org/packages/rudra/auth)
 ![GitHub](https://img.shields.io/github/license/jagepard/Rudra-Auth.svg)
+-----
 
 # Rudra-Auth | [API](https://github.com/Jagepard/Rudra-Auth/blob/master/docs.md "Documentation API")
 ### Authorization
