@@ -20,36 +20,15 @@
 ]
 ```
 #### Usage / Использование
-##### use container
 ```php
-use Rudra\Auth\Auth;
-use Rudra\Container\Rudra;
-use Rudra\Container\Interfaces\RudraInterface;
+use Rudra\Auth\AuthFacade as Auth;
 
-$services = [
-    "contracts" => [
-        RudraInterface::class => Rudra::run(),
-    ],
-    
-    "services" => [
-        // Another services
-        
-        Auth::class => Auth::class,
-        
-        // Another services
-    ]
-];
-```
-```php
-Application::run()->setServices($services); 
-```
-```php
 $user = [
     "email"    => "some@email.com",
-    "password" => "someHash"
+    "password" => "password"
 ];
-    
-Application::run()->objects()->get("auth")->login("somePassword", $user, "dashboard", "Please enter correct information");
-Application::run()->objects()->get("auth")->logout("");
-Application::run()->objects()->get("auth")->updateSessionIfSetRememberMe("login");
+
+Auth::authentication($user[0], $user[1], "admin/dashboard", "Укажите верные данные");
+Auth::exitAuthenticationSession();
+Auth::restoreSessionIfSetRememberMe("login");
 ```
