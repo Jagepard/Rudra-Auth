@@ -19,9 +19,10 @@
         "email" : "jagepard@yandex.ru"
     },
     "require"           : {
-        "php"             : ">=7.4",
+        "php"             : ">=8.0",
         "rudra/container" : "self.version",
-        "rudra/redirect" : "self.version"
+        "rudra/redirect"  : "self.version",
+        "rudra/docs"      : "self.version"
     },
     "autoload"          : {
         "psr-4" : {
