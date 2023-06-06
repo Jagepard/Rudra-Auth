@@ -24,7 +24,7 @@
 use Rudra\Auth\AuthFacade as Auth;
 
 $user = [
-    "email"    => "some@email.com",
+    "email"    => "user@email.com",
     "password" => "password"
 ];
 
