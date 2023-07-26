@@ -22,12 +22,12 @@ class Auth implements AuthInterface
     protected string $sessionHash;
 
     /**
-     * Auth constructor.
-     * @param RudraInterface $rudra
-     *
      * Sets cookie lifetime, session hash
      * ----------------------------------
      * Устанавливает время жизни cookie, хеш сеанса
+     * 
+     * Auth constructor.
+     * @param RudraInterface $rudra
      */
     public function __construct(RudraInterface $rudra)
     {
@@ -36,15 +36,15 @@ class Auth implements AuthInterface
     }
 
     /**
+     * Authentication
+     * --------------
+     * Аутентификация
+     * 
      * @param \stdClass $user
      * @param string $password
      * @param string $redirect
      * @param string $notice
      * @return callable
-     *
-     * Authentication
-     * --------------
-     * Аутентификация
      */
     public function authentication(array $user, string $password, string $redirect = "", string $notice = "")
     {
@@ -65,12 +65,12 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param array $user
-     * @param string $token
-     *
      * Sets cookies if present $_POST["remember_me"]
      * ---------------------------------------------
      * Устанавливает cookies если есть $_POST["remember_me"]
+     * 
+     * @param array $user
+     * @param string $token
      */
     private function setCookiesIfSetRememberMe(array $user, string $token): void
     {
@@ -82,12 +82,12 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param array $user
-     * @param string $token
-     *
      * Sets session data on successful authentication
      * ----------------------------------------------
      * Устанавливает данные сессии при успешной аутентификации
+     * 
+     * @param array $user
+     * @param string $token
      */
     private function setAuthenticationSession(array $user, string $token): void
     {
@@ -96,11 +96,11 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param string $redirect
-     *
      * Exit authentication session
      * ---------------------------
      * Выйти из сеанса аутентификации
+     * 
+     * @param string $redirect
      */
     public function exitAuthenticationSession(string $redirect = ""): void
     {
@@ -130,15 +130,15 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param string|null $token
-     * @param string|null $redirect
-     * @return bool|callable
-     *
      * Authorization
      * Providing access to shared or personal resources
      * ------------------------------------------------
      * Авторизация
      * Предоставление доступа к общим или личным ресурсам
+     * 
+     * @param string|null $token
+     * @param string|null $redirect
+     * @return bool|callable
      */
     public function authorization(string $token = null, string $redirect = null)
     {
@@ -164,14 +164,14 @@ class Auth implements AuthInterface
     }
 
     /**
+     * Role based access
+     * -----------------
+     * Доступ на основе ролей
+     * 
      * @param string $role
      * @param string $privilege
      * @param string|null $redirect
      * @return bool
-     *
-     * Role based access
-     * -----------------
-     * Доступ на основе ролей
      */
     public function roleBasedAccess(string $role, string $privilege, string $redirect = null)
     {
@@ -189,11 +189,11 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param string $redirect
-     *
      * Restore session data if $_POST["remember_me"] was set
      * -----------------------------------------------------
      * Восствнавливает данные сессии если был установлен $_POST["remember_me"]
+     * 
+     * @param string $redirect
      */
     public function restoreSessionIfSetRememberMe($redirect = "login"): void
     {
@@ -214,13 +214,13 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param string $password
-     * @param int $cost
-     * @return string
-     *
      * Creates a password hash
      * -----------------------
      * Создаёт хеш пароля
+     * 
+     * @param string $password
+     * @param int $cost
+     * @return string
      */
     public function bcrypt(string $password, int $cost = 10): string
     {
@@ -239,12 +239,12 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param string $notice
-     * @codeCoverageIgnore
-     *
      * Redirect by setting a notification
      * ----------------------------------
      * Перенаправить установив уведомление
+     * 
+     * @param string $notice
+     * @codeCoverageIgnore
      */
     protected function loginRedirectWithNotice(string $notice): void
     {
@@ -253,11 +253,11 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @return string
-     *
      * Gets the hash of the session
      * ----------------------------
      * Получает хэш сессии
+     * 
+     * @return string
      */
     public function getSessionHash(): string
     {
