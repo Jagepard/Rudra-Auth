@@ -31,7 +31,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
             ]
         ]);
         Rudra::binding([RudraInterface::class => Rudra::run()]);
-        Rudra::services([
+        Rudra::serviceList([
             \Rudra\Auth\Auth::class  => \Rudra\Auth\Auth::class,
             Redirect\Redirect::class => Redirect\Redirect::class
         ]);
