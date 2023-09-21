@@ -10,7 +10,7 @@
 ##### implements [Rudra\Auth\AuthInterface](#rudra_auth_authinterface)
 | Visibility | Function |
 |:-----------|:---------|
-|public|<em><strong>__construct</strong>( Rudra\Container\Interfaces\RudraInterface $rudra )</em><br>Auth constructor.<br>Sets cookie lifetime, session hash<br>Устанавливает время жизни cookie, хеш сеанса|
+|public|<em><strong>__construct</strong>( Rudra\Container\Interfaces\RudraInterface $rudra )</em><br>Sets cookie lifetime, session hash<br>Устанавливает время жизни cookie, хеш сеанса<br>Auth constructor.|
 |public|<em><strong>authentication</strong>( array $user  string $password  string $redirect  string $notice )</em><br>Authentication<br>Аутентификация|
 |private|<em><strong>setCookiesIfSetRememberMe</strong>( array $user  string $token ): void</em><br>Sets cookies if present $_POST["remember_me"]<br>Устанавливает cookies если есть $_POST["remember_me"]|
 |private|<em><strong>setAuthenticationSession</strong>( array $user  string $token ): void</em><br>Sets session data on successful authentication<br>Устанавливает данные сессии при успешной аутентификации|
