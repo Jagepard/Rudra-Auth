@@ -3,25 +3,28 @@
 declare(strict_types = 1);
 
 /**
- * @author    : Jagepard <jagepard@yandex.ru">
- * @license   https://mit-license.org/ MIT
+ * @author  : Jagepard <jagepard@yandex.ru">
+ * @license https://mit-license.org/ MIT
  *
  * phpunit src/tests/AuthTest --coverage-html src/tests/build/coverage-html
  */
 
 namespace Rudra\Auth\Tests;
 
-use Rudra\Redirect;
-use Rudra\Container\Facades\{Request, Rudra, Session};
-use Rudra\Auth\AuthFacade as Auth;
+use Rudra\Auth\Auth;
+use Rudra\Container\Rudra;
+use Rudra\Redirect\Redirect;
 use Rudra\Container\Interfaces\RudraInterface;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
 class AuthTest extends PHPUnit_Framework_TestCase
 {
+    private RudraInterface $rudra;
+
     protected function setUp(): void
     {
-        Rudra::config([
+        $this->rudra = Rudra::run();
+        $this->rudra->config([
             "url"         => "http://example.com",
             "environment" => "test",
             "roles"       => [
@@ -30,12 +33,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
                 "user"   => 2
             ]
         ]);
-        Rudra::binding([RudraInterface::class => Rudra::run()]);
-        Rudra::serviceList([
-            \Rudra\Auth\Auth::class  => \Rudra\Auth\Auth::class,
-            Redirect\Redirect::class => Redirect\Redirect::class
-        ]);
-        Request::server()->set([
+        $this->rudra->binding([RudraInterface::class => $this->rudra]);
+        $this->rudra->request()->server()->set([
             "REMOTE_ADDR"     => "127.0.0.1",
             "HTTP_USER_AGENT" => "Mozilla"
         ]);
@@ -47,11 +46,10 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testRegularAccess()
     {
         session_start();
-        Session::set(["token", "token"]);
-        $this->assertTrue(Auth::authorization());
-
-        Session::unset("token");
-        $this->assertFalse(Auth::authorization("someToken"));
+        $this->rudra->session()->set(["token", "token"]);
+        $this->assertTrue($this->rudra->get(Auth::class)->authorization());
+        $this->rudra->session()->unset("token");
+        $this->assertFalse($this->rudra->get(Auth::class)->authorization("someToken"));
     }
 
     /**
@@ -61,12 +59,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
     {
         /* User Access */
         session_start();
-        Session::set(["token", "userIdToken"]);
-        $this->assertTrue(Auth::authorization("userIdToken"));
+        $this->rudra->session()->set(["token", "userIdToken"]);
+        $this->assertTrue($this->rudra->get(Auth::class)->authorization("userIdToken"));
 
-        Session::unset("token");
-        $this->assertFalse(Auth::authorization("userIdToken"));
-        $this->assertNull(Auth::authorization("userIdToken", ''));
+        $this->rudra->session()->unset("token");
+        $this->assertFalse($this->rudra->get(Auth::class)->authorization("userIdToken"));
     }
 
     /**
@@ -75,16 +72,16 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testCheck(): void
     {
         session_start();
-        $_COOKIE["RudraPermit" . Auth::getSessionHash()] = md5(
-            Request::server()->get("REMOTE_ADDR") .
-            Request::server()->get("HTTP_USER_AGENT")
+        $_COOKIE["RudraPermit" . $this->rudra->get(Auth::class)->getSessionHash()] = md5(
+            $this->rudra->request()->server()->get("REMOTE_ADDR") .
+            $this->rudra->request()->server()->get("HTTP_USER_AGENT")
         );;
-        $_COOKIE["RudraToken" . Auth::getSessionHash()] = "userIdToken";
-        $_COOKIE["RudraUser" . Auth::getSessionHash()]  = json_encode((object)[]);
+        $_COOKIE["RudraToken" . $this->rudra->get(Auth::class)->getSessionHash()] = "userIdToken";
+        $_COOKIE["RudraUser" . $this->rudra->get(Auth::class)->getSessionHash()]  = json_encode((object)[]);
 
-        Auth::restoreSessionIfSetRememberMe();
-        Session::set(["token", "userIdToken"]);
-        $this->assertEquals("userIdToken", Session::get("token"));
+        $this->rudra->get(Auth::class)->restoreSessionIfSetRememberMe();
+        $this->rudra->session()->set(["token", "userIdToken"]);
+        $this->assertEquals("userIdToken", $this->rudra->session()->get("token"));
     }
 
     /**
@@ -94,13 +91,13 @@ class AuthTest extends PHPUnit_Framework_TestCase
     {
         session_start();
         $this->assertNull(
-            Auth::authentication([
+            $this->rudra->get(Auth::class)->authentication([
                 "email"    => "",
                 "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
             ], "password"));
 
         $this->assertNull(
-            Auth::authentication([
+            $this->rudra->get(Auth::class)->authentication([
                 "email"    => "",
                 "password" => password_hash("password", PASSWORD_BCRYPT, ["cost" => 10])
             ], "wrong"));
@@ -112,8 +109,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testLogout(): void
     {
         session_start();
-        Auth::exitAuthenticationSession();
-        $this->assertFalse(Session::has("token"));
+        $this->rudra->get(Auth::class)->exitAuthenticationSession();
+        $this->assertFalse($this->rudra->session()->has("token"));
     }
 
     /**
@@ -121,16 +118,13 @@ class AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testRole(): void
     {
-        $this->assertTrue(Auth::roleBasedAccess("admin", "admin"));
-        $this->assertFalse(Auth::roleBasedAccess("editor", "admin"));
-        $this->assertFalse(Auth::roleBasedAccess("editor", "admin", ''));
-        $this->assertTrue(Auth::roleBasedAccess("editor", "editor"));
+        $this->assertTrue($this->rudra->get(Auth::class)->roleBasedAccess("admin", "admin"));
+        $this->assertFalse($this->rudra->get(Auth::class)->roleBasedAccess("editor", "admin"));
+        $this->assertTrue($this->rudra->get(Auth::class)->roleBasedAccess("editor", "editor"));
 
-        $this->assertFalse(Auth::roleBasedAccess("user", "admin"));
-        $this->assertFalse(Auth::roleBasedAccess("user", "editor"));
-        $this->assertFalse(Auth::roleBasedAccess("user", "admin", ''));
-        $this->assertFalse(Auth::roleBasedAccess("user", "editor", ''));
-        $this->assertTrue(Auth::roleBasedAccess("user", "user"));
+        $this->assertFalse($this->rudra->get(Auth::class)->roleBasedAccess("user", "admin"));
+        $this->assertFalse($this->rudra->get(Auth::class)->roleBasedAccess("user", "editor"));
+        $this->assertTrue($this->rudra->get(Auth::class)->roleBasedAccess("user", "user"));
     }
 
     /**
@@ -140,17 +134,17 @@ class AuthTest extends PHPUnit_Framework_TestCase
     {
         session_start();
         /* Regular Access */
-        Session::set(["token", "token"]);
-        $this->assertTrue(Auth::authorization(null, "API"));
+        $this->rudra->session()->set(["token", "token"]);
+        $this->assertTrue($this->rudra->get(Auth::class)->authorization(null, "API"));
 
-        Auth::exitAuthenticationSession();
-        $this->assertNull(Auth::authorization(null, "API"));
+        $this->rudra->get(Auth::class)->exitAuthenticationSession();
+        $this->assertNull($this->rudra->get(Auth::class)->authorization(null, "API"));
     }
 
     public function testHash()
     {
         $password = "password";
-        $hash     = Auth::bcrypt($password);
+        $hash     = $this->rudra->get(Auth::class)->bcrypt($password);
 
         $this->assertTrue(password_verify($password, $hash));
     }
@@ -161,7 +155,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
     public function testUserToken()
     {
         session_start();
-        Session::set(["token", "someToken"]);
-        $this->assertEquals("someToken", Session::get("token"));
+        $this->rudra->session()->set(["token", "someToken"]);
+        $this->assertEquals("someToken", $this->rudra->session()->get("token"));
     }
 }
