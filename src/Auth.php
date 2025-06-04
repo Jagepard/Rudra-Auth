@@ -34,14 +34,20 @@ class Auth implements AuthInterface
     /**
      * @param  array  $user
      * @param  string $password
-     * @param  string $redirect
-     * @param  string $notice
+     * @param  array  $redirect
+     * @param  array  $notice
      * @return void
      */
-    public function authentication(array $user, string $password, string $redirect = "", string $notice = "")
+    public function authentication(
+        array $user, string $password, array $redirect = ['admin', 'login'], array $notice = ["error" => "Wrong access data"]
+    )
     {
-        if (!isset($user['password'])) {
-            throw new \InvalidArgumentException("Invalid user's array received");
+        if (!isset($user['password'], $user['email'])) {
+            throw new \InvalidArgumentException("User's array must contain 'password' and 'email'");
+        }
+
+        if (count($redirect) !== 2) {
+            throw new \InvalidArgumentException("Redirect array must contain exactly two elements");
         }
 
         if (password_verify($password, $user['password'])) {
@@ -50,10 +56,12 @@ class Auth implements AuthInterface
             $this->setCookiesIfSetRememberMe($user, $token);
             $this->setAuthenticationSession($user, $token);
 
-            return $this->handleRedirect($redirect, ["status" => "Authorized"]);
+            return $this->handleRedirect($redirect[0], ["status" => "Authorized"]);
         }
 
-        return $this->handleRedirect($redirect, ["status" => "Wrong access data"], $this->loginRedirectWithNotice($notice));
+        $this->rudra->session()->set(["alert", $notice]);
+
+        return $this->handleRedirect($redirect[1], ["status" => "Wrong access data"]);
     }
 
     /**
@@ -113,9 +121,9 @@ class Auth implements AuthInterface
     /**
      * @param  string|null $token
      * @param  string|null $redirect
-     * @return void
+     * @return bool
      */
-    public function authorization(string $token = null, string $redirect = null)
+    public function authorization(string $token = null, string $redirect = null): bool
     {
         // If authorized / Если авторизован
         if ($this->rudra->session()->has("token")) {
@@ -195,32 +203,19 @@ class Auth implements AuthInterface
         return password_hash($password, PASSWORD_BCRYPT, ["cost" => $cost]);
     }
 
+
     /**
-     * @param  string        $redirect
-     * @param  array         $jsonResponse
-     * @param  callable|null $redirectCallable
+     * @param  string $redirect
+     * @param  array  $jsonResponse
      * @return void
      */
-    private function handleRedirect(string $redirect, array $jsonResponse, callable $redirectCallable = null)
+    private function handleRedirect(string $redirect, array $jsonResponse): void
     {
-        ("API" !== $redirect) ?: $this->rudra->response()->json($jsonResponse);
-
-        if (isset($redirectCallable)) {
-            return $redirectCallable;
-        }
+        if ("API" === $redirect) { 
+            $this->rudra->response()->json($jsonResponse);
+        };
 
         $this->rudra->get(Redirect::class)->run($redirect);
-    }
-
-     /**
-      * @param  string $notice
-      * @return void
-      * @codeCoverageIgnore
-      */
-    private function loginRedirectWithNotice(string $notice): void
-    {
-        $this->rudra->session()->set(["alert", ["error" => $notice]]);
-        $this->rudra->get(Redirect::class)->run("login");
     }
 
     /**
