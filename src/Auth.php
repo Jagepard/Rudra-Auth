@@ -106,7 +106,7 @@ class Auth implements AuthInterface
     /**
      * Removes the $_POST["remember_me"] cookie
      */
-    protected function unsetRememberMeCookie(): void
+    private function unsetRememberMeCookie(): void
     {
         if ("test" !== $this->rudra->config()->get("environment")) {
             // @codeCoverageIgnoreStart
