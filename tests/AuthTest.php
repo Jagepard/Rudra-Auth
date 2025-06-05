@@ -16,6 +16,7 @@ use Rudra\Container\Rudra;
 use Rudra\Redirect\Redirect;
 use Rudra\Container\Interfaces\RudraInterface;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
+use Rudra\Exceptions\ValidationException;
 
 class AuthTest extends PHPUnit_Framework_TestCase
 {
@@ -31,7 +32,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
                 "admin"  => 0,
                 "editor" => 1,
                 "user"   => 2
-            ]
+            ],
+            "secret" => 'pass'
         ]);
         $this->rudra->binding([RudraInterface::class => $this->rudra]);
         $this->rudra->request()->server()->set([
@@ -103,6 +105,22 @@ class AuthTest extends PHPUnit_Framework_TestCase
             ], "wrong"));
     }
 
+    public function testAuthenticationWrongUserArrayException()
+    {
+        $this->expectException(ValidationException::class);
+        $this->rudra->get(Auth::class)->authentication(["email" => ""], "password");
+    }
+
+    public function testAuthenticationWrongRedirectArrayException()
+    {
+        $this->expectException(ValidationException::class);
+        $this->rudra->get(Auth::class)->authentication(
+            ["email" => "", "password" => ""], 
+            "password", 
+            ['admin', 'login', 'admin']
+        );
+    }
+
     /**
      * @runInSeparateProcess
      */
@@ -113,9 +131,6 @@ class AuthTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->rudra->session()->has("token"));
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testRole(): void
     {
         $this->assertTrue($this->rudra->get(Auth::class)->roleBasedAccess("admin", "admin"));
@@ -157,5 +172,16 @@ class AuthTest extends PHPUnit_Framework_TestCase
         session_start();
         $this->rudra->session()->set(["token", "someToken"]);
         $this->assertEquals("someToken", $this->rudra->session()->get("token"));
+    }
+
+    public function testEncrypt()
+    {
+        $data = '123ABC';
+        $secret = '1234567891011121';
+
+        $encryptedData = $this->rudra->get(Auth::class)->encrypt($data, $secret);
+        $decryptedData = $this->rudra->get(Auth::class)->decrypt($encryptedData, $secret);
+
+        $this->assertEquals($data, $decryptedData);
     }
 }
