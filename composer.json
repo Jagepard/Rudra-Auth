@@ -1,42 +1,43 @@
 {
-    "name"              : "rudra/auth",
-    "description"       : "Rudra framework",
-    "type"              : "library",
-    "keywords"          : [
+    "name": "rudra/auth",
+    "description": "Rudra framework",
+    "type": "library",
+    "keywords": [
         "rudra",
         "auth"
     ],
-    "license"           : "MIT",
-    "authors"           : [
+    "license": "MIT",
+    "authors": [
         {
-            "name"    : "Jagepard",
-            "email"   : "jagepard@yandex.ru",
+            "name": "Jagepard",
+            "email": "jagepard@yandex.ru",
             "homepage": "https://jagepard.ru",
-            "role"    : "Developer"
+            "role": "Developer"
         }
     ],
-    "support"           : {
-        "email" : "jagepard@yandex.ru"
+    "support": {
+        "email": "jagepard@yandex.ru"
     },
-    "require"           : {
-        "php"             : ">=8.0",
-        "rudra/container" : "dev-master",
-        "rudra/redirect"  : "dev-master",
-        "rudra/docs"      : "dev-master"
+    "require": {
+        "php": ">=8.3",
+        "rudra/container": "dev-master",
+        "rudra/redirect": "dev-master",
+        "rudra/docs": "dev-master",
+        "rudra/exception" : "dev-master"
     },
-    "autoload"          : {
-        "psr-4" : {
-            "Rudra\\Auth\\" : "src/"
-        }
-    },
-    "autoload-dev" : {
+    "autoload": {
         "psr-4": {
-            "Rudra\\Auth\\Tests\\" : "tests/"
+            "Rudra\\Auth\\": "src/"
         }
     },
-    "minimum-stability" : "dev",
-    "config"            : {
-        "optimize-autoloader" : true,
-        "prefer-stable"       : true
+    "autoload-dev": {
+        "psr-4": {
+            "Rudra\\Auth\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "config": {
+        "optimize-autoloader": true,
+        "prefer-stable": true
     }
 }

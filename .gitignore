@@ -1,4 +1,7 @@
-# Created by .ignore support plugin (hsz.mobi)
+/.idea/
+/.vscode/
+/tests/build/
 /vendor/
 /composer.lock
-/tests/build/
+/.phpunit.cache/
+/.phpunit.result.cache

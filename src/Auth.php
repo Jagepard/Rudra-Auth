@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace Rudra\Auth;
 
 use Rudra\Redirect\Redirect;
+use Rudra\Exceptions\ValidationException;
 use Rudra\Container\Interfaces\RudraInterface;
 
 class Auth implements AuthInterface
@@ -43,11 +44,11 @@ class Auth implements AuthInterface
     )
     {
         if (!isset($user['password'], $user['email'])) {
-            throw new \InvalidArgumentException("User's array must contain 'password' and 'email'");
+            throw new ValidationException("User's array must contain 'password' and 'email'");
         }
 
         if (count($redirect) !== 2) {
-            throw new \InvalidArgumentException("Redirect array must contain exactly two elements");
+            throw new ValidationException("Redirect array must contain exactly two elements");
         }
 
         if (password_verify($password, $user['password'])) {
@@ -161,13 +162,15 @@ class Auth implements AuthInterface
         }
 
         if (isset($redirect)) {
-            $this->handleRedirect($redirect, ["status" => "Permissions denied"]);
+            $this->handleRedirect($redirect, ["status" => "Permissions denied"]); // @codeCoverageIgnore
         }
 
         return false;
     }
 
     /**
+     * @codeCoverageIgnore
+     * 
      * @param  string $redirect
      * @return void
      */
