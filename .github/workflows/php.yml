@@ -19,11 +19,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Шаг 2: Валидация composer.json и composer.lock
+      # Шаг 2: Настройка PHP и расширений
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: xdebug
+
+      # Шаг 3: Валидация composer.json и composer.lock
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
 
-      # Шаг 3: Кэширование зависимостей Composer
+      # Шаг 4: Кэширование зависимостей Composer
       - name: Cache Composer packages
         id: composer-cache
         uses: actions/cache@v3
@@ -33,19 +40,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-
 
-      # Шаг 4: Установка зависимостей
+      # Шаг 5: Установка зависимостей
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      # Шаг 5: Установка PHPUnit локально
-      - name: Install PHPUnit globally
-        run: composer require --dev phpunit/phpunit --no-update
-        # Добавляем PHPUnit как временную dev-зависимость
+      # Шаг 6: Загрузка PHPUnit PHAR
+      - name: Download PHPUnit PHAR
+        run: |
+          wget https://phar.phpunit.de/phpunit.phar 
+          chmod +x phpunit.phar
+          mv phpunit.phar /usr/local/bin/phpunit
 
-      - name: Update dependencies with PHPUnit
-        run: composer update --prefer-dist --no-progress
-        # Обновляем зависимости, чтобы PHPUnit был установлен
+      # Шаг 7: Проверка версии PHPUnit
+      - name: Check PHPUnit version
+        run: phpunit --version
 
-      # Шаг 6: Запуск тестов
+      # Шаг 8: Запуск тестов
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --configuration phpunit.xml
+        run: phpunit --configuration phpunit.xml --debug
+        env:
+          XDEBUG_MODE: coverage
