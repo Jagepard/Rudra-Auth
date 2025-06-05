@@ -15,7 +15,7 @@
 |private|<em><strong>setCookiesIfSetRememberMe</strong>( array $user  string $token ): void</em><br>|
 |private|<em><strong>setAuthenticationSession</strong>( array $user  string $token ): void</em><br>|
 |public|<em><strong>exitAuthenticationSession</strong>( string $redirect ): void</em><br>|
-|protected|<em><strong>unsetRememberMeCookie</strong>(): void</em><br>Removes the $_POST["remember_me"] cookie|
+|private|<em><strong>unsetRememberMeCookie</strong>(): void</em><br>Removes the $_POST["remember_me"] cookie|
 |public|<em><strong>authorization</strong>( ?string $token  ?string $redirect )</em><br>|
 |public|<em><strong>roleBasedAccess</strong>( string $role  string $privilege  ?string $redirect )</em><br>|
 |public|<em><strong>restoreSessionIfSetRememberMe</strong>(  $redirect ): void</em><br>|
