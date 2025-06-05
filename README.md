@@ -29,7 +29,7 @@ $user = [
     "password" => "password"
 ];
 
-Auth::authentication($user[0], $user[1], "admin/dashboard", "Укажите верные данные");
+Auth::authentication($user, "password", ["admin/dashboard", "login"], ["error" => "Wrong access data"]);
 Auth::exitAuthenticationSession();
 Auth::restoreSessionIfSetRememberMe("login");
 ```
