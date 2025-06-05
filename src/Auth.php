@@ -121,9 +121,9 @@ class Auth implements AuthInterface
     /**
      * @param  string|null $token
      * @param  string|null $redirect
-     * @return bool
+     * @return mixed
      */
-    public function authorization(string $token = null, string $redirect = null): bool
+    public function authorization(string $token = null, string $redirect = null)
     {
         // If authorized / Если авторизован
         if ($this->rudra->session()->has("token")) {
