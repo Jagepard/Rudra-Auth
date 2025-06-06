@@ -10,7 +10,7 @@ declare(strict_types = 1);
 namespace Rudra\Auth;
 
 use Rudra\Redirect\Redirect;
-use Rudra\Exceptions\ValidationException;
+use Rudra\Exceptions\LogicException;
 use Rudra\Container\Interfaces\RudraInterface;
 
 class Auth implements AuthInterface
@@ -44,11 +44,11 @@ class Auth implements AuthInterface
     )
     {
         if (!isset($user['password'], $user['email'])) {
-            throw new ValidationException("User's array must contain 'password' and 'email'");
+            throw new LogicException("User's array must contain 'password' and 'email'");
         }
 
         if (count($redirect) !== 2) {
-            throw new ValidationException("Redirect array must contain exactly two elements");
+            throw new LogicException("Redirect array must contain exactly two elements");
         }
 
         if (password_verify($password, $user['password'])) {
