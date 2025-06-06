@@ -1,43 +1,49 @@
 {
     "name": "rudra/auth",
-    "description": "Rudra framework",
+    "description": "Authentication module for Rudra framework",
     "type": "library",
     "keywords": [
         "rudra",
-        "auth"
+        "auth",
+        "authentication"
     ],
     "license": "MIT",
     "authors": [
         {
             "name": "Jagepard",
             "email": "jagepard@yandex.ru",
-            "homepage": "https://jagepard.ru",
+            "homepage": "https://jagepard.ru", 
             "role": "Developer"
         }
     ],
     "support": {
-        "email": "jagepard@yandex.ru"
+        "email": "jagepard@yandex.ru",
+        "issues": "https://github.com/Jagepard/Rudra-Auth/issues", 
+        "source": "https://github.com/Jagepard/Rudra-Auth" 
     },
     "require": {
         "php": ">=8.3",
-        "rudra/container": "dev-master",
-        "rudra/redirect": "dev-master",
-        "rudra/docs": "dev-master",
-        "rudra/exception" : "dev-master"
+        "rudra/container": "self.version",
+        "rudra/redirect": "self.version",
+        "rudra/docs": "self.version",
+        "rudra/exception": "self.version"
     },
     "autoload": {
         "psr-4": {
             "Rudra\\Auth\\": "src/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Rudra\\Auth\\Tests\\": "tests/"
-        }
-    },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "config": {
         "optimize-autoloader": true,
-        "prefer-stable": true
-    }
+        "sort-packages": true,
+        "platform-check": false
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/Jagepard/Rudra-Auth" 
+        }
+    ]
 }
