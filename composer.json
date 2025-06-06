@@ -33,17 +33,16 @@
             "Rudra\\Auth\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Rudra\\Annotation\\Tests\\": "tests/"
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "optimize-autoloader": true,
         "sort-packages": true,
         "platform-check": false
-    },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/Jagepard/Rudra-Auth" 
-        }
-    ]
+    }
 }
