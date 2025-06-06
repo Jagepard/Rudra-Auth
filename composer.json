@@ -25,7 +25,6 @@
         "php": ">=8.3",
         "rudra/container": "self.version",
         "rudra/redirect": "self.version",
-        "rudra/docs": "self.version",
         "rudra/exception": "self.version"
     },
     "autoload": {
