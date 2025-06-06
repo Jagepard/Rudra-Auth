@@ -14,9 +14,9 @@ namespace Rudra\Auth\Tests;
 use Rudra\Auth\Auth;
 use Rudra\Container\Rudra;
 use Rudra\Redirect\Redirect;
+use Rudra\Exceptions\LogicException;
 use Rudra\Container\Interfaces\RudraInterface;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
-use Rudra\Exceptions\ValidationException;
 
 class AuthTest extends PHPUnit_Framework_TestCase
 {
@@ -107,13 +107,13 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
     public function testAuthenticationWrongUserArrayException()
     {
-        $this->expectException(ValidationException::class);
+        $this->expectException(LogicException::class);
         $this->rudra->get(Auth::class)->authentication(["email" => ""], "password");
     }
 
     public function testAuthenticationWrongRedirectArrayException()
     {
-        $this->expectException(ValidationException::class);
+        $this->expectException(LogicException::class);
         $this->rudra->get(Auth::class)->authentication(
             ["email" => "", "password" => ""], 
             "password", 
