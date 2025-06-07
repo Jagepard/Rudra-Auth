@@ -14,11 +14,11 @@ namespace Rudra\Auth\Tests;
 use Rudra\Auth\Auth;
 use Rudra\Container\Rudra;
 use Rudra\Redirect\Redirect;
+use PHPUnit\Framework\TestCase;
 use Rudra\Exceptions\LogicException;
 use Rudra\Container\Interfaces\RudraInterface;
-use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
-class AuthTest extends PHPUnit_Framework_TestCase
+class AuthTest extends TestCase
 {
     private RudraInterface $rudra;
 
