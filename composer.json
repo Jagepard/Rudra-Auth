@@ -25,7 +25,8 @@
         "php": ">=8.3",
         "rudra/container": "self.version",
         "rudra/redirect": "self.version",
-        "rudra/exception": "self.version"
+        "rudra/exception": "self.version",
+        "rudra/docs": "self.version"
     },
     "autoload": {
         "psr-4": {
@@ -43,5 +44,10 @@
         "optimize-autoloader": true,
         "sort-packages": true,
         "platform-check": false
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }
