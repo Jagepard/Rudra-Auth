@@ -47,7 +47,7 @@ jobs:
       # Шаг 6: Загрузка PHPUnit PHAR
       - name: Download PHPUnit PHAR
         run: |
-          wget https://phar.phpunit.de/phpunit.phar 
+          wget https://phar.phpunit.de/phpunit.phar  
           chmod +x phpunit.phar
           mv phpunit.phar /usr/local/bin/phpunit
 
@@ -55,8 +55,17 @@ jobs:
       - name: Check PHPUnit version
         run: phpunit --version
 
-      # Шаг 8: Запуск тестов
-      - name: Run PHPUnit tests
-        run: phpunit --configuration phpunit.xml --debug
+      # Шаг 8: Запуск тестов с генерацией отчета о покрытии
+      - name: Run PHPUnit tests with coverage
+        run: |
+          mkdir -p build/logs
+          phpunit --configuration phpunit.xml --coverage-clover build/logs/clover.xml --debug
         env:
           XDEBUG_MODE: coverage
+
+      # Шаг 9: Отправка данных о покрытии в Coveralls
+      - name: Send coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: build/logs/clover.xml
