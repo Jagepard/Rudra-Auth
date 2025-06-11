@@ -94,7 +94,7 @@ class Auth implements AuthInterface
      * @param  string $redirect
      * @return void
      */
-    public function exitAuthenticationSession(string $redirect = ""): void
+    public function logout(string $redirect = ""): void
     {
         $this->rudra->session()->unset("token");
         $this->rudra->session()->unset("user");
@@ -126,17 +126,18 @@ class Auth implements AuthInterface
      */
     public function authorization(string $token = null, string $redirect = null)
     {
-        // If authorized / Если авторизован
-        if ($this->rudra->session()->has("token")) {
-            // Providing access to shared resources / Предоставление доступа к общим ресурсам
-            if (!isset($token)) {
-                return true;
-            }
+        if (!$this->rudra->session()->has("token")) {
+            return false;
+        }
 
-            // Providing access to the user's personal resources / Предоставление доступа к личным ресурсам пользователя
-            if ($token === $this->rudra->session()->get("token")) {
-                return true;
-            }
+        // Providing access to shared resources / Предоставление доступа к общим ресурсам
+        if (!isset($token)) {
+            return true;
+        }
+
+        // Providing access to the user's personal resources / Предоставление доступа к личным ресурсам пользователя
+        if (hash_equals($token, $this->rudra->session()->get("token"))) {
+            return true;
         }
 
         // If not logged in / Если не авторизован
