@@ -12,7 +12,7 @@ namespace Rudra\Auth;
 interface AuthInterface
 {
     public function authentication(array $user, string $password, array $redirect = ['admin', 'login'], array $notice = ["error" => "Wrong access data"]);
-    public function exitAuthenticationSession(string $redirect = ""): void;
+    public function logout(string $redirect = ""): void;
     public function authorization(string $token = null, string $redirect = null);
     public function roleBasedAccess(string $role, string $privilege, string $redirect = null);
     public function bcrypt(string $password, int $cost = 10): string;
