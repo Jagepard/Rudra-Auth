@@ -127,7 +127,7 @@ class AuthTest extends TestCase
     public function testLogout(): void
     {
         session_start();
-        $this->rudra->get(Auth::class)->exitAuthenticationSession();
+        $this->rudra->get(Auth::class)->logout();
         $this->assertFalse($this->rudra->session()->has("token"));
     }
 
@@ -152,8 +152,8 @@ class AuthTest extends TestCase
         $this->rudra->session()->set(["token", "token"]);
         $this->assertTrue($this->rudra->get(Auth::class)->authorization(null, "API"));
 
-        $this->rudra->get(Auth::class)->exitAuthenticationSession();
-        $this->assertNull($this->rudra->get(Auth::class)->authorization(null, "API"));
+        $this->rudra->get(Auth::class)->logout();
+        $this->assertFalse($this->rudra->get(Auth::class)->authorization(null, "API"));
     }
 
     public function testHash()

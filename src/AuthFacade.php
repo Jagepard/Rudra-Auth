@@ -13,7 +13,7 @@ use Rudra\Container\Traits\FacadeTrait;
 
 /**
  * @method static authentication(\stdClass $user, string $password, string $redirect = "", string $notice = "")
- * @method static void exitAuthenticationSession(string $redirect = "")
+ * @method static void logout(string $redirect = "")
  * @method static authorization(string $token = null, string $redirect = null)
  * @method static roleBasedAccess(string $role, string $privilege, string $redirect = null)
  * @method static void restoreSessionIfSetRememberMe($redirect = "login")

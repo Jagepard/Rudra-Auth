@@ -10,25 +10,35 @@
 #### Install / Установка
 ```composer require rudra/auth```
 
-##### Setting up roles / Настройка ролей
-```
-[
-    'admin'     => 0,
-    'editor'    => 1,
-    'moderator' => 2,
-    'user'      => 3
-]
-```
-#### Usage / Использование
+##### User registration / Регистрация пользователя
 ```php
-use Rudra\Auth\AuthFacade as Auth;
-
 $user = [
     "email"    => "user@email.com",
-    "password" => "password"
+    "password" => Auth::bcrypr("password")
 ];
+```
+##### Getting a user from the database / Получение пользователя из базы данных
+```php
+$user = [
+    "email"    => "user@email.com",
+    "password" => "password_hash"
+];
+```
 
-Auth::authentication($user, "password", ["admin/dashboard", "login"], ["error" => "Wrong access data"]);
-Auth::exitAuthenticationSession();
-Auth::restoreSessionIfSetRememberMe("login");
+##### Usage / Использование
+```php
+use Rudra\Auth\AuthFacade as Auth;
+```
+##### Authentication / Аутентификация
+```php
+Auth::authentication(
+    $user, 
+    "password", 
+    ["admin/dashboard", "login"],
+    ["error" => "Wrong access data"]
+);
+```
+##### Logout from authentication session / Выход из сеанса аутентификации
+```php
+Auth::logout();
 ```
