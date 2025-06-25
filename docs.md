@@ -7,23 +7,22 @@
 <a id="rudra_auth_auth"></a>
 
 ### Class: Rudra\Auth\Auth
-##### implements [Rudra\Auth\AuthInterface](#rudra_auth_authinterface)
 | Visibility | Function |
 |:-----------|:---------|
-|public|<em><strong>__construct</strong>( Rudra\Container\Interfaces\RudraInterface $rudra )</em><br>Sets cookie lifetime, session hash|
-|public|<em><strong>authentication</strong>( array $user  string $password  array $redirect  array $notice )</em><br>|
-|private|<em><strong>setCookiesIfSetRememberMe</strong>( array $user  string $token ): void</em><br>|
-|private|<em><strong>setAuthenticationSession</strong>( array $user  string $token ): void</em><br>|
-|public|<em><strong>exitAuthenticationSession</strong>( string $redirect ): void</em><br>|
-|private|<em><strong>unsetRememberMeCookie</strong>(): void</em><br>Removes the $_POST["remember_me"] cookie|
-|public|<em><strong>authorization</strong>( ?string $token  ?string $redirect )</em><br>|
-|public|<em><strong>roleBasedAccess</strong>( string $role  string $privilege  ?string $redirect )</em><br>|
-|public|<em><strong>restoreSessionIfSetRememberMe</strong>(  $redirect ): void</em><br>|
-|public|<em><strong>bcrypt</strong>( string $password  int $cost ): string</em><br>|
-|private|<em><strong>handleRedirect</strong>( string $redirect  array $jsonResponse ): void</em><br>|
-|public|<em><strong>getSessionHash</strong>(): string</em><br>|
-|public|<em><strong>encrypt</strong>( string $data  string $secret )</em><br>|
-|public|<em><strong>decrypt</strong>( string $data  string $secret )</em><br>|
+| public | `__construct(Rudra\Container\Interfaces\RudraInterface $rudra)`<br>Sets cookie lifetime, session hash |
+| public | `authentication(array $user, string $password, array $redirect, array $notice)`<br> |
+| private | `setCookiesIfSetRememberMe(array $user, string $token): void`<br> |
+| private | `setAuthenticationSession(array $user, string $token): void`<br> |
+| public | `logout(string $redirect): void`<br> |
+| private | `unsetRememberMeCookie(): void`<br>Removes the \$_POST["remember_me"] cookie |
+| public | `authorization(?string $token, ?string $redirect)`<br> |
+| public | `roleBasedAccess(string $role, string $privilege, ?string $redirect)`<br> |
+| public | `restoreSessionIfSetRememberMe( $redirect): void`<br> |
+| public | `bcrypt(string $password, int $cost): string`<br> |
+| private | `handleRedirect(string $redirect, array $jsonResponse): void`<br> |
+| public | `getSessionHash(): string`<br> |
+| public | `encrypt(string $data, string $secret)`<br> |
+| public | `decrypt(string $data, string $secret)`<br> |
 
 
 <a id="rudra_auth_authfacade"></a>
@@ -31,7 +30,7 @@
 ### Class: Rudra\Auth\AuthFacade
 | Visibility | Function |
 |:-----------|:---------|
-|public static|<em><strong>__callStatic</strong>( string $method  array $parameters ): mixed</em><br>|
+| public static | `__callStatic(string $method, array $parameters): ?mixed`<br> |
 
 
 <a id="rudra_auth_authinterface"></a>
@@ -39,11 +38,11 @@
 ### Class: Rudra\Auth\AuthInterface
 | Visibility | Function |
 |:-----------|:---------|
-|abstract public|<em><strong>authentication</strong>( array $user  string $password  array $redirect  array $notice )</em><br>|
-|abstract public|<em><strong>exitAuthenticationSession</strong>( string $redirect ): void</em><br>|
-|abstract public|<em><strong>authorization</strong>( ?string $token  ?string $redirect )</em><br>|
-|abstract public|<em><strong>roleBasedAccess</strong>( string $role  string $privilege  ?string $redirect )</em><br>|
-|abstract public|<em><strong>bcrypt</strong>( string $password  int $cost ): string</em><br>|
+| abstract public | `authentication(array $user, string $password, array $redirect, array $notice)`<br> |
+| abstract public | `logout(string $redirect): void`<br> |
+| abstract public | `authorization(?string $token, ?string $redirect)`<br> |
+| abstract public | `roleBasedAccess(string $role, string $privilege, ?string $redirect)`<br> |
+| abstract public | `bcrypt(string $password, int $cost): string`<br> |
 <hr>
 
 ###### created with [Rudra-Documentation-Collector](#https://github.com/Jagepard/Rudra-Documentation-Collector)
