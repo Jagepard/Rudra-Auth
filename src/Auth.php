@@ -26,9 +26,12 @@ class Auth implements AuthInterface
     {
         $this->rudra       = $rudra;
         $this->expireTime  = time() + 3600 * 24 * 7;
-        $this->sessionHash = md5(
+        $this->sessionHash = hash_hmac(
+            'sha256',
             $rudra->request()->server()->get("REMOTE_ADDR") . 
-            $rudra->request()->server()->get("HTTP_USER_AGENT")
+            $rudra->request()->server()->get("HTTP_USER_AGENT") . 
+            session_id(),
+            $rudra->config()->get("secret")
         );
     }
 
