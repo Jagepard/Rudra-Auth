@@ -243,7 +243,7 @@ class Auth implements AuthInterface
         $ciphering     = "AES-128-CTR";
         $iv_length     = openssl_cipher_iv_length($ciphering);
         $options       = 0;
-        $encryption_iv = $this->rudra->config()->get('secret') ?? '1234567891011121';
+        $encryption_iv = $this->rudra->config()->get('secret');
 
         return openssl_encrypt($data, $ciphering, $secret, $options, $encryption_iv);
     }
@@ -257,7 +257,7 @@ class Auth implements AuthInterface
     {
         $ciphering     = "AES-128-CTR";
         $options       = 0;
-        $decryption_iv = $this->rudra->config()->get('secret') ?? '1234567891011121';
+        $decryption_iv = $this->rudra->config()->get('secret');
         
         return openssl_decrypt($data, $ciphering, $secret, $options, $decryption_iv);
     }
