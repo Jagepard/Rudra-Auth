@@ -63,7 +63,7 @@ class Auth implements AuthInterface
             return $this->handleRedirect($redirect[0], ["status" => "Authorized"]);
         }
 
-        $this->rudra->session()->set(["alert", $notice]);
+        $this->rudra->session()->set("alert", $notice);
 
         return $this->handleRedirect($redirect[1], ["status" => "Wrong access data"]);
     }
@@ -76,9 +76,24 @@ class Auth implements AuthInterface
     private function setCookiesIfSetRememberMe(array $user, string $token): void
     {
         if ($this->rudra->request()->post()->has("remember_me")) {
-            $this->rudra->cookie()->set([md5("RudraPermit" . $this->sessionHash), [$this->sessionHash, $this->expireTime]]); // @codeCoverageIgnore
-            $this->rudra->cookie()->set([md5("RudraToken" . $this->sessionHash), [$token, $this->expireTime]]);   // @codeCoverageIgnore
-            $this->rudra->cookie()->set([md5("RudraUser" . $this->sessionHash), [$this->encrypt(json_encode($user), $this->rudra->config()->get('secret')), $this->expireTime]]); // @codeCoverageIgnore
+            // Устанавливаем куки с учётом времени жизни
+            $this->rudra->cookie()->set(
+                md5("RudraPermit" . $this->sessionHash),
+                $this->sessionHash,
+                $this->expireTime
+            ); // @codeCoverageIgnore
+
+            $this->rudra->cookie()->set(
+                md5("RudraToken" . $this->sessionHash),
+                $token,
+                $this->expireTime
+            ); // @codeCoverageIgnore
+
+            $this->rudra->cookie()->set(
+                md5("RudraUser" . $this->sessionHash),
+                $this->encrypt(json_encode($user), $this->rudra->config()->get('secret')),
+                $this->expireTime
+            ); // @codeCoverageIgnore
         }
     }
 
@@ -89,8 +104,8 @@ class Auth implements AuthInterface
      */
     private function setAuthenticationSession(array $user, string $token): void
     {
-        $this->rudra->session()->set(["token", $token]);
-        $this->rudra->session()->set(["user", $user]);
+        $this->rudra->session()->set("token", $token);
+        $this->rudra->session()->set("user", $user);
     }
 
     /**
@@ -99,8 +114,8 @@ class Auth implements AuthInterface
      */
     public function logout(string $redirect = ""): void
     {
-        $this->rudra->session()->unset("token");
-        $this->rudra->session()->unset("user");
+        $this->rudra->session()->remove("token");
+        $this->rudra->session()->remove("user");
         $this->unsetRememberMeCookie();
         session_regenerate_id(true);
         $this->handleRedirect($redirect, ["status" => "Logout"]);
@@ -114,9 +129,9 @@ class Auth implements AuthInterface
         if ("test" !== $this->rudra->config()->get("environment")) {
             // @codeCoverageIgnoreStart
             if ($this->rudra->cookie()->has(md5("RudraPermit" . $this->sessionHash))) {
-                $this->rudra->cookie()->unset(md5("RudraPermit" . $this->sessionHash)); // @codeCoverageIgnore
-                $this->rudra->cookie()->unset(md5("RudraToken" . $this->sessionHash)); // @codeCoverageIgnore
-                $this->rudra->cookie()->unset(md5("RudraUser" . $this->sessionHash)); // @codeCoverageIgnore
+                $this->rudra->cookie()->remove(md5("RudraPermit" . $this->sessionHash)); // @codeCoverageIgnore
+                $this->rudra->cookie()->remove(md5("RudraToken" . $this->sessionHash)); // @codeCoverageIgnore
+                $this->rudra->cookie()->remove(md5("RudraUser" . $this->sessionHash)); // @codeCoverageIgnore
                 // @codeCoverageIgnoreEnd
             }
         }

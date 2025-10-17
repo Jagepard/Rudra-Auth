@@ -48,9 +48,9 @@ class AuthTest extends TestCase
     public function testRegularAccess()
     {
         session_start();
-        $this->rudra->session()->set(["token", "token"]);
+        $this->rudra->session()->set("token", "token");
         $this->assertTrue($this->rudra->get(Auth::class)->authorization());
-        $this->rudra->session()->unset("token");
+        $this->rudra->session()->remove("token");
         $this->assertFalse($this->rudra->get(Auth::class)->authorization("someToken"));
     }
 
@@ -61,10 +61,10 @@ class AuthTest extends TestCase
     {
         /* User Access */
         session_start();
-        $this->rudra->session()->set(["token", "userIdToken"]);
+        $this->rudra->session()->set("token", "userIdToken");
         $this->assertTrue($this->rudra->get(Auth::class)->authorization("userIdToken"));
 
-        $this->rudra->session()->unset("token");
+        $this->rudra->session()->remove("token");
         $this->assertFalse($this->rudra->get(Auth::class)->authorization("userIdToken"));
     }
 
@@ -82,7 +82,7 @@ class AuthTest extends TestCase
         $_COOKIE["RudraUser" . $this->rudra->get(Auth::class)->getSessionHash()]  = json_encode((object)[]);
 
         $this->rudra->get(Auth::class)->restoreSessionIfSetRememberMe();
-        $this->rudra->session()->set(["token", "userIdToken"]);
+        $this->rudra->session()->set("token", "userIdToken");
         $this->assertEquals("userIdToken", $this->rudra->session()->get("token"));
     }
 
@@ -149,7 +149,7 @@ class AuthTest extends TestCase
     {
         session_start();
         /* Regular Access */
-        $this->rudra->session()->set(["token", "token"]);
+        $this->rudra->session()->set("token", "token");
         $this->assertTrue($this->rudra->get(Auth::class)->authorization(null, "API"));
 
         $this->rudra->get(Auth::class)->logout();
@@ -170,7 +170,7 @@ class AuthTest extends TestCase
     public function testUserToken()
     {
         session_start();
-        $this->rudra->session()->set(["token", "someToken"]);
+        $this->rudra->session()->set("token", "someToken");
         $this->assertEquals("someToken", $this->rudra->session()->get("token"));
     }
 
