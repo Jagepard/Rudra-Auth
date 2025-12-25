@@ -3,11 +3,16 @@
 declare(strict_types = 1);
 
 /**
- * @author  : Jagepard <jagepard@yandex.ru">
- * @license https://mit-license.org/ MIT
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * phpunit src/tests/AuthTest --coverage-html src/tests/build/coverage-html
+ * @author  Jagepard <jagepard@yandex.ru>
+ * @license https://mozilla.org/MPL/2.0/  MPL-2.0
+ * 
+ * phpunit src/tests/ContainerTest --coverage-html src/tests/coverage-html
  */
+
 
 namespace Rudra\Auth\Tests;
 
