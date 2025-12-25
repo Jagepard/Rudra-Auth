@@ -7,7 +7,7 @@ declare(strict_types = 1);
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * @author  Jagepard <jagepard@yandex.ru>
+ * @author  Korotkov Danila (Jagepard) <jagepard@yandex.ru>
  * @license https://mozilla.org/MPL/2.0/  MPL-2.0
  * 
  * phpunit src/tests/ContainerTest --coverage-html src/tests/coverage-html
