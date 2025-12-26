@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types = 1);
+<?php declare(strict_types = 1);
 
 /**
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,7 +10,6 @@ declare(strict_types = 1);
  * 
  * phpunit src/tests/ContainerTest --coverage-html src/tests/coverage-html
  */
-
 
 namespace Rudra\Auth\Tests;
 
