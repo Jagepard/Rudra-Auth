@@ -10,19 +10,19 @@
 | Visibility | Function |
 |:-----------|:---------|
 | public | `__construct(Rudra\Container\Interfaces\RudraInterface $rudra)`<br>Sets cookie lifetime, session hash |
-| public | `authentication(array $user, string $password, array $redirect, array $notice)`<br> |
+| public | `authentication(array $user, string $password, array $redirect, array $notice): void`<br> |
 | private | `setCookiesIfSetRememberMe(array $user, string $token): void`<br> |
 | private | `setAuthenticationSession(array $user, string $token): void`<br> |
 | public | `logout(string $redirect): void`<br> |
-| private | `unsetRememberMeCookie(): void`<br>Removes the \$_POST["remember_me"] cookie |
-| public | `authorization(?string $token, ?string $redirect)`<br> |
-| public | `roleBasedAccess(string $role, string $privilege, ?string $redirect)`<br> |
-| public | `restoreSessionIfSetRememberMe( $redirect): void`<br> |
+| private | `unsetRememberMeCookie(): void`<br>Removes the "remember me" cookies |
+| public | `authorization(?string $token, ?string $redirect): bool`<br> |
+| public | `roleBasedAccess(string $role, string $privilege, ?string $redirect): bool`<br> |
+| public | `restoreSessionIfSetRememberMe(string $redirect): void`<br> |
 | public | `bcrypt(string $password, int $cost): string`<br> |
 | private | `handleRedirect(string $redirect, array $jsonResponse): void`<br> |
 | public | `getSessionHash(): string`<br> |
-| public | `encrypt(string $data, string $secret)`<br> |
-| public | `decrypt(string $data, string $secret)`<br> |
+| private | `encrypt(string $data, string $secret): string`<br> |
+| private | `decrypt(string $data, string $secret): string`<br> |
 
 
 <a id="rudra_auth_authfacade"></a>
@@ -30,7 +30,7 @@
 ### Class: Rudra\Auth\AuthFacade
 | Visibility | Function |
 |:-----------|:---------|
-| public static | `__callStatic(string $method, array $parameters): ?mixed`<br> |
+| public static | `__callStatic(string $method, array $parameters): ?mixed`<br>Handles static method calls for the Facade class.<br>It dynamically resolves the underlying class name by removing "Facade" from the class name.<br>If the resolved class does not exist, it attempts to clean up the class name by removing spaces.<br>If the resolved class is not already registered in the container, it registers it.<br>Finally, it delegates the static method call to the resolved class instance.<br>-------------------------<br>Обрабатывает статические вызовы методов для класса Facade.<br>Динамически разрешает имя базового класса, удаляя "Facade" из имени класса.<br>Если разрешённый класс не существует, пытается очистить имя класса, удаляя пробелы.<br>Если разрешённый класс ещё не зарегистрирован в контейнере, он регистрируется.<br>В конце делегирует статический вызов метода экземпляру разрешённого класса. |
 
 
 <a id="rudra_auth_authinterface"></a>
@@ -38,10 +38,10 @@
 ### Class: Rudra\Auth\AuthInterface
 | Visibility | Function |
 |:-----------|:---------|
-| abstract public | `authentication(array $user, string $password, array $redirect, array $notice)`<br> |
+| abstract public | `authentication(array $user, string $password, array $redirect, array $notice): void`<br> |
 | abstract public | `logout(string $redirect): void`<br> |
-| abstract public | `authorization(?string $token, ?string $redirect)`<br> |
-| abstract public | `roleBasedAccess(string $role, string $privilege, ?string $redirect)`<br> |
+| abstract public | `authorization(?string $token, ?string $redirect): bool`<br> |
+| abstract public | `roleBasedAccess(string $role, string $privilege, ?string $redirect): bool`<br> |
 | abstract public | `bcrypt(string $password, int $cost): string`<br> |
 <hr>
 
