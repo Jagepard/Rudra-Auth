@@ -20,7 +20,7 @@ interface AuthInterface
      * @param  array  $notice
      * @return void
      */
-    public function authentication(array $user, string $password, array $redirect = ['admin', 'login'], array $notice = ["error" => "Wrong access data"]);
+    public function authentication(array $user, string $password, array $redirect = ['admin', 'login'], array $notice = ["error" => "Wrong access data"]): void;
 
     /**
      * @param  string $redirect
@@ -31,17 +31,17 @@ interface AuthInterface
     /**
      * @param  string|null $token
      * @param  string|null $redirect
-     * @return void
+     * @return bool
      */
-    public function authorization(string $token = null, string $redirect = null);
+    public function authorization(?string $token = null, ?string $redirect = null): bool;
 
     /**
      * @param  string      $role
      * @param  string      $privilege
      * @param  string|null $redirect
-     * @return void
+     * @return bool
      */
-    public function roleBasedAccess(string $role, string $privilege, string $redirect = null);
+    public function roleBasedAccess(string $role, string $privilege, ?string $redirect = null): bool;
 
     /**
      * @param  string  $password
