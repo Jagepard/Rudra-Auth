@@ -176,14 +176,20 @@ class AuthTest extends TestCase
         $this->assertEquals("someToken", $this->rudra->session()->get("token"));
     }
 
-    public function testEncrypt()
+    public function testEncryptDecryptWithReflection(): void
     {
-        $data = '123ABC';
+        $data   = '123ABC';
         $secret = '1234567891011121';
+        $auth   = $this->rudra->get(Auth::class);
 
-        $encryptedData = $this->rudra->get(Auth::class)->encrypt($data, $secret);
-        $decryptedData = $this->rudra->get(Auth::class)->decrypt($encryptedData, $secret);
+        $encryptMethod = new \ReflectionMethod($auth, 'encrypt');
+        $encryptMethod->setAccessible(true);
+        $encrypted = $encryptMethod->invoke($auth, $data, $secret);
 
-        $this->assertEquals($data, $decryptedData);
+        $decryptMethod = new \ReflectionMethod($auth, 'decrypt');
+        $decryptMethod->setAccessible(true);
+        $decrypted = $decryptMethod->invoke($auth, $encrypted, $secret);
+
+        $this->assertSame($data, $decrypted);
     }
 }
