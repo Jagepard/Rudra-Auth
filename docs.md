@@ -9,12 +9,12 @@
 ### Class: Rudra\Auth\Auth
 | Visibility | Function |
 |:-----------|:---------|
-| public | `__construct(Rudra\Container\Interfaces\RudraInterface $rudra)`<br>Sets cookie lifetime, session hash |
+| public | `__construct(Rudra\Container\Interfaces\RudraInterface $rudra)`<br> |
 | public | `authentication(array $user, string $password, array $redirect, array $notice): void`<br> |
 | private | `setCookiesIfSetRememberMe(array $user, string $token): void`<br> |
 | private | `setAuthenticationSession(array $user, string $token): void`<br> |
 | public | `logout(string $redirect): void`<br> |
-| private | `unsetRememberMeCookie(): void`<br>Removes the "remember me" cookies |
+| private | `unsetRememberMeCookie(): void`<br> |
 | public | `authorization(?string $token, ?string $redirect): bool`<br> |
 | public | `roleBasedAccess(string $role, string $privilege, ?string $redirect): bool`<br> |
 | public | `restoreSessionIfSetRememberMe(string $redirect): void`<br> |
