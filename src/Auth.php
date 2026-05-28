@@ -15,7 +15,7 @@ use Rudra\Redirect\Redirect;
 use Rudra\Exceptions\LogicException;
 use Rudra\Container\Interfaces\RudraInterface;
 
-class Auth implements AuthInterface
+final class Auth implements AuthInterface
 {
     private readonly int $expireTime;
     private readonly string $sessionHash;
