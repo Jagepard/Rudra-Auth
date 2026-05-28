@@ -17,11 +17,11 @@ use Rudra\Container\Interfaces\RudraInterface;
 
 class Auth implements AuthInterface
 {
-    private readonly int $expireTime;
-    private readonly string $sessionHash;
+    private int    $expireTime;
+    private string $sessionHash;
 
     /**
-     * Sets cookie lifetime, session hash
+     * @param RudraInterface $rudra
      */
     public function __construct(private readonly RudraInterface $rudra)
     {
@@ -29,6 +29,7 @@ class Auth implements AuthInterface
         $userAgent  = $rudra->request()?->server()?->get("HTTP_USER_AGENT") ?? '';
         $secret     = $rudra->config()?->get("secret") ?? throw new \RuntimeException('Auth secret is missing');
 
+        // Sets the cookie lifetime, session hash / Устанавливает время жизни cookie, хэш сессии.
         $this->expireTime  = strtotime('+1 week');
         $this->sessionHash = hash_hmac(
             algo: 'sha256',
@@ -128,8 +129,7 @@ class Auth implements AuthInterface
     }
 
     /**
-     * Removes the "remember me" cookies
-     * 
+     * @return void
      * @codeCoverageIgnore
      */
     private function unsetRememberMeCookie(): void
@@ -189,7 +189,7 @@ class Auth implements AuthInterface
     {
         $roles = $this->rudra->config()->get("roles");
 
-        // Роли: чем меньше число, тем выше привилегия (1 > 2 > 3)
+        // Roles: the smaller the number, the higher the privilege (1 > 2 > 3) / Роли: чем меньше число, тем выше привилегия (1 > 2 > 3)
         if ($roles[$role] <= $roles[$privilege]) {
             return true;
         }
