@@ -2,7 +2,11 @@
 - [Rudra\Auth\Auth](#rudra_auth_auth)
 - [Rudra\Auth\AuthFacade](#rudra_auth_authfacade)
 - [Rudra\Auth\AuthInterface](#rudra_auth_authinterface)
-<hr>
+
+
+---
+
+
 
 <a id="rudra_auth_auth"></a>
 
@@ -30,7 +34,7 @@
 ### Class: Rudra\Auth\AuthFacade
 | Visibility | Function |
 |:-----------|:---------|
-| public static | `__callStatic(string $method, array $parameters): ?mixed`<br>Handles static method calls for the Facade class.<br>It dynamically resolves the underlying class name by removing "Facade" from the class name.<br>If the resolved class does not exist, it attempts to clean up the class name by removing spaces.<br>If the resolved class is not already registered in the container, it registers it.<br>Finally, it delegates the static method call to the resolved class instance.<br>-------------------------<br>Обрабатывает статические вызовы методов для класса Facade.<br>Динамически разрешает имя базового класса, удаляя "Facade" из имени класса.<br>Если разрешённый класс не существует, пытается очистить имя класса, удаляя пробелы.<br>Если разрешённый класс ещё не зарегистрирован в контейнере, он регистрируется.<br>В конце делегирует статический вызов метода экземпляру разрешённого класса. |
+| public static | `__callStatic(string $method, array $parameters): mixed`<br>Handles static method calls for the Facade class.<br>It dynamically resolves the underlying class name by removing "Facade" from the class name.<br>If the resolved class does not exist, it attempts to clean up the class name by removing spaces.<br>If the resolved class is not already registered in the container, it registers it.<br>Finally, it delegates the static method call to the resolved class instance.<br>-------------------------<br>Обрабатывает статические вызовы методов для класса Facade.<br>Динамически разрешает имя базового класса, удаляя "Facade" из имени класса.<br>Если разрешённый класс не существует, пытается очистить имя класса, удаляя пробелы.<br>Если разрешённый класс ещё не зарегистрирован в контейнере, он регистрируется.<br>В конце делегирует статический вызов метода экземпляру разрешённого класса. |
 
 
 <a id="rudra_auth_authinterface"></a>
@@ -43,6 +47,8 @@
 | abstract public | `authorization(?string $token, ?string $redirect): bool`<br> |
 | abstract public | `roleBasedAccess(string $role, string $privilege, ?string $redirect): bool`<br> |
 | abstract public | `bcrypt(string $password, int $cost): string`<br> |
-<hr>
 
-###### created with [Rudra-Documentation-Collector](#https://github.com/Jagepard/Rudra-Documentation-Collector)
+
+---
+
+###### created with [Rudra-Documentation-Collector](https://github.com/Jagepard/Rudra-Documentation-Collector)
