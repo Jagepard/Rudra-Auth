@@ -56,7 +56,7 @@ $user = [
 ```php
 $user = [
     "email"    => "user@email.com",
-    "password" => "password_hash"
+    "password" => "password_hash",
     "role"     => "admin"
 ];
 ```
