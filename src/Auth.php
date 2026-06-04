@@ -29,7 +29,13 @@ class Auth implements AuthInterface
         $userAgent  = $rudra->request()?->server()?->get("HTTP_USER_AGENT") ?? '';
         $secret     = $rudra->config()?->get("secret") ?? throw new \RuntimeException('Auth secret is missing');
 
-        // Sets the cookie lifetime, session hash / Устанавливает время жизни cookie, хэш сессии.
+        /**
+         * --------------------------------------------|
+         * Sets the cookie lifetime, session hash
+         * --------------------------------------------|
+         * Устанавливает время жизни cookie, хэш сессии
+         * --------------------------------------------|
+         */
         $this->expireTime  = strtotime('+1 week');
         $this->sessionHash = hash_hmac(
             algo: 'sha256',
@@ -159,17 +165,35 @@ class Auth implements AuthInterface
             return false;
         }
 
-        // Providing access to shared resources / Предоставление доступа к общим ресурсам
+        /**
+         * ---------------------------------------|
+         * Providing access to shared resources
+         * ---------------------------------------|
+         * Предоставление доступа к общим ресурсам
+         * ---------------------------------------|
+         */
         if ($token === null) {
             return true;
         }
 
-        // Providing access to the user's personal resources / Предоставление доступа к личным ресурсам пользователя
+        /**
+         * -----------------------------------------------------|
+         * Providing access to the user's personal resources
+         * -----------------------------------------------------|
+         * Предоставление доступа к личным ресурсам пользователя
+         * -----------------------------------------------------|
+         */
         if (hash_equals($token, $this->rudra->session()->get("token"))) {
             return true;
         }
 
-        // If not logged in / Если не авторизован
+        /**
+         * -------------------|
+         * If not logged in
+         * -------------------|
+         * Если не авторизован
+         * -------------------|
+         */
         if ($redirect !== null) {
             $this->handleRedirect($redirect, ["status" => "Access denied"]);
             return false;
@@ -189,7 +213,13 @@ class Auth implements AuthInterface
     {
         $roles = $this->rudra->config()->get("roles");
 
-        // Roles: the smaller the number, the higher the privilege (1 > 2 > 3) / Роли: чем меньше число, тем выше привилегия (1 > 2 > 3)
+        /**
+         * -------------------------------------------------------------------|
+         * Roles: the smaller the number, the higher the privilege (1 > 2 > 3)
+         * -------------------------------------------------------------------|
+         * Роли: чем меньше число, тем выше привилегия (1 > 2 > 3)
+         * -------------------------------------------------------------------|
+         */
         if ($roles[$role] <= $roles[$privilege]) {
             return true;
         }
