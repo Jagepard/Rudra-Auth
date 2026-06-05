@@ -21,7 +21,9 @@ class Auth implements AuthInterface
     private string $sessionHash;
 
     /**
-     * @param RudraInterface $rudra
+     * @param  RudraInterface $rudra
+     * @return void
+     * @throws \RuntimeException
      */
     public function __construct(private readonly RudraInterface $rudra)
     {
@@ -29,13 +31,7 @@ class Auth implements AuthInterface
         $userAgent  = $rudra->request()?->server()?->get("HTTP_USER_AGENT") ?? '';
         $secret     = $rudra->config()?->get("secret") ?? throw new \RuntimeException('Auth secret is missing');
 
-        /**
-         * --------------------------------------------
-         * Sets the cookie lifetime, session hash
-         * --------------------------------------------
-         * Устанавливает время жизни cookie, хэш сессии
-         * --------------------------------------------
-         */
+        // Sets the cookie lifetime, session hash
         $this->expireTime  = strtotime('+1 week');
         $this->sessionHash = hash_hmac(
             algo: 'sha256',
@@ -50,6 +46,7 @@ class Auth implements AuthInterface
      * @param  array{0: string, 1: string} $redirect // [0]: 'admin' (успех), [1]: 'login' (ошибка)
      * @param  array{error: string} $notice
      * @return void
+     * @throws LogicException
      */
     #[\Override]
     public function authentication(array $user, string $password,
@@ -80,9 +77,6 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param  array  $user
-     * @param  string $token
-     * @return void
      * @codeCoverageIgnore
      */
     private function setCookiesIfSetRememberMe(array $user, string $token): void
@@ -109,21 +103,12 @@ class Auth implements AuthInterface
         );
     }
 
-    /**
-     * @param  array  $user
-     * @param  string $token
-     * @return void
-     */
     private function setAuthenticationSession(array $user, string $token): void
     {
         $this->rudra->session()->set("token", $token);
         $this->rudra->session()->set("user", $user);
     }
 
-    /**
-     * @param  string $redirect
-     * @return void
-     */
     #[\Override]
     public function logout(string $redirect = ""): void
     {
@@ -135,7 +120,6 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @return void
      * @codeCoverageIgnore
      */
     private function unsetRememberMeCookie(): void
@@ -153,11 +137,6 @@ class Auth implements AuthInterface
         }
     }
 
-    /**
-     * @param  string|null $token
-     * @param  string|null $redirect
-     * @return bool
-     */
     #[\Override]
     public function authorization(?string $token = null, ?string $redirect = null): bool
     {
@@ -165,35 +144,17 @@ class Auth implements AuthInterface
             return false;
         }
 
-        /**
-         * ---------------------------------------
-         * Providing access to shared resources
-         * ---------------------------------------
-         * Предоставление доступа к общим ресурсам
-         * ---------------------------------------
-         */
+        // Providing access to shared resources
         if ($token === null) {
             return true;
         }
 
-        /**
-         * -----------------------------------------------------
-         * Providing access to the user's personal resources
-         * -----------------------------------------------------
-         * Предоставление доступа к личным ресурсам пользователя
-         * -----------------------------------------------------
-         */
+        // Providing access to the user's personal resources
         if (hash_equals($token, $this->rudra->session()->get("token"))) {
             return true;
         }
 
-        /**
-         * -------------------
-         * If not logged in
-         * -------------------
-         * Если не авторизован
-         * -------------------
-         */
+        // If not logged in
         if ($redirect !== null) {
             $this->handleRedirect($redirect, ["status" => "Access denied"]);
             return false;
@@ -203,23 +164,18 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param  string      $role
-     * @param  string      $privilege
-     * @param  string|null $redirect
-     * @return bool
+     * @throws \InvalidArgumentException
      */
     #[\Override]
     public function roleBasedAccess(string $role, string $privilege, ?string $redirect = null): bool
     {
         $roles = $this->rudra->config()->get("roles");
 
-        /**
-         * -------------------------------------------------------------------
-         * Roles: the smaller the number, the higher the privilege (1 > 2 > 3)
-         * -------------------------------------------------------------------
-         * Роли: чем меньше число, тем выше привилегия (1 > 2 > 3)
-         * -------------------------------------------------------------------
-         */
+        if (!isset($roles[$role], $roles[$privilege])) {
+            throw new \InvalidArgumentException("Role '{$role}' or '{$privilege}' not found in config");
+        }
+
+        // Roles: the smaller the number, the higher the privilege (1 > 2 > 3)
         if ($roles[$role] <= $roles[$privilege]) {
             return true;
         }
@@ -233,8 +189,6 @@ class Auth implements AuthInterface
     }
 
     /**
-     * @param  string $redirect
-     * @return void
      * @codeCoverageIgnore
      */
     public function restoreSessionIfSetRememberMe(string $redirect = "login"): void
@@ -263,23 +217,12 @@ class Auth implements AuthInterface
         $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
     }
 
-    /**
-     * @param  string $password
-     * @param  int    $cost
-     * @return string
-     */
     #[\Override]
     public function bcrypt(string $password, int $cost = 10): string
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $cost]);
     }
 
-
-    /**
-     * @param  string $redirect
-     * @param  array  $jsonResponse
-     * @return void
-     */
     private function handleRedirect(string $redirect, array $jsonResponse): void
     {
         if ($redirect === 'API') {
@@ -290,42 +233,45 @@ class Auth implements AuthInterface
         $this->rudra->get(Redirect::class)->run($redirect);
     }
 
-    /**
-     * @return string
-     */
     public function getSessionHash(): string
     {
         return $this->sessionHash;
     }
 
-    /**
-     * @param  string $data
-     * @param  string $secret
-     * @return string
-     */
     private function encrypt(string $data, string $secret): string
     {
         $ciphering = 'AES-128-CTR';
-        $iv        = $this->rudra->config()->get('secret');
-        $result    = openssl_encrypt($data, $ciphering, $secret, 0, $iv);
-
-        if ($result === false) {
+        $ivLength  = openssl_cipher_iv_length($ciphering);
+        $iv        = random_bytes($ivLength);
+        
+        $ciphertext = openssl_encrypt($data, $ciphering, $secret, OPENSSL_RAW_DATA, $iv);
+        if ($ciphertext === false) {
             throw new \RuntimeException('Encryption failed');
         }
 
-        return $result;
+        return base64_encode($iv . $ciphertext);
     }
 
     /**
-     * @param  string $data
-     * @param  string $secret
-     * @return string
+     * @throws \RuntimeException
      */
     private function decrypt(string $data, string $secret): string
     {
+        $binary = base64_decode($data, true);
+        if ($binary === false) {
+            throw new \RuntimeException('Invalid encrypted data (base64 decode failed)');
+        }
+
         $ciphering = 'AES-128-CTR';
-        $iv        = $this->rudra->config()->get('secret');
-        $result    = openssl_decrypt($data, $ciphering, $secret, 0, $iv);
+        $ivLength  = openssl_cipher_iv_length($ciphering);
+        
+        if (strlen($binary) < $ivLength) {
+            throw new \RuntimeException('Encrypted data too short');
+        }
+
+        $iv         = substr($binary, 0, $ivLength);
+        $ciphertext = substr($binary, $ivLength);
+        $result     = openssl_decrypt($ciphertext, $ciphering, $secret, OPENSSL_RAW_DATA, $iv);
 
         if ($result === false) {
             throw new \RuntimeException('Decryption failed');
