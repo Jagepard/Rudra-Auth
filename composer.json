@@ -22,7 +22,7 @@
         "source": "https://github.com/Jagepard/Rudra-Auth" 
     },
     "require": {
-        "php": ">=8.3",
+        "php": "^8.3",
         "rudra/container": "self.version",
         "rudra/redirect": "self.version",
         "rudra/exception": "self.version",
