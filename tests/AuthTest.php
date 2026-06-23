@@ -7,8 +7,6 @@
  *
  * @author  Korotkov Danila (Jagepard) <jagepard@yandex.ru>
  * @license https://mozilla.org/MPL/2.0/  MPL-2.0
- * 
- * phpunit tests/AuthTest.php
  */
 
 namespace Rudra\Auth\Tests;
