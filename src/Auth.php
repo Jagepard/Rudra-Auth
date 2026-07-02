@@ -43,7 +43,7 @@ class Auth implements AuthInterface
     /**
      * @param  array{email: string, password: string} $user
      * @param  string $password
-     * @param  array{0: string, 1: string} $redirect // [0]: 'admin' (успех), [1]: 'login' (ошибка)
+     * @param  array{0: string, 1: string} $redirect // [0]: 'admin' (success), [1]: 'login' (error)
      * @param  array{error: string} $notice
      * @return void
      * @throws LogicException
