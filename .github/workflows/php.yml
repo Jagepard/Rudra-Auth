@@ -15,23 +15,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Клонирование репозитория
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Шаг 2: Настройка PHP и расширений
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'  # ← Было '8.3', стало '8.4'
+          php-version: '8.4'  # ← Changed from '8.3' to '8.4'
           extensions: xdebug
-          coverage: xdebug    # ← Явно включаем драйвер покрытия
+          coverage: xdebug    # ← Explicitly enable coverage driver
 
-      # Шаг 3: Валидация composer.json и composer.lock
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
 
-      # Шаг 4: Кэширование зависимостей Composer
       - name: Cache Composer packages
         id: composer-cache
         uses: actions/cache@v3
@@ -41,22 +37,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-
 
-      # Шаг 5: Установка зависимостей
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      # Шаг 6: Загрузка PHPUnit PHAR
       - name: Download PHPUnit PHAR
         run: |
           wget https://phar.phpunit.de/phpunit.phar  
           chmod +x phpunit.phar
           mv phpunit.phar /usr/local/bin/phpunit
 
-      # Шаг 7: Проверка версии PHPUnit
       - name: Check PHPUnit version
         run: phpunit --version
 
-      # Шаг 8: Запуск тестов с генерацией отчета о покрытии
       - name: Run PHPUnit tests with coverage
         run: |
           mkdir -p build/logs
@@ -64,7 +56,6 @@ jobs:
         env:
           XDEBUG_MODE: coverage
 
-      # Шаг 9: Отправка данных о покрытии в Coveralls
       - name: Send coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
