@@ -13,7 +13,6 @@ namespace Rudra\Auth\Tests;
 
 use Rudra\Auth\Auth;
 use Rudra\Container\Rudra;
-use Rudra\Redirect\Redirect;
 use Rudra\Exceptions\LogicException;
 use Rudra\Container\Interfaces\RudraInterface;
 
@@ -76,7 +75,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $_COOKIE["RudraPermit" . $this->rudra->get(Auth::class)->getSessionHash()] = md5(
             $this->rudra->request()->server()->get("REMOTE_ADDR") .
             $this->rudra->request()->server()->get("HTTP_USER_AGENT")
-        );;
+        );
         $_COOKIE["RudraToken" . $this->rudra->get(Auth::class)->getSessionHash()] = "userIdToken";
         $_COOKIE["RudraUser" . $this->rudra->get(Auth::class)->getSessionHash()]  = json_encode((object)[]);
 
