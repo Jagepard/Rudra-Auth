@@ -35,7 +35,7 @@ class Auth implements AuthInterface
         $this->expireTime  = strtotime('+1 week');
         $this->sessionHash = hash_hmac(
             algo: 'sha256',
-            data: $remoteAddr . $userAgent . session_id(),
+            data: $remoteAddr . $userAgent,
             key: $secret
         );
     }
@@ -84,21 +84,16 @@ class Auth implements AuthInterface
         if (!$this->rudra->request()->post()->has("remember_me")) {
             return;
         }
-
-        $secret = $this->rudra->config()->get('secret');
-        $hash   = $this->sessionHash;
         
-        $this->rudra->cookie()->set(
-            md5("RudraPermit{$hash}"), $hash, $this->expireTime
-        );
+        $payload = json_encode([
+            'user'    => $user,
+            'token'   => $token,
+            'expires' => $this->expireTime
+        ], JSON_THROW_ON_ERROR);
 
         $this->rudra->cookie()->set(
-            md5("RudraToken{$hash}"), $token, $this->expireTime
-        );
-
-        $this->rudra->cookie()->set(
-            md5("RudraUser{$hash}"),
-            $this->encrypt(json_encode($user, JSON_THROW_ON_ERROR), $secret),
+            'rudra_remember_me',
+            $this->encrypt($payload, $this->rudra->config()->get('secret')),
             $this->expireTime
         );
     }
@@ -128,12 +123,8 @@ class Auth implements AuthInterface
             return;
         }
 
-        $hash = $this->sessionHash;
-        
-        if ($this->rudra->cookie()->has(md5("RudraPermit{$hash}"))) {
-            $this->rudra->cookie()->remove(md5("RudraPermit{$hash}"));
-            $this->rudra->cookie()->remove(md5("RudraToken{$hash}"));
-            $this->rudra->cookie()->remove(md5("RudraUser{$hash}"));
+        if ($this->rudra->cookie()->has('rudra_remember_me')) {
+            $this->rudra->cookie()->remove('rudra_remember_me');
         }
     }
 
@@ -193,28 +184,32 @@ class Auth implements AuthInterface
      */
     public function restoreSessionIfSetRememberMe(string $redirect = "login"): void
     {
-        $hash      = $this->sessionHash;
-        $permitKey = md5("RudraPermit{$hash}");
-
-        if (!$this->rudra->cookie()->has($permitKey)) {
+        if (!$this->rudra->cookie()->has('rudra_remember_me')) {
             return;
         }
 
-        if ($hash === $this->rudra->cookie()->get($permitKey)) {
-            $secret    = $this->rudra->config()->get('secret');
-            $userKey   = md5("RudraUser{$hash}");
-            $tokenKey  = md5("RudraToken{$hash}");
-
-            $this->setAuthenticationSession(
-                json_decode($this->decrypt($this->rudra->cookie()->get($userKey), $secret), true, 512, JSON_THROW_ON_ERROR),
-                $this->rudra->cookie()->get($tokenKey)
+        try {
+            $decryptedJson = $this->decrypt(
+                $this->rudra->cookie()->get('rudra_remember_me'),
+                $this->rudra->config()->get('secret')
             );
+            $data = json_decode($decryptedJson, true, 512, JSON_THROW_ON_ERROR);
 
+            if (!isset($data['expires']) || $data['expires'] < time()) {
+                $this->unsetRememberMeCookie();
+                $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
+                return;
+            }
+
+            if (isset($data['user'], $data['token'])) {
+                $this->setAuthenticationSession($data['user'], $data['token']);
+                return;
+            }
+        } catch (\Exception $e) {
+            $this->unsetRememberMeCookie();
+            $this->handleRedirect($redirect, ['status' => 'Invalid authorization data']);
             return;
         }
-
-        $this->unsetRememberMeCookie();
-        $this->handleRedirect($redirect, ['status' => 'Authorization data expired']);
     }
 
     #[\Override]
