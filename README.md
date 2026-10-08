@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/Jagepard/Rudra-Auth/badge.svg?branch=master)](https://coveralls.io/github/Jagepard/Rudra-Auth?branch=master)
 -----
 
-## Authentication, session management and RBAC | [API](https://github.com/Jagepard/Rudra-Auth/blob/master/docs.md "Documentation API")
+## Authentication, session management and RBAC | [API](https://github.com/Jagepard/Rudra-Auth/blob/master/docs.md 'Documentation API')
 
 #### Install
 ```composer require rudra/auth```
@@ -32,16 +32,16 @@ environment: production
 ##### User registration
 ```php
 $user = [
-    "email"    => "user@email.com",
-    "password" => Auth::bcrypt("password")
+    'email'    => 'user@email.com',
+    'password' => Auth::bcrypt('password')
 ];
 ```
 ##### Getting a user from the database
 ```php
 $user = [
-    "email"    => "user@email.com",
-    "password" => "password_hash",
-    "role"     => "admin"
+    'email'    => 'user@email.com',
+    'password' => 'password_hash',
+    'role'     => 'admin'
 ];
 ```
 ##### Authentication
@@ -50,35 +50,35 @@ $user = [
 ```php
 Auth::authentication(
     $user, 
-    "password", 
-    ["admin/dashboard", "login"],
-    ["error" => "Wrong access data"]
+    'password', 
+    ['admin/dashboard', 'login'],
+    ['error' => 'Wrong access data']
 );
 ```
-> **Note:** For the "Remember Me" feature to work, the login form must contain a checkbox with the name `remember_me`.
+> **Note:** For the 'Remember Me' feature to work, the login form must contain a checkbox with the name `remember_me`.
 ##### Login form example
 ```html
-<form method="POST" action="/login">
-    <input type="email" name="email" required>
-    <input type="password" name="password" required>
+<form method='POST' action='/login'>
+    <input type='email' name='email' required>
+    <input type='password' name='password' required>
     <label>
-        <input type="checkbox" name="remember_me"> Remember me / Запомнить меня
+        <input type='checkbox' name='remember_me'> Remember me / Запомнить меня
     </label>
-    <button type="submit">Login</button>
+    <button type='submit'>Login</button>
 </form>
 ```
 ##### Restoring session (Remember Me)
 >Called at the beginning of the application loading (before authorization check).
 >If the user has valid 'Remember Me' cookies, the session will be restored automatically.
 ```php
-Auth::restoreSessionIfSetRememberMe("login");
+Auth::restoreSessionIfSetRememberMe('login');
 ```
 ##### Authorization check
 
 ###### General authorization check
 >Check if the user is authorized. If not — redirect to 'login' 
 ```php
-if (!Auth::authorization(null, "login")) {
+if (!Auth::authorization(null, 'login')) {
     exit;
 }
 ```
@@ -94,7 +94,7 @@ The token is generated from the user's password, email, and session hash.
 $token = md5($user['password'] . $user['email'] . Auth::getSessionHash());
 
 // Check if the token matches the session token
-if (!Auth::authorization($token, "login")) {
+if (!Auth::authorization($token, 'login')) {
     exit;
 }
 ```
@@ -105,18 +105,18 @@ if (!Auth::authorization($token, "login")) {
 use Rudra\Container\Facades\Session;
 
 // Get the role of the current user from the session (for example, after authorization)
-if (Session::has("user")) {
-   $currentRole = Session::get("user")['role'] ?? 'user';
+if (Session::has('user')) {
+   $currentRole = Session::get('user')['role'] ?? 'user';
 }
 
 // Check if the permissions are sufficient for access (for example, 'editor' level is required)
-if (!Auth::roleBasedAccess($currentRole, "editor", "error/403")) {
+if (!Auth::roleBasedAccess($currentRole, 'editor', 'error/403')) {
     exit;
 }
 ```
 ##### Log out of the authentication session with a redirect to the login page
 ```php
-Auth::logout("login");
+Auth::logout('login');
 ```
 ## License
 
