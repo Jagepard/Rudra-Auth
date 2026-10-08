@@ -27,9 +27,9 @@ class Auth implements AuthInterface
      */
     public function __construct(private readonly RudraInterface $rudra)
     {
-        $remoteAddr = $rudra->request()?->server()?->get("REMOTE_ADDR") ?? '';
-        $userAgent  = $rudra->request()?->server()?->get("HTTP_USER_AGENT") ?? '';
-        $secret     = $rudra->config()?->get("secret") ?? throw new \RuntimeException('Auth secret is missing');
+        $remoteAddr = $rudra->request()?->server()?->get('REMOTE_ADDR') ?? '';
+        $userAgent  = $rudra->request()?->server()?->get('HTTP_USER_AGENT') ?? '';
+        $secret     = $rudra->config()?->get('secret') ?? throw new \RuntimeException('Auth secret is missing');
 
         // Sets the cookie lifetime, session hash
         $this->expireTime  = strtotime('+1 week');
@@ -58,7 +58,7 @@ class Auth implements AuthInterface
         }
 
         if (count($redirect) !== 2) {
-            throw new LogicException("Redirect array must contain exactly two elements");
+            throw new LogicException('Redirect array must contain exactly two elements');
         }
 
         if (password_verify($password, $user['password'])) {
@@ -81,7 +81,7 @@ class Auth implements AuthInterface
      */
     private function setCookiesIfSetRememberMe(array $user, string $token): void
     {
-        if (!$this->rudra->request()->post()->has("remember_me")) {
+        if (!$this->rudra->request()->post()->has('remember_me')) {
             return;
         }
         
@@ -100,15 +100,15 @@ class Auth implements AuthInterface
 
     private function setAuthenticationSession(array $user, string $token): void
     {
-        $this->rudra->session()->set("token", $token);
-        $this->rudra->session()->set("user", $user);
+        $this->rudra->session()->set('token', $token);
+        $this->rudra->session()->set('user', $user);
     }
 
     #[\Override]
-    public function logout(string $redirect = ""): void
+    public function logout(string $redirect = ''): void
     {
-        $this->rudra->session()->remove("token");
-        $this->rudra->session()->remove("user");
+        $this->rudra->session()->remove('token');
+        $this->rudra->session()->remove('user');
         $this->unsetRememberMeCookie();
         session_regenerate_id(true);
         $this->handleRedirect($redirect, ['status' => 'Logout']);
@@ -119,7 +119,7 @@ class Auth implements AuthInterface
      */
     private function unsetRememberMeCookie(): void
     {
-        if ("test" === $this->rudra->config()->get("environment")) {
+        if ('test' === $this->rudra->config()->get('environment')) {
             return;
         }
 
@@ -131,7 +131,7 @@ class Auth implements AuthInterface
     #[\Override]
     public function authorization(?string $token = null, ?string $redirect = null): bool
     {
-        if (!$this->rudra->session()->has("token")) {
+        if (!$this->rudra->session()->has('token')) {
             return false;
         }
 
@@ -141,13 +141,13 @@ class Auth implements AuthInterface
         }
 
         // Providing access to the user's personal resources
-        if (hash_equals($token, $this->rudra->session()->get("token"))) {
+        if (hash_equals($token, $this->rudra->session()->get('token'))) {
             return true;
         }
 
         // If not logged in
         if ($redirect !== null) {
-            $this->handleRedirect($redirect, ["status" => "Access denied"]);
+            $this->handleRedirect($redirect, ['status' => 'Access denied']);
             return false;
         }
 
@@ -160,10 +160,10 @@ class Auth implements AuthInterface
     #[\Override]
     public function roleBasedAccess(string $role, string $privilege, ?string $redirect = null): bool
     {
-        $roles = $this->rudra->config()->get("roles");
+        $roles = $this->rudra->config()->get('roles');
 
         if (!isset($roles[$role], $roles[$privilege])) {
-            throw new \InvalidArgumentException("Role '{$role}' or '{$privilege}' not found in config");
+            throw new \InvalidArgumentException("Role $role or $privilege not found in config");///
         }
 
         // Roles: the smaller the number, the higher the privilege (1 > 2 > 3)
@@ -182,7 +182,7 @@ class Auth implements AuthInterface
     /**
      * @codeCoverageIgnore
      */
-    public function restoreSessionIfSetRememberMe(string $redirect = "login"): void
+    public function restoreSessionIfSetRememberMe(string $redirect = 'login'): void
     {
         if (!$this->rudra->cookie()->has('rudra_remember_me')) {
             return;
