@@ -13,8 +13,8 @@ namespace Rudra\Auth;
 
 interface AuthInterface
 {
-    public function authentication(array $user, string $password, array $redirect = ['admin', 'login'], array $notice = ["error" => "Wrong access data"]): void;
-    public function logout(string $redirect = ""): void;
+    public function authentication(array $user, string $password, array $redirect = ['admin', 'login'], array $notice = ['error' => 'Wrong access data']): void;
+    public function logout(string $redirect = ''): void;
     public function authorization(?string $token = null, ?string $redirect = null): bool;
     public function roleBasedAccess(string $role, string $privilege, ?string $redirect = null): bool;
     public function bcrypt(string $password, int $cost = 10): string;
