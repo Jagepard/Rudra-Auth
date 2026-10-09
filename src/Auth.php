@@ -22,14 +22,16 @@ use Rudra\Container\Interfaces\RudraInterface;
 class Auth implements AuthInterface
 {
     private const CIPHER = 'AES-128-CTR';
+    private const IV_LENGTH = 16; // AES block size is always 16 bytes (128 bits)
 
     private readonly Session $session;
     private readonly Request $request;
     private readonly Cookie  $cookie;
     private readonly Response $response;
     private readonly Redirect $redirect;
-    private readonly string $secret;
     private readonly string $environment;
+    private readonly string $secret;
+    private readonly array $roles; 
 
     private int    $expireTime;
     private string $sessionHash;
@@ -50,6 +52,7 @@ class Auth implements AuthInterface
         $config            = $this->rudra->config();
         $this->secret      = $config->get('secret') ?? throw new \RuntimeException('Auth secret is missing');
         $this->environment = $config->get('environment') ?? 'production';
+        $this->roles       = $config->get('roles') ?? [];
 
         $remoteAddr = $this->request->server()?->get('REMOTE_ADDR') ?? '';
         $userAgent  = $this->request->server()?->get('HTTP_USER_AGENT') ?? '';
@@ -178,19 +181,16 @@ class Auth implements AuthInterface
     #[\Override]
     public function roleBasedAccess(string $role, string $privilege, ?string $redirect = null): bool
     {
-        $roles = $this->rudra->config()->get('roles');
-
-        if (!isset($roles[$role], $roles[$privilege])) {
+        if (!isset($this->roles[$role], $this->roles[$privilege])) { // <-- Используем кэш
             throw new \InvalidArgumentException("Role $role or $privilege not found in config");
         }
 
-        // Roles: the smaller the number, the higher the privilege (1 > 2 > 3)
-        if ($roles[$role] <= $roles[$privilege]) {
+        if ($this->roles[$role] <= $this->roles[$privilege]) {
             return true;
         }
 
         if ($redirect !== null) {
-            $this->handleRedirect($redirect, ['status' => 'Permissions denied']); // @codeCoverageIgnore
+            $this->handleRedirect($redirect, ['status' => 'Permissions denied']);
             return false;
         }
 
@@ -254,8 +254,7 @@ class Auth implements AuthInterface
 
     private function encrypt(string $data, string $secret): string
     {
-        $ivLength  = openssl_cipher_iv_length(self::CIPHER);
-        $iv        = random_bytes($ivLength);
+        $iv = random_bytes(self::IV_LENGTH);
         
         $ciphertext = openssl_encrypt($data, self::CIPHER, $secret, OPENSSL_RAW_DATA, $iv);
         if ($ciphertext === false) {
@@ -265,9 +264,6 @@ class Auth implements AuthInterface
         return base64_encode($iv . $ciphertext);
     }
 
-    /**
-     * @throws \RuntimeException
-     */
     private function decrypt(string $data, string $secret): string
     {
         $binary = base64_decode($data, true);
@@ -275,14 +271,12 @@ class Auth implements AuthInterface
             throw new \RuntimeException('Invalid encrypted data (base64 decode failed)');
         }
 
-        $ivLength = openssl_cipher_iv_length(self::CIPHER);
-        
-        if (strlen($binary) < $ivLength) {
+        if (strlen($binary) < self::IV_LENGTH) {
             throw new \RuntimeException('Encrypted data too short');
         }
 
-        $iv         = substr($binary, 0, $ivLength);
-        $ciphertext = substr($binary, $ivLength);
+        $iv         = substr($binary, 0, self::IV_LENGTH);
+        $ciphertext = substr($binary, self::IV_LENGTH);
         $result     = openssl_decrypt($ciphertext, self::CIPHER, $secret, OPENSSL_RAW_DATA, $iv);
 
         if ($result === false) {
