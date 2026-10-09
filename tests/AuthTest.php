@@ -13,11 +13,14 @@ namespace Rudra\Auth\Tests;
 
 use Rudra\Auth\Auth;
 use Rudra\Container\Rudra;
+use Rudra\Container\Session;
 use Rudra\Exceptions\LogicException;
 use Rudra\Container\Interfaces\RudraInterface;
 
 class AuthTest extends \PHPUnit\Framework\TestCase
 {
+    private Auth $auth;
+    private Session $session;
     private RudraInterface $rudra;
 
     protected function setUp(): void
@@ -38,6 +41,9 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             'REMOTE_ADDR'     => '127.0.0.1',
             'HTTP_USER_AGENT' => 'Mozilla'
         ]);
+
+        $this->session = $this->rudra->session();
+        $this->auth    = $this->rudra->get(Auth::class);
     }
 
     /**
@@ -46,10 +52,10 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testRegularAccess()
     {
         session_start();
-        $this->rudra->session()->set('token', 'token');
-        $this->assertTrue($this->rudra->get(Auth::class)->authorization());
-        $this->rudra->session()->remove('token');
-        $this->assertFalse($this->rudra->get(Auth::class)->authorization('someToken'));
+        $this->session->set('token', 'token');
+        $this->assertTrue($this->auth->authorization());
+        $this->session->remove('token');
+        $this->assertFalse($this->auth->authorization('someToken'));
     }
 
     /**
@@ -59,11 +65,10 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     {
         /* User Access */
         session_start();
-        $this->rudra->session()->set('token', 'userIdToken');
-        $this->assertTrue($this->rudra->get(Auth::class)->authorization('userIdToken'));
-
-        $this->rudra->session()->remove('token');
-        $this->assertFalse($this->rudra->get(Auth::class)->authorization('userIdToken'));
+        $this->session->set('token', 'userIdToken');
+        $this->assertTrue($this->auth->authorization('userIdToken'));
+        $this->session->remove('token');
+        $this->assertFalse($this->auth->authorization('userIdToken'));
     }
 
     /**
@@ -72,15 +77,17 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testCheck(): void
     {
         session_start();
-        $_COOKIE['RudraPermit' . $this->rudra->get(Auth::class)->getSessionHash()] = md5(
-            $this->rudra->request()->server()->get('REMOTE_ADDR') .
-            $this->rudra->request()->server()->get('HTTP_USER_AGENT')
-        );
-        $_COOKIE['RudraToken' . $this->rudra->get(Auth::class)->getSessionHash()] = 'userIdToken';
-        $_COOKIE['RudraUser' . $this->rudra->get(Auth::class)->getSessionHash()]  = json_encode((object)[]);
+        $server = $this->rudra->request()->server();
 
-        $this->rudra->get(Auth::class)->restoreSessionIfSetRememberMe();
-        $this->rudra->session()->set('token', 'userIdToken');
+        $_COOKIE["RudraPermit{$this->auth->getSessionHash()}"] = md5(
+            $server->get('REMOTE_ADDR') .
+            $server->get('HTTP_USER_AGENT')
+        );
+        $_COOKIE["RudraPermit{$this->auth->getSessionHash()}"] = 'userIdToken';
+        $_COOKIE["RudraPermit{$this->auth->getSessionHash()}"] = json_encode((object)[]);
+
+        $this->auth->restoreSessionIfSetRememberMe();
+        $this->session->set('token', 'userIdToken');
         $this->assertEquals('userIdToken', $this->rudra->session()->get('token'));
     }
 
@@ -91,13 +98,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     {
         session_start();
         $this->assertNull(
-            $this->rudra->get(Auth::class)->authentication([
+            $this->auth->authentication([
                 'email'    => '',
                 'password' => password_hash('password', PASSWORD_BCRYPT, ['cost' => 10])
             ], 'password'));
 
         $this->assertNull(
-            $this->rudra->get(Auth::class)->authentication([
+            $this->auth->authentication([
                 'email'    => '',
                 'password' => password_hash('password', PASSWORD_BCRYPT, ['cost' => 10])
             ], 'wrong'));
@@ -106,13 +113,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testAuthenticationWrongUserArrayException()
     {
         $this->expectException(LogicException::class);
-        $this->rudra->get(Auth::class)->authentication(['email' => ''], 'password');
+        $this->auth->authentication(['email' => ''], 'password');
     }
 
     public function testAuthenticationWrongRedirectArrayException()
     {
         $this->expectException(LogicException::class);
-        $this->rudra->get(Auth::class)->authentication(
+        $this->auth->authentication(
             ['email' => '', 'password' => ''], 
             'password', 
             ['admin', 'login', 'admin']
@@ -125,19 +132,19 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testLogout(): void
     {
         session_start();
-        $this->rudra->get(Auth::class)->logout();
-        $this->assertFalse($this->rudra->session()->has('token'));
+        $this->auth->logout();
+        $this->assertFalse($this->session->has('token'));
     }
 
     public function testRole(): void
     {
-        $this->assertTrue($this->rudra->get(Auth::class)->roleBasedAccess('admin', 'admin'));
-        $this->assertFalse($this->rudra->get(Auth::class)->roleBasedAccess('editor', 'admin'));
-        $this->assertTrue($this->rudra->get(Auth::class)->roleBasedAccess('editor', 'editor'));
+        $this->assertTrue($this->auth->roleBasedAccess('admin', 'admin'));
+        $this->assertFalse($this->auth->roleBasedAccess('editor', 'admin'));
+        $this->assertTrue($this->auth->roleBasedAccess('editor', 'editor'));
 
-        $this->assertFalse($this->rudra->get(Auth::class)->roleBasedAccess('user', 'admin'));
-        $this->assertFalse($this->rudra->get(Auth::class)->roleBasedAccess('user', 'editor'));
-        $this->assertTrue($this->rudra->get(Auth::class)->roleBasedAccess('user', 'user'));
+        $this->assertFalse($this->auth->roleBasedAccess('user', 'admin'));
+        $this->assertFalse($this->auth->roleBasedAccess('user', 'editor'));
+        $this->assertTrue($this->auth->roleBasedAccess('user', 'user'));
     }
 
     /**
@@ -147,17 +154,17 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     {
         session_start();
         /* Regular Access */
-        $this->rudra->session()->set('token', 'token');
-        $this->assertTrue($this->rudra->get(Auth::class)->authorization(null, 'API'));
+        $this->session->set('token', 'token');
+        $this->assertTrue($this->auth->authorization(null, 'API'));
 
-        $this->rudra->get(Auth::class)->logout();
-        $this->assertFalse($this->rudra->get(Auth::class)->authorization(null, 'API'));
+        $this->auth->logout();
+        $this->assertFalse($this->auth->authorization(null, 'API'));
     }
 
     public function testHash()
     {
         $password = 'password';
-        $hash     = $this->rudra->get(Auth::class)->bcrypt($password);
+        $hash     = $this->auth->bcrypt($password);
 
         $this->assertTrue(password_verify($password, $hash));
     }
@@ -168,23 +175,22 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testUserToken()
     {
         session_start();
-        $this->rudra->session()->set('token', 'someToken');
-        $this->assertEquals('someToken', $this->rudra->session()->get('token'));
+        $this->session->set('token', 'someToken');
+        $this->assertEquals('someToken', $this->session->get('token'));
     }
 
     public function testEncryptDecryptWithReflection(): void
     {
         $data   = '123ABC';
         $secret = '1234567891011121';
-        $auth   = $this->rudra->get(Auth::class);
 
-        $encryptMethod = new \ReflectionMethod($auth, 'encrypt');
+        $encryptMethod = new \ReflectionMethod($this->auth, 'encrypt');
         $encryptMethod->setAccessible(true);
-        $encrypted = $encryptMethod->invoke($auth, $data, $secret);
+        $encrypted = $encryptMethod->invoke($this->auth, $data, $secret);
 
-        $decryptMethod = new \ReflectionMethod($auth, 'decrypt');
+        $decryptMethod = new \ReflectionMethod($this->auth, 'decrypt');
         $decryptMethod->setAccessible(true);
-        $decrypted = $decryptMethod->invoke($auth, $encrypted, $secret);
+        $decrypted = $decryptMethod->invoke($this->auth, $encrypted, $secret);
 
         $this->assertSame($data, $decrypted);
     }
